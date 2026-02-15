@@ -1,6 +1,14 @@
+<script setup lang="ts">
+const auth = useAuth()
+
+async function onLogout() {
+  await auth.logout()
+}
+</script>
+
 <template>
   <div class="min-h-screen bg-background">
-    <header class="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
+    <header v-if="auth.isAuthenticated.value" class="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
       <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3">
         <div class="flex items-center gap-3">
           <div class="flex size-9 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
@@ -19,11 +27,14 @@
           <Badge variant="outline">
             chadcn-vue
           </Badge>
+          <Button v-if="auth.isAuthenticated.value" size="sm" variant="outline" @click="onLogout">
+            Se deconnecter
+          </Button>
         </div>
       </div>
     </header>
 
-    <main class="mx-auto w-full max-w-7xl px-4 py-8">
+    <main v-if="auth.isAuthenticated.value" class="mx-auto w-full max-w-7xl px-4 py-8">
       <slot />
     </main>
   </div>
