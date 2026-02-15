@@ -1,0 +1,3092 @@
+{
+	"info": {
+		"_postman_id": "577df766-8c2c-4972-8e27-9f6a20ab88dd",
+		"name": "the-punisher-go",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31553491"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = pm.variables.replaceIn('{{$randomEmail}}');",
+									"const password = pm.variables.replaceIn('{{$randomPassword}}');",
+									"const first_name = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const last_name = pm.variables.replaceIn('{{$randomLastName}}');",
+									"",
+									"pm.collectionVariables.set('auth_email', email);",
+									"pm.collectionVariables.set('auth_password', password);",
+									"pm.collectionVariables.set('first_name', first_name);",
+									"pm.collectionVariables.set('last_name', last_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{auth_email}}\",\n    \"password\": \"{{auth_password}}\",\n    \"first_name\": \"{{first_name}}\",\n    \"last_name\": \"{{last_name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Static",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const email = pm.variables.replaceIn('{{$randomEmail}}');",
+									"const password = pm.variables.replaceIn('{{$randomPassword}}');",
+									"const first_name = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const last_name = pm.variables.replaceIn('{{$randomLastName}}');",
+									"",
+									"pm.collectionVariables.set('auth_email', email);",
+									"pm.collectionVariables.set('auth_password', password);",
+									"pm.collectionVariables.set('first_name', first_name);",
+									"pm.collectionVariables.set('last_name', last_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@test.fr\",\n    \"password\": \"{{auth_password}}\",\n    \"first_name\": \"{{first_name}}\",\n    \"last_name\": \"{{last_name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const accessToken = pm.response.json().access_token;",
+									"",
+									"pm.environment.set(\"access_token\", accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{auth_email}}\",\n    \"password\": \"{{auth_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const accessToken = pm.response.json().access_token;",
+									"",
+									"pm.environment.set(\"access_token\", accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@test.fr\",\n    \"password\": \"admin@test.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const accessToken = pm.response.json().access_token;",
+									"",
+									"pm.environment.set(\"access_token\", accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "refresh_token=test",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{auth_email}}\",\n    \"password\": \"{{auth_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/auth/refresh",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Classrooms",
+					"item": [
+						{
+							"name": "Get Student Classrooms",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/students/{{created_student_id}}/classrooms",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"students",
+										"{{created_student_id}}",
+										"classrooms"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Bonuses",
+					"item": [
+						{
+							"name": "Get Student Bonuses",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/students/{{created_student_id}}/bonuses?page=1&state=unused",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"students",
+										"{{created_student_id}}",
+										"bonuses"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "state",
+											"value": "unused",
+											"description": "used|unused"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Penalties",
+					"item": [
+						{
+							"name": "Get Student Penalties",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/students/{{created_student_id}}/penalties?page=1",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"students",
+										"{{created_student_id}}",
+										"penalties"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Punishments",
+					"item": [
+						{
+							"name": "Get Student Punishments",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/students/{{created_student_id}}/punishments?page=1&state=pending",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"students",
+										"{{created_student_id}}",
+										"punishments"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "state",
+											"value": "pending",
+											"description": "pending|resolved"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Students",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/students?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"students"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/students/{{created_student_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"students",
+								"{{created_student_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const first_name = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const last_name = pm.variables.replaceIn('{{$randomLastName}}');",
+									"",
+									"pm.collectionVariables.set('first_name', first_name);",
+									"pm.collectionVariables.set('last_name', last_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdStudentId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_student_id\", createdStudentId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"{{first_name}}\",\n    \"last_name\": \"{{last_name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/students",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const first_name = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const last_name = pm.variables.replaceIn('{{$randomLastName}}');",
+									"",
+									"pm.collectionVariables.set('first_name', first_name);",
+									"pm.collectionVariables.set('last_name', last_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"{{first_name}}\",\n    \"last_name\": \"{{last_name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/students/{{created_student_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"students",
+								"{{created_student_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Student",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_student_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/students/{{created_student_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"students",
+								"{{created_student_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bonus Types",
+			"item": [
+				{
+					"name": "Get BonusTypes",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonus-types?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonus-types"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One BonusType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonus-types/{{created_bonus_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonus-types",
+								"{{created_bonus_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create BonusType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdBonusTypeId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_bonus_type_id\", createdBonusTypeId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonus-types",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonus-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update BonusType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonus-types/{{created_bonus_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonus-types",
+								"{{created_bonus_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete BonusType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_student_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonus-types/{{created_bonus_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonus-types",
+								"{{created_bonus_type_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Penalty Types",
+			"item": [
+				{
+					"name": "Get PenaltyTypes",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalty-types?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalty-types"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One PenaltyType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalty-types/{{created_penalty_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalty-types",
+								"{{created_penalty_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PenaltyType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdPenaltyTypeId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_penalty_type_id\", createdPenaltyTypeId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalty-types",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalty-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update PenaltyType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalty-types/{{created_penalty_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalty-types",
+								"{{created_penalty_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete PenaltyType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_student_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalty-types/{{created_penalty_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalty-types",
+								"{{created_penalty_type_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Punishment Types",
+			"item": [
+				{
+					"name": "Get PunishmentTypes",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishment-types?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishment-types"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One PunishmentType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishment-types/{{created_punishment_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishment-types",
+								"{{created_punishment_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PunishmentType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdPunishmentTypeId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_punishment_type_id\", createdPunishmentTypeId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishment-types",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishment-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update PunishmentType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.variables.replaceIn('{{$randomCity}}');",
+									"",
+									"pm.collectionVariables.set('name', name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishment-types/{{created_punishment_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishment-types",
+								"{{created_punishment_type_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete PunishmentType",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_student_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishment-types/{{created_punishment_type_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishment-types",
+								"{{created_punishment_type_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bonuses",
+			"item": [
+				{
+					"name": "Get Bonuses",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonuses?page=1&state=unused",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonuses"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "state",
+									"value": "unused",
+									"description": "used|unused"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Bonus",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonuses/{{created_bonus_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonuses",
+								"{{created_bonus_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bonus",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdBonusId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_bonus_id\", createdBonusId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": \"{{created_student_id}}\",\n    \"bonus_type_id\": \"{{created_bonus_type_id}}\",\n    \"points\": 1.1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonuses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonuses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bonus",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_bonus_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonuses/{{created_bonus_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonuses",
+								"{{created_bonus_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Use Bonus",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": \"{{created_student_id}}\",\n    \"bonus_type_id\": \"{{created_bonus_type_id}}\",\n    \"points\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/bonuses/{{created_bonus_id}}/use",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"bonuses",
+								"{{created_bonus_id}}",
+								"use"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rules",
+			"item": [
+				{
+					"name": "Get Rules",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/rules?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"rules"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Rule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/rules/{{created_rule_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"rules",
+								"{{created_rule_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Rule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const lorem_name = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+									"",
+									"pm.collectionVariables.set('lorem_name', lorem_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdRuleId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_rule_id\", createdRuleId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{lorem_name}}\",\n    \"resulting_punishment_type_id\": \"{{created_punishment_type_id}}\",\n    \"penalty_type_id\": \"{{created_penalty_type_id}}\",\n    \"threshold\": 3,\n    \"due_at_after_days\": 7,\n    \"mode\": \"every\", // every|at|after\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/rules",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"rules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Rule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const lorem_name = pm.variables.replaceIn('{{$randomLoremSentence}}');",
+									"",
+									"pm.collectionVariables.set('lorem_name', lorem_name);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{lorem_name}}\",\n    \"resulting_punishment_type_id\": \"{{created_punishment_type_id}}\",\n    \"penalty_type_id\": \"{{created_penalty_type_id}}\",\n    \"threshold\": 1,\n    \"due_at_after_days\": 3,\n    \"mode\": \"after\", // every|at|after\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/rules/{{created_rule_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"rules",
+								"{{created_rule_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_rule_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/rules/{{created_rule_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"rules",
+								"{{created_rule_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Penalties",
+			"item": [
+				{
+					"name": "Get Penalties",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalties?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalties"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Penalty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalties/{{created_penalty_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalties",
+								"{{created_penalty_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Penalty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdPenaltyId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_penalty_id\", createdPenaltyId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": \"{{created_student_id}}\",\n    \"penalty_type_id\": \"{{created_penalty_type_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalties",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalties"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Penalty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_penalty_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/penalties/{{created_penalty_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"penalties",
+								"{{created_penalty_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Punishments",
+			"item": [
+				{
+					"name": "Get Punishments",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishments?page=1&state=pending",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "state",
+									"value": "pending",
+									"description": "pending|resolved"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Punishment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishments/{{created_punishment_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishments",
+								"{{created_punishment_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Punishment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdPunishmentId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_punishment_id\", createdPunishmentId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": \"{{created_student_id}}\",\n    \"punishment_type_id\": \"{{created_punishment_type_id}}\",\n    \"due_at\": \"2026-02-20T17:00:00Z\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Punishment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_punishment_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishments/{{created_punishment_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishments",
+								"{{created_punishment_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resolve Punishment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/punishments/{{created_punishment_id}}/resolve",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"punishments",
+								"{{created_punishment_id}}",
+								"resolve"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Classrooms",
+			"item": [
+				{
+					"name": "Students",
+					"item": [
+						{
+							"name": "Get Classroom Students",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}/students",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"classrooms",
+										"{{created_classroom_id}}",
+										"students"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Classroom Student",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"student_id\": \"{{created_student_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}/students",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"classrooms",
+										"{{created_classroom_id}}",
+										"students"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Classroom Student",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}/students/{{created_student_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"{{version}}",
+										"classrooms",
+										"{{created_classroom_id}}",
+										"students",
+										"{{created_student_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Classrooms",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/classrooms?page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"classrooms"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Classroom",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"classrooms",
+								"{{created_classroom_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Classroom",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const firstName = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const lastName = pm.variables.replaceIn('{{$randomLastName}}');",
+									"const mainTeacher = `${firstName} ${lastName}`;",
+									"",
+									"const currentYear = new Date().getFullYear();",
+									"const schoolYear = `${currentYear}-${currentYear + 1}`;",
+									"",
+									"const niveaux = ['6', '5', '4', '3'];",
+									"const randomNiveau = _.sample(niveaux);",
+									"const randomSection = _.random(1, 8);",
+									"const className = `${randomNiveau}eme${randomSection}`;",
+									"",
+									"pm.collectionVariables.set('generated_class_name', className);",
+									"pm.collectionVariables.set('generated_year', schoolYear);",
+									"pm.collectionVariables.set('generated_teacher', mainTeacher);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseBody = pm.response.json();",
+									"",
+									"const createdClassroomId = responseBody.id;",
+									"",
+									"pm.collectionVariables.set(\"created_classroom_id\", createdClassroomId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{generated_class_name}}\",\n    \"year\": \"{{generated_year}}\",\n    \"main_teacher\": \"{{generated_teacher}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/classrooms",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"classrooms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Classroom",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const firstName = pm.variables.replaceIn('{{$randomFirstName}}');",
+									"const lastName = pm.variables.replaceIn('{{$randomLastName}}');",
+									"const mainTeacher = `${firstName} ${lastName}`;",
+									"",
+									"const currentYear = new Date().getFullYear();",
+									"const schoolYear = `${currentYear}-${currentYear + 1}`;",
+									"",
+									"const niveaux = ['6', '5', '4', '3'];",
+									"const randomNiveau = _.sample(niveaux);",
+									"const randomSection = _.random(1, 8);",
+									"const className = `${randomNiveau}eme${randomSection}`;",
+									"",
+									"pm.collectionVariables.set('generated_class_name', className);",
+									"pm.collectionVariables.set('generated_year', schoolYear);",
+									"pm.collectionVariables.set('generated_teacher', mainTeacher);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{generated_class_name}}\",\n    \"year\": \"{{generated_year}}\",\n    \"main_teacher\": \"{{generated_teacher}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"classrooms",
+								"{{created_classroom_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Classroom",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"created_classroom_id\", \"00000000-0000-0000-0000-000000000000\");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/classrooms/{{created_classroom_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"classrooms",
+								"{{created_classroom_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/{{version}}/health",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"{{version}}",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "first_name",
+			"value": ""
+		},
+		{
+			"key": "last_name",
+			"value": ""
+		},
+		{
+			"key": "auth_email",
+			"value": ""
+		},
+		{
+			"key": "auth_password",
+			"value": ""
+		},
+		{
+			"key": "created_student_id",
+			"value": ""
+		},
+		{
+			"key": "generated_class_name",
+			"value": ""
+		},
+		{
+			"key": "generated_year",
+			"value": ""
+		},
+		{
+			"key": "generated_teacher",
+			"value": ""
+		},
+		{
+			"key": "created_classroom_id",
+			"value": ""
+		},
+		{
+			"key": "name",
+			"value": ""
+		},
+		{
+			"key": "created_bonus_type_id",
+			"value": ""
+		},
+		{
+			"key": "created_bonus_id",
+			"value": ""
+		},
+		{
+			"key": "created_penalty_type_id",
+			"value": ""
+		},
+		{
+			"key": "created_penalty_id",
+			"value": ""
+		},
+		{
+			"key": "created_punishment_type_id",
+			"value": ""
+		},
+		{
+			"key": "created_punishment_id",
+			"value": ""
+		},
+		{
+			"key": "lorem_name",
+			"value": ""
+		},
+		{
+			"key": "created_rule_id",
+			"value": ""
+		}
+	]
+}
