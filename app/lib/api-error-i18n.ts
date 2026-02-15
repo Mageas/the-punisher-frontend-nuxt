@@ -29,6 +29,8 @@ const ERROR_MESSAGES_FR: Record<string, string> = {
   validation_email_already_exists: "Cette adresse email est deja utilisee.",
 }
 
+const GENERIC_ERROR_MESSAGE = "Une erreur est survenue. Merci de reessayer."
+
 function formatExpectedValue(raw: string): string {
   return raw
     .replace(/^expected_/, "")
@@ -38,7 +40,7 @@ function formatExpectedValue(raw: string): string {
 
 export function translateApiErrorKey(errorKey: string): string {
   if (!errorKey) {
-    return "Une erreur est survenue. Merci de reessayer."
+    return GENERIC_ERROR_MESSAGE
   }
 
   if (errorKey.startsWith("validation_error:")) {
@@ -61,5 +63,5 @@ export function translateApiErrorKey(errorKey: string): string {
     return `Parametre mal forme. Attendu: ${formatExpectedValue(expected)}.`
   }
 
-  return ERROR_MESSAGES_FR[errorKey] ?? errorKey
+  return ERROR_MESSAGES_FR[errorKey] ?? GENERIC_ERROR_MESSAGE
 }

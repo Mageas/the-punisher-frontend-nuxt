@@ -1,13 +1,7 @@
-import { translateApiErrorKey } from "@/lib/api-error-i18n"
+import { parseApiError } from "@/lib/api-error"
 
 type AuthApiSuccess = {
   access_token: string
-}
-
-type AuthApiError = {
-  error?: string
-  error_code?: number
-  error_details?: Array<{ field?: string; error?: string }>
 }
 
 type LoginPayload = {
@@ -23,35 +17,6 @@ type RegisterPayload = {
 }
 
 const LOGGED_OUT_STORAGE_KEY = "tp.logged-out"
-
-function getErrorPayload(error: unknown): AuthApiError | null {
-  if (!error || typeof error !== "object") {
-    return null
-  }
-
-  const maybe = error as { data?: AuthApiError }
-  if (!maybe.data || typeof maybe.data !== "object") {
-    return null
-  }
-
-  return maybe.data
-}
-
-function getFallbackErrorMessage(error: unknown): string {
-  const defaultMessage = "Une erreur est survenue. Merci de reessayer."
-  if (!error || typeof error !== "object") {
-    return defaultMessage
-  }
-
-  const maybe = error as { statusMessage?: string; message?: string }
-  if (maybe.statusMessage) {
-    return maybe.statusMessage
-  }
-  if (maybe.message) {
-    return maybe.message
-  }
-  return defaultMessage
-}
 
 export function useAuth() {
   const config = useRuntimeConfig()
@@ -116,24 +81,9 @@ export function useAuth() {
   }
 
   const applyApiError = (error: unknown) => {
-    const payload = getErrorPayload(error)
-
-    if (!payload) {
-      lastError.value = getFallbackErrorMessage(error)
-      fieldErrors.value = {}
-      return
-    }
-
-    const nextFieldErrors: Record<string, string> = {}
-    for (const detail of payload.error_details ?? []) {
-      if (!detail?.field) {
-        continue
-      }
-      nextFieldErrors[detail.field] = translateApiErrorKey(detail.error ?? "")
-    }
-
-    fieldErrors.value = nextFieldErrors
-    lastError.value = translateApiErrorKey(payload.error ?? "") || getFallbackErrorMessage(error)
+    const parsed = parseApiError(error)
+    fieldErrors.value = parsed.fieldErrors
+    lastError.value = parsed.message
   }
 
   const login = async (payload: LoginPayload) => {

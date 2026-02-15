@@ -1,10 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {}
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: process.env.NUXT_DEVTOOLS === 'true' },
+  devtools: { enabled: env.NUXT_DEVTOOLS === 'true' },
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/v1',
+      apiBaseUrl: env.NUXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/v1',
     },
   },
   css: ['~/assets/css/tailwind.css'],
