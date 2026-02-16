@@ -58,7 +58,7 @@ async function onSubmit() {
         <form class="space-y-4" @submit.prevent="onSubmit">
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="space-y-2">
-              <Label for="first-name">Prenom</Label>
+              <Label for="first-name">Prénom</Label>
               <Input
                 id="first-name"
                 v-model="form.firstName"
@@ -147,7 +147,7 @@ async function onSubmit() {
 
       <CardFooter class="justify-center">
         <p class="text-sm text-muted-foreground">
-          Deja un compte ?
+          Déjà un compte ?
           <NuxtLink to="/login" class="font-medium text-primary underline-offset-4 hover:underline">
             Se connecter
           </NuxtLink>

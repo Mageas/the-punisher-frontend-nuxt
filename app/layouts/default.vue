@@ -25,10 +25,10 @@ async function onLogout() {
             Light only
           </Badge>
           <Badge variant="outline">
-            chadcn-vue
+            shadcn-vue
           </Badge>
-          <Button v-if="auth.isAuthenticated.value" size="sm" variant="outline" @click="onLogout">
-            Se deconnecter
+          <Button size="sm" variant="outline" @click="onLogout">
+            Se déconnecter
           </Button>
         </div>
       </div>

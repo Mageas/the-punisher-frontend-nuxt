@@ -4,7 +4,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const auth = useAuth()
-  await auth.init()
 
   const isPublicAuthRoute = to.path === "/login" || to.path === "/register"
 

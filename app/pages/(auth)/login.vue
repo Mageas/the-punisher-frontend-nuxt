@@ -64,9 +64,9 @@ async function onSubmit() {
       role="status"
       aria-live="polite"
     >
-      <p class="text-sm font-semibold">Inscription reussie</p>
+      <p class="text-sm font-semibold">Inscription réussie</p>
       <p class="mt-1 text-sm text-muted-foreground">
-        Votre compte a bien ete cree. Vous pouvez maintenant vous connecter.
+        Votre compte a bien été créé. Vous pouvez maintenant vous connecter.
       </p>
     </div>
 

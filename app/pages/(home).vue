@@ -169,18 +169,18 @@ useSeoMeta({
         </CardDescription>
       </CardHeader>
       <CardFooter class="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-        <Button>Ajouter une penalite</Button>
+        <Button>Ajouter une pénalité</Button>
         <Button variant="secondary">Ajouter un bonus</Button>
         <Button variant="outline" @click="refreshDashboard">
           Rafraichir
         </Button>
         <Dialog v-model:open="isCreatePunishmentDialogOpen">
           <DialogTrigger as-child>
-            <Button variant="outline">Creer une punition</Button>
+            <Button variant="outline">Créer une punition</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Creer une punition manuelle</DialogTitle>
+              <DialogTitle>Créer une punition manuelle</DialogTitle>
               <DialogDescription>
                 Exemple de flux UI. L'integration API complete sera faite dans les prochains items backlog.
               </DialogDescription>
@@ -188,15 +188,15 @@ useSeoMeta({
 
             <div class="grid gap-4 py-2">
               <div class="grid gap-2">
-                <Label for="student">Eleve</Label>
-                <Input id="student" placeholder="Rechercher un eleve" />
+                <Label for="student">Élève</Label>
+                <Input id="student" placeholder="Rechercher un élève" />
               </div>
               <div class="grid gap-2">
                 <Label for="punishment-type">Type de punition</Label>
                 <Input id="punishment-type" placeholder="Ex: Retenue" />
               </div>
               <div class="grid gap-2">
-                <Label for="due-at">Date d'echeance</Label>
+                <Label for="due-at">Date d'échéance</Label>
                 <Input id="due-at" type="datetime-local" />
               </div>
             </div>
@@ -264,9 +264,9 @@ useSeoMeta({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Eleve</TableHead>
+                    <TableHead>Élève</TableHead>
                     <TableHead>Punition</TableHead>
-                    <TableHead>Echeance locale</TableHead>
+                    <TableHead>Échéance locale</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -301,9 +301,9 @@ useSeoMeta({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Eleve</TableHead>
+                    <TableHead>Élève</TableHead>
                     <TableHead>Bonus</TableHead>
-                    <TableHead>Cree le</TableHead>
+                    <TableHead>Créé le</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

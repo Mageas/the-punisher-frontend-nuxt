@@ -7,18 +7,13 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
 
   for (const path of REFRESH_TOKEN_POSSIBLE_PATHS) {
+    // Clear cookie with httpOnly flag to match how it was originally set
     setCookie(event, REFRESH_TOKEN_COOKIE_NAME, "", {
       path,
       maxAge: 0,
       expires: new Date(0),
       sameSite: "lax",
       httpOnly: true,
-    })
-    setCookie(event, REFRESH_TOKEN_COOKIE_NAME, "", {
-      path,
-      maxAge: 0,
-      expires: new Date(0),
-      sameSite: "lax",
     })
   }
 
