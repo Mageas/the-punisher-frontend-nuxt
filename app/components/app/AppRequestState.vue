@@ -12,11 +12,11 @@ withDefaults(
   }>(),
   {
     errorMessage: null,
-    loadingTitle: "Chargement...",
-    loadingDescription: "Recuperation des donnees en cours.",
-    emptyTitle: "Aucune donnee",
-    emptyDescription: "Aucun element a afficher pour le moment.",
-    retryLabel: "Reessayer",
+    loadingTitle: "general.loading",
+    loadingDescription: "general.loading_desc",
+    emptyTitle: "general.no_data",
+    emptyDescription: "general.empty_description",
+    retryLabel: "general.retry",
   },
 )
 
@@ -28,8 +28,8 @@ const emit = defineEmits<{
 <template>
   <Card v-if="isLoading">
     <CardHeader>
-      <CardTitle>{{ loadingTitle }}</CardTitle>
-      <CardDescription>{{ loadingDescription }}</CardDescription>
+      <CardTitle>{{ $t(loadingTitle) }}</CardTitle>
+      <CardDescription>{{ $t(loadingDescription) }}</CardDescription>
     </CardHeader>
     <CardContent>
       <div class="space-y-2">
@@ -42,8 +42,8 @@ const emit = defineEmits<{
 
   <Card v-else-if="errorMessage">
     <CardHeader>
-      <CardTitle>Erreur de chargement</CardTitle>
-      <CardDescription>Impossible de recuperer les donnees.</CardDescription>
+      <CardTitle>{{ $t('general.error') }}</CardTitle>
+      <CardDescription>{{ $t('general.error_desc') }}</CardDescription>
     </CardHeader>
     <CardContent class="space-y-4">
       <Alert variant="destructive">
@@ -51,15 +51,15 @@ const emit = defineEmits<{
         <AlertDescription>{{ errorMessage }}</AlertDescription>
       </Alert>
       <Button variant="outline" @click="emit('retry')">
-        {{ retryLabel }}
+        {{ $t(retryLabel) }}
       </Button>
     </CardContent>
   </Card>
 
   <Card v-else-if="isEmpty">
     <CardHeader>
-      <CardTitle>{{ emptyTitle }}</CardTitle>
-      <CardDescription>{{ emptyDescription }}</CardDescription>
+      <CardTitle>{{ $t(emptyTitle) }}</CardTitle>
+      <CardDescription>{{ $t(emptyDescription) }}</CardDescription>
     </CardHeader>
   </Card>
 

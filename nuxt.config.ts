@@ -10,7 +10,18 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/tailwind.css'],
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n'],
+  i18n: {
+    locales: [
+      {
+        code: 'fr',
+        file: 'fr.json'
+      }
+    ],
+    langDir: 'locales',
+    defaultLocale: 'fr',
+    strategy: 'no_prefix',
+  },
   shadcn: {
     /**
      * Prefix for all the imported component.

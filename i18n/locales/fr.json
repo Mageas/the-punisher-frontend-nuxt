@@ -1,0 +1,111 @@
+{
+  "general": {
+    "dashboard": "Tableau de bord",
+    "management": "Gestion",
+    "logout": "Se déconnecter",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "no_data": "Aucune donnée",
+    "empty_description": "Aucun élément à afficher.",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "confirm_delete": "Confirmer la suppression",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "modify": "Modifier",
+    "add": "Ajouter",
+    "actions": "Actions",
+    "created_at": "Créé le",
+    "updated_at": "Mis à jour le",
+    "id": "ID",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "students": {
+    "title": "Élèves",
+    "description": "Liste des élèves.",
+    "add_title": "Ajouter un élève",
+    "add_description": "Créez une nouvelle fiche élève.",
+    "edit_title": "Modifier un élève",
+    "edit_description": "Mettre à jour les informations de l'élève.",
+    "delete_description": "Cette action est irréversible. L'élève sera supprimé définitivement.",
+    "firstname": "Prénom",
+    "lastname": "Nom",
+    "unknown": "Élève inconnu",
+    "create_error": "Création impossible",
+    "edit_error": "Modification impossible",
+    "delete_error": "Suppression impossible",
+    "load_error": "Erreur de chargement",
+    "loading_title": "Chargement des élèves...",
+    "loading_desc": "Récupération de la liste en cours.",
+    "empty_title": "Aucun élève pour l'instant",
+    "empty_desc": "Ajoutez votre premier élève pour démarrer le suivi.",
+    "detail_title": "Fiche élève",
+    "detail_desc": "Détail de l'élève.",
+    "no_classrooms": "Aucune classe assignée",
+    "validation_error": "Le prénom et le nom sont obligatoires.",
+    "meta_title": "Gestion des élèves - The Punisher",
+    "meta_description": "Gérer les élèves."
+  },
+  "overview": {
+    "title": "Vue d'ensemble de la gestion",
+    "description": "Choisissez une ressource pour accéder à son écran dédié.",
+    "students": "Élèves",
+    "students_desc": "Gestion des élèves.",
+    "classrooms": "Classes",
+    "classrooms_desc": "Gestion des classes.",
+    "types": "Types",
+    "types_desc": "Gestion des types de bonus, pénalités et punitions.",
+    "rules": "Règles",
+    "rules_desc": "Gestion des règles automatiques.",
+    "bonuses": "Bonus",
+    "bonuses_desc": "Gestion des bonus.",
+    "penalties": "Pénalités",
+    "penalties_desc": "Gestion des pénalités.",
+    "punishments": "Punitions",
+    "punishments_desc": "Gestion des punitions."
+  },
+  "classrooms": {
+    "title": "Classes",
+    "description": "Gestion des classes.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des classes."
+  },
+  "punishments": {
+    "title": "Punitions",
+    "description": "Gestion des punitions.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des punitions."
+  },
+  "penalties": {
+    "title": "Pénalités",
+    "description": "Gestion des pénalités.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des pénalités."
+  },
+  "bonuses": {
+    "title": "Bonus",
+    "description": "Gestion des bonus.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des bonus."
+  },
+  "types": {
+    "title": "Types",
+    "description": "Gestion des types.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des types de bonus, pénalités et punitions."
+  },
+  "rules": {
+    "title": "Règles",
+    "description": "Gestion des règles.",
+    "ready_title": "Page ressource prête",
+    "ready_desc": "Cette page accueillera la gestion des règles automatiques."
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page}"
+  }
+}

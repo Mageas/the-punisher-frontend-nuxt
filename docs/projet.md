@@ -91,6 +91,7 @@ Remplacer un suivi manuel par un outil rapide, fiable et actionnable pour un ens
 | Punishments (global) | Liste globale + filtre etat | `GET /punishments?page=1&state=...`, `GET /punishments/{id}` |
 
 Notes implementation front:
+- [IMPORTANT] Pas de texte hardcodé : utilisation obligatoire de l'i18n pour tout texte affiché.
 - Tri par defaut applique sur `created_at` desc dans chaque vue.
 - Confirmation modale obligatoire avant suppression.
 - "Punitions en retard" calculees cote front a partir de la liste `pending`.
