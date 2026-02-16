@@ -20,6 +20,12 @@ const LOGGED_OUT_STORAGE_KEY = "tp.logged-out"
 
 export function useAuth() {
   const config = useRuntimeConfig()
+  // NOTE: Access token is stored in client-side state (not httpOnly cookie) to enable
+  // client-side API requests with authorization headers. Refresh tokens use httpOnly cookies
+  // for security. This is a common pattern where short-lived access tokens are acceptable
+  // in client state, while long-lived refresh tokens remain secure in httpOnly cookies.
+  // To mitigate XSS risks: keep access token lifetime short, implement CSP headers, and
+  // sanitize all user inputs.
   const accessToken = useState<string | null>("auth.access-token", () => null)
   const initialized = useState<boolean>("auth.initialized", () => false)
   const initInFlight = useState<Promise<void> | null>("auth.init-in-flight", () => null)
