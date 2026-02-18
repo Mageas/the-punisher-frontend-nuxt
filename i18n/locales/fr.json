@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "The Punisher"
+  },
+  "auth": {
+    "login": "Connexion",
+    "loginSubtitle": "Connectez-vous à votre compte",
+    "loginSubmit": "Se connecter",
+    "register": "Inscription",
+    "noAccount": "Pas encore de compte ?",
+    "createAccount": "Créer un compte",
+    "email": "Email",
+    "emailPlaceholder": "professeur{'@'}ecole.fr",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••"
+  },
+  "apiErrors": {
+    "messages": {
+      "internal_error": "Une erreur interne est survenue.",
+      "invalid_request_body": "Le corps de la requête est invalide.",
+      "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+      "register_not_allowed": "L'inscription n'est pas autorisée.",
+      "malformed_parameter": "Un paramètre est mal formé.",
+      "validation_failed": "La validation a échoué.",
+      "conflict": "Conflit détecté avec les données existantes.",
+      "invalid_credentials_or_user_doesnt_exist": "Identifiants invalides ou utilisateur introuvable.",
+      "jwt_invalid_signing_method": "Méthode de signature du token invalide.",
+      "jwt_invalid_token": "Token invalide.",
+      "jwt_expired": "Votre session a expiré.",
+      "student_not_found": "Élève introuvable.",
+      "bonus_type_not_found": "Type de bonus introuvable.",
+      "penalty_type_not_found": "Type de pénalité introuvable.",
+      "rule_not_found": "Règle introuvable.",
+      "bonus_not_found": "Bonus introuvable.",
+      "penalty_not_found": "Pénalité introuvable.",
+      "punishment_type_not_found": "Type de punition introuvable.",
+      "punishment_not_found": "Punition introuvable.",
+      "punishment_already_resolved": "Cette punition est déjà marquée comme résolue.",
+      "bonus_already_used": "Ce bonus a déjà été consommé.",
+      "classroom_not_found": "Classe introuvable.",
+      "student_classroom_relation_exists": "Cet élève est déjà assigné à cette classe.",
+      "student_or_classroom_not_found": "Élève ou classe introuvable."
+    },
+    "details": {
+      "validation_error": "Erreur de validation: {value}.",
+      "validation_field_required": "Ce champ est requis.",
+      "validation_invalid_email": "Adresse email invalide.",
+      "validation_min_length": "Doit contenir au moins {value} caractères.",
+      "validation_max_length": "Doit contenir au maximum {value} caractères.",
+      "validation_email_already_exists": "Cette adresse email existe déjà.",
+      "validation_unknown_field": "Champ inconnu.",
+      "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}."
+    }
+  }
+}
