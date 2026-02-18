@@ -5,6 +5,7 @@
     "": {
       "name": "the-punisher-frontend-nuxt",
       "dependencies": {
+        "@internationalized/date": "^3.11.0",
         "@nuxtjs/i18n": "10.2.3",
         "@pinia/nuxt": "0.11.3",
         "@tanstack/vue-table": "^8.21.3",

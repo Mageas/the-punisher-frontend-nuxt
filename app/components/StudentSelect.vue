@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Classroom } from "~/types/api"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-vue-next"
-import { computed, ref } from "vue"
-import { Button } from "@/components/ui/button"
+import type { Student } from '~/types/api'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -10,42 +10,41 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-
-const ALL_STUDENTS_VALUE = "__all_students__"
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
-  classrooms: readonly Classroom[]
-  fullWidth?: boolean
+  students: readonly Student[]
+  placeholder?: string
+  searchPlaceholder?: string
+  emptyText?: string
 }>()
 
-const modelValue = defineModel<string>({ default: "" })
+const modelValue = defineModel<string>({ default: '' })
 
 const { t } = useI18n()
 const open = ref(false)
 
-const options = computed(() => [
-  { value: ALL_STUDENTS_VALUE, label: t("common.allStudents") },
-  ...props.classrooms.map(classroom => ({
-    value: classroom.id,
-    label: classroom.name,
+const options = computed(() =>
+  props.students.map(student => ({
+    value: student.id,
+    label: `${student.first_name} ${student.last_name}`,
   })),
-])
+)
 
 const selectedLabel = computed(() => {
-  if (!modelValue.value) return t("common.allStudents")
+  if (!modelValue.value) return props.placeholder ?? t('modals.penalty.selectStudent')
   const found = options.value.find(option => option.value === modelValue.value)
-  return found?.label ?? t("common.allStudents")
+  return found?.label ?? props.placeholder ?? t('modals.penalty.selectStudent')
 })
 
 function select(value: string) {
-  modelValue.value = value === ALL_STUDENTS_VALUE ? "" : value
+  modelValue.value = value
   open.value = false
 }
 </script>
@@ -57,20 +56,17 @@ function select(value: string) {
         variant="outline"
         role="combobox"
         :aria-expanded="open"
-        :class="cn(
-          'justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground',
-          props.fullWidth ? 'w-full' : 'w-[200px]',
-        )"
+        class="w-full justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
       >
         <span class="truncate">{{ selectedLabel }}</span>
         <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent :class="cn('p-0', props.fullWidth ? 'w-[--reka-popover-trigger-width]' : 'w-[200px]')" align="start">
+    <PopoverContent class="w-[--reka-popover-trigger-width] p-0" align="start">
       <Command>
-        <CommandInput :placeholder="t('common.searchClass')" />
+        <CommandInput :placeholder="searchPlaceholder ?? t('modals.penalty.searchStudent')" />
         <CommandList>
-          <CommandEmpty>{{ t('common.noClassFound') }}</CommandEmpty>
+          <CommandEmpty>{{ emptyText ?? t('modals.penalty.noStudentFound') }}</CommandEmpty>
           <CommandGroup>
             <CommandItem
               v-for="option in options"
@@ -82,9 +78,7 @@ function select(value: string) {
               <CheckIcon
                 :class="cn(
                   'mr-2 h-4 w-4',
-                  (option.value === ALL_STUDENTS_VALUE && !modelValue) || modelValue === option.value
-                    ? 'opacity-100'
-                    : 'opacity-0',
+                  modelValue === option.value ? 'opacity-100' : 'opacity-0',
                 )"
               />
               {{ option.label }}

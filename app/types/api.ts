@@ -96,6 +96,50 @@ export interface DashboardResponse {
 }
 
 /**
+ * A student from the API.
+ */
+export interface Student {
+  id: string
+  first_name: string
+  last_name: string
+  classrooms: { id: string, name: string }[]
+  available_bonus_points: number
+  penalty_count: number
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Bonus type from the API.
+ */
+export interface BonusType {
+  id: string
+  name: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Penalty type from the API.
+ */
+export interface PenaltyType {
+  id: string
+  name: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Punishment type from the API.
+ */
+export interface PunishmentType {
+  id: string
+  name: string
+  created_at: string
+  updated_at: string
+}
+
+/**
  * Authenticated user profile from /user/me.
  */
 export interface User {

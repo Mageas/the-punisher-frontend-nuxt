@@ -10,6 +10,8 @@
     "auto": "Auto",
     "available": "Disponible",
     "used": "Consommé",
+    "selectDate": "Sélectionner une date...",
+    "time": "Heure",
     "resolve": "Marquer comme fait",
     "dueAt": "Échéance : {date}",
     "inSelection": "dans la sélection",
@@ -47,6 +49,54 @@
     "recentPenalties": "Dernières pénalités",
     "recentBonuses": "Derniers bonus",
     "pendingPunishments": "Punitions en attente"
+  },
+  "modals": {
+    "penalty": {
+      "title": "Nouvelle pénalité",
+      "class": "Classe",
+      "student": "Élève",
+      "penaltyType": "Type de pénalité",
+      "selectStudent": "Sélectionner un élève...",
+      "searchStudent": "Rechercher un élève...",
+      "noStudentFound": "Aucun élève trouvé.",
+      "selectPenaltyType": "Sélectionner un type...",
+      "searchPenaltyType": "Rechercher un type...",
+      "noPenaltyTypeFound": "Aucun type trouvé.",
+      "cancel": "Annuler",
+      "submit": "Valider"
+    },
+    "bonus": {
+      "title": "Nouveau bonus",
+      "class": "Classe",
+      "student": "Élève",
+      "bonusType": "Type de bonus",
+      "selectStudent": "Sélectionner un élève...",
+      "searchStudent": "Rechercher un élève...",
+      "noStudentFound": "Aucun élève trouvé.",
+      "selectBonusType": "Sélectionner un type...",
+      "searchBonusType": "Rechercher un type...",
+      "noBonusTypeFound": "Aucun type trouvé.",
+      "points": "Points",
+      "pointsPlaceholder": "1.0",
+      "cancel": "Annuler",
+      "submit": "Valider"
+    },
+    "punishment": {
+      "title": "Nouvelle punition",
+      "class": "Classe",
+      "student": "Élève",
+      "punishmentType": "Type de punition",
+      "dueAt": "Échéance",
+      "selectDate": "Sélectionner une date...",
+      "selectStudent": "Sélectionner un élève....",
+      "searchStudent": "Rechercher un élève...",
+      "noStudentFound": "Aucun élève trouvé.",
+      "selectPunishmentType": "Sélectionner un type...",
+      "searchPunishmentType": "Rechercher un type...",
+      "noPunishmentTypeFound": "Aucun type trouvé.",
+      "cancel": "Annuler",
+      "submit": "Valider"
+    }
   },
   "auth": {
     "login": "Connexion",

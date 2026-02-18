@@ -13,6 +13,11 @@ const selectedClassroomId = ref<string>('')
 const dashboard = ref<DashboardResponse | null>(null)
 const loading = ref(true)
 
+// Modal states
+const showBonusModal = ref(false)
+const showPenaltyModal = ref(false)
+const showPunishmentModal = ref(false)
+
 // Fetch dashboard data
 async function fetchDashboard() {
   loading.value = true
@@ -28,6 +33,11 @@ async function fetchDashboard() {
 async function resolvePunishment(id: string) {
   await $api(`/punishments/${id}/resolve`, { method: 'POST' })
   await fetchDashboard()
+}
+
+// Refresh dashboard after modal creation
+function onModalCreated() {
+  fetchDashboard()
 }
 
 // Watch filter changes
@@ -50,15 +60,15 @@ await Promise.all([fetchAllClassrooms(), fetchDashboard()])
         <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
       </div>
       <div class="flex flex-wrap gap-2 xl:justify-end">
-        <Button variant="outline" class="justify-center">
+        <Button variant="outline" class="justify-center cursor-pointer" @click="showBonusModal = true">
           <Star class="w-4 h-4" />
           {{ t('dashboard.newBonus') }}
         </Button>
-        <Button variant="outline" class="justify-center">
+        <Button variant="outline" class="justify-center cursor-pointer" @click="showPenaltyModal = true">
           <AlertTriangle class="w-4 h-4" />
           {{ t('dashboard.newPenalty') }}
         </Button>
-        <Button class="justify-center">
+        <Button class="justify-center cursor-pointer" @click="showPunishmentModal = true">
           <Gavel class="w-4 h-4" />
           {{ t('dashboard.newPunishment') }}
         </Button>
@@ -83,5 +93,10 @@ await Promise.all([fetchAllClassrooms(), fetchDashboard()])
         />
       </div>
     </template>
+
+    <!-- Modals -->
+    <DashboardBonusModal v-model:open="showBonusModal" @created="onModalCreated" />
+    <DashboardPenaltyModal v-model:open="showPenaltyModal" @created="onModalCreated" />
+    <DashboardPunishmentModal v-model:open="showPunishmentModal" @created="onModalCreated" />
   </div>
 </template>
