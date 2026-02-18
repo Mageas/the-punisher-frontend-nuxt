@@ -18,7 +18,6 @@ const selectedStudentId = ref('')
 const selectedBonusTypeId = ref('')
 const points = ref<number>(1)
 const submitting = ref(false)
-const openBonusTypePopover = ref(false)
 
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
@@ -66,13 +65,13 @@ async function submit() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="sm:max-w-md">
+    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{{ t('modals.bonus.title') }}</DialogTitle>
         <DialogDescription class="sr-only">{{ t('modals.bonus.title') }}</DialogDescription>
       </DialogHeader>
 
-      <form class="space-y-4" @submit.prevent="submit">
+      <form class="min-w-0 space-y-4" @submit.prevent="submit">
         <!-- Global error -->
         <Alert v-if="globalError" variant="destructive">
           <AlertDescription>{{ globalError }}</AlertDescription>
@@ -100,45 +99,7 @@ async function submit() {
         <!-- Bonus Type -->
         <div class="space-y-2">
           <Label>{{ t('modals.bonus.bonusType') }}</Label>
-          <Popover v-model:open="openBonusTypePopover">
-            <PopoverTrigger as-child>
-              <Button
-                variant="outline"
-                role="combobox"
-                class="w-full justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
-              >
-                <span class="truncate">
-                  {{ bonusTypes.find(bt => bt.id === selectedBonusTypeId)?.name ?? t('modals.bonus.selectBonusType') }}
-                </span>
-                <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-[--reka-popover-trigger-width] p-0" align="start">
-              <Command>
-                <CommandInput :placeholder="t('modals.bonus.searchBonusType')" />
-                <CommandList>
-                  <CommandEmpty>{{ t('modals.bonus.noBonusTypeFound') }}</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      v-for="bt in bonusTypes"
-                      :key="bt.id"
-                      :value="bt.name"
-                      class="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                      @select="selectedBonusTypeId = bt.id; openBonusTypePopover = false"
-                    >
-                      <CheckIcon
-                        :class="cn(
-                          'mr-2 h-4 w-4',
-                          selectedBonusTypeId === bt.id ? 'opacity-100' : 'opacity-0',
-                        )"
-                      />
-                      {{ bt.name }}
-                    </CommandItem>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <BonusTypeSelect v-model="selectedBonusTypeId" :bonus-types="bonusTypes" />
           <p v-if="fieldErrors.bonus_type_id" class="text-sm text-destructive">{{ fieldErrors.bonus_type_id }}</p>
         </div>
 
@@ -161,8 +122,3 @@ async function submit() {
     </DialogContent>
   </Dialog>
 </template>
-
-<script lang="ts">
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
-</script>

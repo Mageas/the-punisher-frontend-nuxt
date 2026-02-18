@@ -19,7 +19,6 @@ const selectedPunishmentTypeId = ref('')
 const dueAt = ref<DateValue>()
 const dueAtTime = ref('08:00')
 const submitting = ref(false)
-const openPunishmentTypePopover = ref(false)
 
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
@@ -75,13 +74,13 @@ async function submit() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="sm:max-w-md">
+    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{{ t('modals.punishment.title') }}</DialogTitle>
         <DialogDescription class="sr-only">{{ t('modals.punishment.title') }}</DialogDescription>
       </DialogHeader>
 
-      <form class="space-y-4" @submit.prevent="submit">
+      <form class="min-w-0 space-y-4" @submit.prevent="submit">
         <!-- Global error -->
         <Alert v-if="globalError" variant="destructive">
           <AlertDescription>{{ globalError }}</AlertDescription>
@@ -109,45 +108,7 @@ async function submit() {
         <!-- Punishment Type -->
         <div class="space-y-2">
           <Label>{{ t('modals.punishment.punishmentType') }}</Label>
-          <Popover v-model:open="openPunishmentTypePopover">
-            <PopoverTrigger as-child>
-              <Button
-                variant="outline"
-                role="combobox"
-                class="w-full justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
-              >
-                <span class="truncate">
-                  {{ punishmentTypes.find(pt => pt.id === selectedPunishmentTypeId)?.name ?? t('modals.punishment.selectPunishmentType') }}
-                </span>
-                <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-[--reka-popover-trigger-width] p-0" align="start">
-              <Command>
-                <CommandInput :placeholder="t('modals.punishment.searchPunishmentType')" />
-                <CommandList>
-                  <CommandEmpty>{{ t('modals.punishment.noPunishmentTypeFound') }}</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      v-for="pt in punishmentTypes"
-                      :key="pt.id"
-                      :value="pt.name"
-                      class="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                      @select="selectedPunishmentTypeId = pt.id; openPunishmentTypePopover = false"
-                    >
-                      <CheckIcon
-                        :class="cn(
-                          'mr-2 h-4 w-4',
-                          selectedPunishmentTypeId === pt.id ? 'opacity-100' : 'opacity-0',
-                        )"
-                      />
-                      {{ pt.name }}
-                    </CommandItem>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <PunishmentTypeSelect v-model="selectedPunishmentTypeId" :punishment-types="punishmentTypes" />
           <p v-if="fieldErrors.punishment_type_id" class="text-sm text-destructive">{{ fieldErrors.punishment_type_id }}</p>
         </div>
 
@@ -179,6 +140,4 @@ async function submit() {
 <script lang="ts">
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
 </script>

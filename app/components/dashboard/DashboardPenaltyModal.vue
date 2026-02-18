@@ -17,7 +17,6 @@ const selectedClassroomId = ref('')
 const selectedStudentId = ref('')
 const selectedPenaltyTypeId = ref('')
 const submitting = ref(false)
-const openPenaltyTypePopover = ref(false)
 
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
@@ -62,13 +61,13 @@ async function submit() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="sm:max-w-md">
+    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{{ t('modals.penalty.title') }}</DialogTitle>
         <DialogDescription class="sr-only">{{ t('modals.penalty.title') }}</DialogDescription>
       </DialogHeader>
 
-      <form class="space-y-4" @submit.prevent="submit">
+      <form class="min-w-0 space-y-4" @submit.prevent="submit">
         <!-- Global error -->
         <Alert v-if="globalError" variant="destructive">
           <AlertDescription>{{ globalError }}</AlertDescription>
@@ -96,45 +95,7 @@ async function submit() {
         <!-- Penalty Type -->
         <div class="space-y-2">
           <Label>{{ t('modals.penalty.penaltyType') }}</Label>
-          <Popover v-model:open="openPenaltyTypePopover">
-            <PopoverTrigger as-child>
-              <Button
-                variant="outline"
-                role="combobox"
-                class="w-full justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
-              >
-                <span class="truncate">
-                  {{ penaltyTypes.find(pt => pt.id === selectedPenaltyTypeId)?.name ?? t('modals.penalty.selectPenaltyType') }}
-                </span>
-                <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-[--reka-popover-trigger-width] p-0" align="start">
-              <Command>
-                <CommandInput :placeholder="t('modals.penalty.searchPenaltyType')" />
-                <CommandList>
-                  <CommandEmpty>{{ t('modals.penalty.noPenaltyTypeFound') }}</CommandEmpty>
-                  <CommandGroup>
-                    <CommandItem
-                      v-for="pt in penaltyTypes"
-                      :key="pt.id"
-                      :value="pt.name"
-                      class="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                      @select="selectedPenaltyTypeId = pt.id; openPenaltyTypePopover = false"
-                    >
-                      <CheckIcon
-                        :class="cn(
-                          'mr-2 h-4 w-4',
-                          selectedPenaltyTypeId === pt.id ? 'opacity-100' : 'opacity-0',
-                        )"
-                      />
-                      {{ pt.name }}
-                    </CommandItem>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <PenaltyTypeSelect v-model="selectedPenaltyTypeId" :penalty-types="penaltyTypes" />
           <p v-if="fieldErrors.penalty_type_id" class="text-sm text-destructive">{{ fieldErrors.penalty_type_id }}</p>
         </div>
 
@@ -150,8 +111,3 @@ async function submit() {
     </DialogContent>
   </Dialog>
 </template>
-
-<script lang="ts">
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
-import { cn } from '@/lib/utils'
-</script>

@@ -56,13 +56,13 @@ function select(value: string) {
         variant="outline"
         role="combobox"
         :aria-expanded="open"
-        class="w-full justify-between font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
+        class="w-full max-w-full justify-between overflow-hidden font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground"
       >
-        <span class="truncate">{{ selectedLabel }}</span>
+        <span class="min-w-0 flex-1 truncate text-left" :title="selectedLabel">{{ selectedLabel }}</span>
         <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent class="w-[--reka-popover-trigger-width] p-0" align="start">
+    <PopoverContent class="w-[--reka-popover-trigger-width] max-w-[calc(100vw-2rem)] p-0" align="start">
       <Command>
         <CommandInput :placeholder="searchPlaceholder ?? t('modals.penalty.searchStudent')" />
         <CommandList>
@@ -81,7 +81,7 @@ function select(value: string) {
                   modelValue === option.value ? 'opacity-100' : 'opacity-0',
                 )"
               />
-              {{ option.label }}
+              <span class="min-w-0 flex-1 truncate" :title="option.label">{{ option.label }}</span>
             </CommandItem>
           </CommandGroup>
         </CommandList>
