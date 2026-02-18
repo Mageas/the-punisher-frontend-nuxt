@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// CUSTOMIZATION NOTICE:
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Added `cursor-pointer` on `DialogClose` for consistent clickable UX.
 import type { DialogContentEmits, DialogContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
@@ -48,7 +52,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         <slot />
 
         <DialogClose
-          class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary"
+          class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary cursor-pointer"
         >
           <X class="w-4 h-4" />
           <span class="sr-only">Close</span>
