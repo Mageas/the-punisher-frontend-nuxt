@@ -3,13 +3,13 @@ import type { BonusType, PaginatedResponse } from '~/types/api'
 /**
  * Composable to fetch ALL bonus types across all pages.
  */
-export function useBonusTypes() {
+export function useAllBonusTypes() {
   const { $api } = useNuxtApp()
 
   const bonusTypes = ref<BonusType[]>([])
   const loading = ref(false)
 
-  async function fetchAllBonusTypes() {
+  async function fetchBonusTypes() {
     loading.value = true
     const all: BonusType[] = []
     let page = 1
@@ -31,6 +31,6 @@ export function useBonusTypes() {
   return {
     bonusTypes: bonusTypes as Readonly<Ref<BonusType[]>>,
     loading: readonly(loading),
-    fetchAllBonusTypes,
+    fetchBonusTypes,
   }
 }

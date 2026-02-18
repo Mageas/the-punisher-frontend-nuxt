@@ -4,13 +4,13 @@ import type { PaginatedResponse, Student } from '~/types/api'
  * Composable to fetch ALL students across all pages.
  * Optionally filtered by classroom ID.
  */
-export function useStudents() {
+export function useAllStudents() {
   const { $api } = useNuxtApp()
 
   const students = ref<Student[]>([])
   const loading = ref(false)
 
-  async function fetchAllStudents(classroomId?: string) {
+  async function fetchStudents(classroomId?: string) {
     loading.value = true
     const all: Student[] = []
     let page = 1
@@ -35,6 +35,6 @@ export function useStudents() {
   return {
     students: students as Readonly<Ref<Student[]>>,
     loading: readonly(loading),
-    fetchAllStudents,
+    fetchStudents,
   }
 }

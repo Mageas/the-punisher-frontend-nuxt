@@ -3,13 +3,13 @@ import type { PaginatedResponse, PunishmentType } from '~/types/api'
 /**
  * Composable to fetch ALL punishment types across all pages.
  */
-export function usePunishmentTypes() {
+export function useAllPunishmentTypes() {
   const { $api } = useNuxtApp()
 
   const punishmentTypes = ref<PunishmentType[]>([])
   const loading = ref(false)
 
-  async function fetchAllPunishmentTypes() {
+  async function fetchPunishmentTypes() {
     loading.value = true
     const all: PunishmentType[] = []
     let page = 1
@@ -31,6 +31,6 @@ export function usePunishmentTypes() {
   return {
     punishmentTypes: punishmentTypes as Readonly<Ref<PunishmentType[]>>,
     loading: readonly(loading),
-    fetchAllPunishmentTypes,
+    fetchPunishmentTypes,
   }
 }

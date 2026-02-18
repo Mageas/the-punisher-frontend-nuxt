@@ -9,7 +9,7 @@ const { t } = useI18n()
 const { $api } = useNuxtApp()
 
 // Classroom filter
-const { classrooms, fetchAllClassrooms } = useClassrooms()
+const { classrooms, fetchClassrooms } = useAllClassrooms()
 const selectedClassroomId = ref<string>('')
 
 // Dashboard data
@@ -49,7 +49,7 @@ watch(selectedClassroomId, () => {
 })
 
 // Initial load
-await Promise.all([fetchAllClassrooms(), fetchDashboard()])
+await Promise.all([fetchClassrooms(), fetchDashboard()])
 </script>
 
 <template>

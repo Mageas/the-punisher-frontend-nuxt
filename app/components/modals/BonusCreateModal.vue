@@ -8,9 +8,9 @@ const open = defineModel<boolean>('open', { default: false })
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
-const { classrooms, fetchAllClassrooms } = useClassrooms()
-const { students, fetchAllStudents } = useStudents()
-const { bonusTypes, fetchAllBonusTypes } = useBonusTypes()
+const { classrooms, fetchClassrooms } = useAllClassrooms()
+const { students, fetchStudents } = useAllStudents()
+const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
 
 // Form
 const selectedClassroomId = ref('')
@@ -22,7 +22,7 @@ const submitting = ref(false)
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
   selectedStudentId.value = ''
-  fetchAllStudents(selectedClassroomId.value || undefined)
+  fetchStudents(selectedClassroomId.value || undefined)
 })
 
 // Load data when modal opens
@@ -33,7 +33,7 @@ watch(open, async (isOpen) => {
     selectedStudentId.value = ''
     selectedBonusTypeId.value = ''
     points.value = 1
-    await Promise.all([fetchAllClassrooms(), fetchAllStudents(), fetchAllBonusTypes()])
+    await Promise.all([fetchClassrooms(), fetchStudents(), fetchBonusTypes()])
   }
 })
 
