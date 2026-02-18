@@ -3,6 +3,7 @@ import { Skull } from 'lucide-vue-next'
 
 definePageMeta({
   layout: false,
+  auth: false,
 })
 
 const { t } = useI18n()

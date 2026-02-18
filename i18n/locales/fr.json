@@ -2,6 +2,51 @@
   "app": {
     "title": "The Punisher"
   },
+  "common": {
+    "allStudents": "Tous les élèves",
+    "searchClass": "Rechercher une classe...",
+    "noClassFound": "Aucune classe trouvée.",
+    "recent": "Récent",
+    "auto": "Auto",
+    "available": "Disponible",
+    "used": "Consommé",
+    "resolve": "Marquer comme fait",
+    "dueAt": "Échéance : {date}",
+    "inSelection": "dans la sélection",
+    "currentPeriod": "période en cours",
+    "toResolve": "à résoudre",
+    "pt": "+{points} pt | +{points} pts",
+    "nToResolve": "{count} à résoudre",
+    "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés"
+  },
+  "sidebar": {
+    "general": "Général",
+    "dashboard": "Tableau de bord",
+    "tracking": "Suivi",
+    "punishments": "Punitions",
+    "bonuses": "Bonus",
+    "management": "Gestion",
+    "students": "Élèves",
+    "classes": "Classes",
+    "configuration": "Configuration",
+    "rules": "Règles",
+    "penaltyTypes": "Types de pénalités",
+    "punishmentTypes": "Types de punitions",
+    "bonusTypes": "Types de bonus"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "newBonus": "Nouveau Bonus",
+    "newPenalty": "Nouvelle Pénalité",
+    "newPunishment": "Nouvelle Punition",
+    "kpiStudents": "Élèves",
+    "kpiBonusPoints": "Points bonus dispo.",
+    "kpiPenalties": "Pénalités",
+    "kpiPendingPunishments": "Punitions en attente",
+    "recentPenalties": "Dernières pénalités",
+    "recentBonuses": "Derniers bonus",
+    "pendingPunishments": "Punitions en attente"
+  },
   "auth": {
     "login": "Connexion",
     "loginSubtitle": "Connectez-vous à votre compte",
