@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   siblingCount: 1,
 })
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'update:page': [value: number]
@@ -34,7 +35,7 @@ const emit = defineEmits<{
     >
       <PaginationContent v-slot="slotProps">
         <PaginationPrevious>
-          <span class="hidden sm:block">Précédent</span>
+          <span class="hidden sm:block">{{ t('common.previous') }}</span>
         </PaginationPrevious>
         <template v-for="(item, index) in slotProps?.items ?? []" :key="index">
           <PaginationItem
@@ -47,7 +48,7 @@ const emit = defineEmits<{
           <PaginationEllipsis v-else :index="index" />
         </template>
         <PaginationNext>
-          <span class="hidden sm:block">Suivant</span>
+          <span class="hidden sm:block">{{ t('common.next') }}</span>
         </PaginationNext>
       </PaginationContent>
     </Pagination>

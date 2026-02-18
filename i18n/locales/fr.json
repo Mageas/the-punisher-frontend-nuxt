@@ -13,6 +13,11 @@
     "selectDate": "Sélectionner une date...",
     "time": "Heure",
     "resolve": "Marquer comme fait",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "first": "Premier",
+    "last": "Dernier",
+    "morePages": "Plus de pages",
     "dueAt": "Échéance : {date}",
     "inSelection": "dans la sélection",
     "currentPeriod": "période en cours",
@@ -20,6 +25,14 @@
     "pt": "+{points} pt | +{points} pts",
     "nToResolve": "{count} à résoudre",
     "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés"
+  },
+  "ui": {
+    "close": "Fermer",
+    "sidebar": {
+      "title": "Barre latérale",
+      "mobileDescription": "Affiche la barre latérale mobile.",
+      "toggle": "Afficher ou masquer la barre latérale"
+    }
   },
   "sidebar": {
     "general": "Général",

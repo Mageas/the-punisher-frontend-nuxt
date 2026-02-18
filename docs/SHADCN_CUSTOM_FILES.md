@@ -1,19 +1,33 @@
 # Shadcn Custom Files (Do Not Overwrite)
 
-These files were customized locally and must not be overwritten by `shadcn-vue` updates:
+Only the files listed below were customized locally and must not be overwritten by `shadcn-vue` updates.
+
+## Custom UI Files
 
 - `app/components/ui/dialog/DialogContent.vue`
 - `app/components/ui/dialog/DialogScrollContent.vue`
+- `app/components/ui/pagination/PaginationEllipsis.vue`
+- `app/components/ui/pagination/PaginationFirst.vue`
+- `app/components/ui/pagination/PaginationLast.vue`
+- `app/components/ui/pagination/PaginationNext.vue`
+- `app/components/ui/pagination/PaginationPrevious.vue`
+- `app/components/ui/sheet/SheetContent.vue`
+- `app/components/ui/sidebar/Sidebar.vue`
+- `app/components/ui/sidebar/SidebarRail.vue`
+- `app/components/ui/sidebar/SidebarTrigger.vue`
 
-## Why
+## Header Marker
 
-Custom UX behavior was added for dialog close buttons:
+Each customized file keeps this header:
 
-- explicit `cursor-pointer` on close button in regular dialogs
-- explicit `cursor-pointer` on close button in scroll dialogs
+```ts
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - <local customization summary>
+```
 
 ## Safety Rules
 
-1. Do not run overwrite flows for these files (`add -o`, update commands that rewrite existing components).
-2. If you need upstream changes, merge manually into these files.
-3. Keep this list updated when new `ui/*` files are customized.
+1. Do not run overwrite flows on listed files (`add -o`, update commands that rewrite existing components).
+2. If you need upstream shadcn changes, merge manually into local files.
+3. Keep this list updated when a `ui/*` file is customized or reverted.

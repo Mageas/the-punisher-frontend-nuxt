@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Added i18n translations for sidebar accessibility labels.
 import type { HTMLAttributes } from "vue"
 import { PanelLeft } from "lucide-vue-next"
 import { cn } from "@/lib/utils"
@@ -10,6 +13,7 @@ const props = defineProps<{
 }>()
 
 const { toggleSidebar } = useSidebar()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -22,6 +26,6 @@ const { toggleSidebar } = useSidebar()
     @click="toggleSidebar"
   >
     <PanelLeft />
-    <span class="sr-only">Toggle Sidebar</span>
+    <span class="sr-only">{{ t('ui.sidebar.toggle') }}</span>
   </Button>
 </template>

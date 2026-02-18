@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Added i18n translations for sidebar accessibility labels.
 import type { SidebarProps } from "."
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -18,6 +21,7 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 })
 
 const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -42,8 +46,8 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
       }"
     >
       <SheetHeader class="sr-only">
-        <SheetTitle>Sidebar</SheetTitle>
-        <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+        <SheetTitle>{{ t('ui.sidebar.title') }}</SheetTitle>
+        <SheetDescription>{{ t('ui.sidebar.mobileDescription') }}</SheetDescription>
       </SheetHeader>
       <div class="flex h-full w-full flex-col">
         <slot />

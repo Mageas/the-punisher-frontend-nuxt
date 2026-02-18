@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Added i18n translations for pagination labels.
 import type { PaginationEllipsisProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
@@ -9,6 +12,7 @@ import { cn } from "@/lib/utils"
 const props = defineProps<PaginationEllipsisProps & { class?: HTMLAttributes["class"] }>()
 
 const delegatedProps = reactiveOmit(props, "class")
+const { t } = useI18n()
 </script>
 
 <template>
@@ -19,7 +23,7 @@ const delegatedProps = reactiveOmit(props, "class")
   >
     <slot>
       <MoreHorizontal class="size-4" />
-      <span class="sr-only">More pages</span>
+      <span class="sr-only">{{ t('common.morePages') }}</span>
     </slot>
   </PaginationEllipsis>
 </template>

@@ -3,6 +3,7 @@
 // This shadcn-generated file was locally modified and must not be overwritten.
 // Local change summary:
 // - Added `cursor-pointer` on `DialogClose` for consistent clickable UX.
+// - Added translation for close button's screen reader text.
 import type { DialogContentEmits, DialogContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
@@ -26,6 +27,7 @@ const emits = defineEmits<DialogContentEmits>()
 const delegatedProps = reactiveOmit(props, "class")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const { t } = useI18n()
 </script>
 
 <template>
@@ -55,7 +57,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
           class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary cursor-pointer"
         >
           <X class="w-4 h-4" />
-          <span class="sr-only">Close</span>
+          <span class="sr-only">{{ t('ui.close') }}</span>
         </DialogClose>
       </DialogContent>
     </DialogOverlay>
