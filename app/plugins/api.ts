@@ -5,7 +5,7 @@
  * - On 401 responses, attempts a silent token refresh then retries the request once.
  * - If refresh fails, clears auth state and redirects to /login.
  */
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const accessToken = useCookie('access_token', { path: '/' })
 
@@ -93,7 +93,7 @@ export default defineNuxtPlugin(() => {
 
         // Refresh failed — redirect to login
         accessToken.value = null
-        await navigateTo('/login')
+        await nuxtApp.runWithContext(() => navigateTo('/login'))
       }
     },
   })
