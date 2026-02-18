@@ -50,6 +50,16 @@
     "recentBonuses": "Derniers bonus",
     "pendingPunishments": "Punitions en attente"
   },
+  "punishments": {
+    "title": "Punitions",
+    "newPunishment": "Nouvelle punition",
+    "searchPlaceholder": "Rechercher une punition...",
+    "noPunishments": "Aucune punition trouvée.",
+    "pending": "En attente",
+    "resolved": "Résolu",
+    "resolvedAt": "Résolu le {date}",
+    "manualPunishment": "Punition manuelle"
+  },
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
@@ -96,6 +106,12 @@
       "noPunishmentTypeFound": "Aucun type trouvé.",
       "cancel": "Annuler",
       "submit": "Valider"
+    },
+    "delete": {
+      "title": "Confirmer la suppression",
+      "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
     }
   },
   "auth": {

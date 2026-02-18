@@ -140,6 +140,23 @@ export interface PunishmentType {
 }
 
 /**
+ * A punishment from the API (full resource).
+ */
+export interface Punishment {
+  id: string
+  student_id: string
+  student_first_name: string
+  student_last_name: string
+  punishment_type_id: string
+  punishment_type_name: string
+  triggering_rule_id: string | null
+  triggering_rule_name: string | null
+  created_at: string
+  due_at: string | null
+  resolved_at: string | null
+}
+
+/**
  * Authenticated user profile from /user/me.
  */
 export interface User {

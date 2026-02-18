@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
+import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
+import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
+import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -95,8 +98,8 @@ await Promise.all([fetchAllClassrooms(), fetchDashboard()])
     </template>
 
     <!-- Modals -->
-    <DashboardBonusModal v-model:open="showBonusModal" @created="onModalCreated" />
-    <DashboardPenaltyModal v-model:open="showPenaltyModal" @created="onModalCreated" />
-    <DashboardPunishmentModal v-model:open="showPunishmentModal" @created="onModalCreated" />
+    <BonusCreateModal v-model:open="showBonusModal" @created="onModalCreated" />
+    <PenaltyCreateModal v-model:open="showPenaltyModal" @created="onModalCreated" />
+    <PunishmentCreateModal v-model:open="showPunishmentModal" @created="onModalCreated" />
   </div>
 </template>
