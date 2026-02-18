@@ -112,6 +112,12 @@
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
+    },
+    "resolve": {
+      "title": "Confirmer la résolution",
+      "punishmentMessage": "Êtes-vous sûr de vouloir marquer cette punition comme faite ?",
+      "cancel": "Annuler",
+      "confirm": "Marquer comme fait"
     }
   },
   "auth": {

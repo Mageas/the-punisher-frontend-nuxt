@@ -4,6 +4,7 @@ import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
 import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
 import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
 import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
+import PunishmentResolveModal from '~/components/modals/PunishmentResolveModal.vue'
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -20,6 +21,8 @@ const loading = ref(true)
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
+const showResolveModal = ref(false)
+const punishmentToResolveId = ref<string | null>(null)
 
 // Fetch dashboard data
 async function fetchDashboard() {
@@ -35,7 +38,15 @@ async function fetchDashboard() {
 // Resolve a punishment
 async function resolvePunishment(id: string) {
   await $api(`/punishments/${id}/resolve`, { method: 'POST' })
-  await fetchDashboard()
+}
+
+function openResolveModal(id: string) {
+  punishmentToResolveId.value = id
+  showResolveModal.value = true
+}
+
+function onResolveConfirmed() {
+  fetchDashboard()
 }
 
 // Refresh dashboard after modal creation
@@ -92,7 +103,7 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
       <div class="mt-8">
         <DashboardPendingPunishments
           :punishments="dashboard.pending_punishments"
-          @resolve="resolvePunishment"
+          @resolve="openResolveModal"
         />
       </div>
     </template>
@@ -101,5 +112,11 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
     <BonusCreateModal v-model:open="showBonusModal" @created="onModalCreated" />
     <PenaltyCreateModal v-model:open="showPenaltyModal" @created="onModalCreated" />
     <PunishmentCreateModal v-model:open="showPunishmentModal" @created="onModalCreated" />
+    <PunishmentResolveModal
+      v-model:open="showResolveModal"
+      :punishment-id="punishmentToResolveId"
+      :resolve-fn="resolvePunishment"
+      @confirmed="onResolveConfirmed"
+    />
   </div>
 </template>

@@ -4,6 +4,7 @@ import { refDebounced } from '@vueuse/core'
 import CustomPagination from '~/components/CustomPagination.vue'
 import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
 import PunishmentDeleteModal from '~/components/modals/PunishmentDeleteModal.vue'
+import PunishmentResolveModal from '~/components/modals/PunishmentResolveModal.vue'
 
 const { t } = useI18n()
 const {
@@ -28,7 +29,9 @@ const showPagination = computed(() => totalCount.value > 0)
 // Modals
 const showCreateModal = ref(false)
 const showDeleteModal = ref(false)
+const showResolveModal = ref(false)
 const punishmentToDeleteId = ref<string | null>(null)
+const punishmentToResolveId = ref<string | null>(null)
 
 // Format date helper
 function formatDate(dateStr: string | null): string {
@@ -56,7 +59,6 @@ async function onPageChange(nextPage: number) {
 // Resolve a punishment inline
 async function handleResolve(id: string) {
   await resolvePunishment(id)
-  await reload(page.value)
 }
 
 // Open delete modal
@@ -65,8 +67,19 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
+// Open resolve modal
+function openResolveModal(id: string) {
+  punishmentToResolveId.value = id
+  showResolveModal.value = true
+}
+
 // After delete confirmed
 function onDeleteConfirmed() {
+  reload(page.value)
+}
+
+// After resolve confirmed
+function onResolveConfirmed() {
   reload(page.value)
 }
 
@@ -172,7 +185,7 @@ await reload()
             v-if="!punishment.resolved_at"
             class="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground cursor-pointer"
             :title="t('common.resolve')"
-            @click="handleResolve(punishment.id)"
+            @click="openResolveModal(punishment.id)"
           >
             <CircleCheck class="w-5 h-5 text-green-400" />
           </button>
@@ -203,6 +216,12 @@ await reload()
       :punishment-id="punishmentToDeleteId"
       :delete-fn="deletePunishment"
       @confirmed="onDeleteConfirmed"
+    />
+    <PunishmentResolveModal
+      v-model:open="showResolveModal"
+      :punishment-id="punishmentToResolveId"
+      :resolve-fn="handleResolve"
+      @confirmed="onResolveConfirmed"
     />
   </div>
 </template>
