@@ -7,12 +7,22 @@
     "loginSubtitle": "Connectez-vous à votre compte",
     "loginSubmit": "Se connecter",
     "register": "Inscription",
+    "registerSubtitle": "Créez votre compte professeur",
+    "registerSubmit": "Créer mon compte",
     "noAccount": "Pas encore de compte ?",
     "createAccount": "Créer un compte",
+    "hasAccount": "Déjà un compte ?",
+    "signIn": "Se connecter",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
     "email": "Email",
     "emailPlaceholder": "professeur{'@'}ecole.fr",
     "password": "Mot de passe",
-    "passwordPlaceholder": "••••••••"
+    "passwordPlaceholder": "••••••••",
+    "passwordConfirm": "Confirmer le mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas."
   },
   "apiErrors": {
     "messages": {

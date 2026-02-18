@@ -1,0 +1,174 @@
+<script setup lang="ts">
+import { Skull } from 'lucide-vue-next'
+
+definePageMeta({
+  layout: false,
+})
+
+const { t } = useI18n()
+const { register, isAuthenticated } = useAuth()
+const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
+
+if (isAuthenticated.value) {
+  await navigateTo('/')
+}
+
+const form = reactive({
+  lastName: '',
+  firstName: '',
+  email: '',
+  password: '',
+  passwordConfirm: '',
+})
+const isLoading = ref(false)
+const passwordMismatch = ref(false)
+
+async function onSubmit() {
+  clearErrors()
+  passwordMismatch.value = false
+
+  if (form.password !== form.passwordConfirm) {
+    passwordMismatch.value = true
+    return
+  }
+
+  isLoading.value = true
+
+  try {
+    await register({
+      email: form.email,
+      password: form.password,
+      first_name: form.firstName,
+      last_name: form.lastName,
+    })
+
+    await navigateTo('/login')
+  }
+  catch (err) {
+    handleApiError(err)
+  }
+  finally {
+    isLoading.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-sm">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-secondary mb-4">
+          <Skull class="w-6 h-6" />
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">
+          {{ t('app.title') }}
+        </h1>
+        <p class="text-sm text-muted-foreground mt-1">
+          {{ t('auth.registerSubtitle') }}
+        </p>
+      </div>
+
+      <!-- Card -->
+      <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+        <!-- Global error -->
+        <Alert v-if="globalError" variant="destructive" class="mb-4">
+          <AlertDescription>{{ globalError }}</AlertDescription>
+        </Alert>
+
+        <form class="space-y-4" @submit.prevent="onSubmit">
+          <!-- Nom / Prénom -->
+          <div class="space-y-2">
+            <Label for="lastname">{{ t('auth.lastName') }}</Label>
+            <Input
+              id="lastname"
+              v-model="form.lastName"
+              type="text"
+              :placeholder="t('auth.lastNamePlaceholder')"
+              :aria-invalid="!!fieldErrors.last_name"
+              @input="clearFieldError('last_name')"
+            />
+            <p v-if="fieldErrors.last_name" class="text-sm text-destructive">
+              {{ fieldErrors.last_name }}
+            </p>
+          </div>
+          <div class="space-y-2">
+            <Label for="firstname">{{ t('auth.firstName') }}</Label>
+            <Input
+              id="firstname"
+              v-model="form.firstName"
+              type="text"
+              :placeholder="t('auth.firstNamePlaceholder')"
+              :aria-invalid="!!fieldErrors.first_name"
+              @input="clearFieldError('first_name')"
+            />
+            <p v-if="fieldErrors.first_name" class="text-sm text-destructive">
+              {{ fieldErrors.first_name }}
+            </p>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <Label for="email">{{ t('auth.email') }}</Label>
+            <Input
+              id="email"
+              v-model="form.email"
+              type="email"
+              :placeholder="t('auth.emailPlaceholder')"
+              :aria-invalid="!!fieldErrors.email"
+              @input="clearFieldError('email')"
+            />
+            <p v-if="fieldErrors.email" class="text-sm text-destructive">
+              {{ fieldErrors.email }}
+            </p>
+          </div>
+
+          <!-- Password -->
+          <div class="space-y-2">
+            <Label for="password">{{ t('auth.password') }}</Label>
+            <Input
+              id="password"
+              v-model="form.password"
+              type="password"
+              :placeholder="t('auth.passwordPlaceholder')"
+              :aria-invalid="!!fieldErrors.password"
+              @input="clearFieldError('password')"
+            />
+            <p v-if="fieldErrors.password" class="text-sm text-destructive">
+              {{ fieldErrors.password }}
+            </p>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="space-y-2">
+            <Label for="password-confirm">{{ t('auth.passwordConfirm') }}</Label>
+            <Input
+              id="password-confirm"
+              v-model="form.passwordConfirm"
+              type="password"
+              :placeholder="t('auth.passwordPlaceholder')"
+              :aria-invalid="passwordMismatch"
+              @input="passwordMismatch = false"
+            />
+            <p v-if="passwordMismatch" class="text-sm text-destructive">
+              {{ t('auth.passwordMismatch') }}
+            </p>
+          </div>
+
+          <!-- Submit -->
+          <Button type="submit" class="w-full mt-2" :disabled="isLoading">
+            {{ t('auth.registerSubmit') }}
+          </Button>
+        </form>
+      </div>
+
+      <!-- Link -->
+      <p class="text-center text-sm text-muted-foreground mt-4">
+        {{ t('auth.hasAccount') }}
+        <NuxtLink to="/login" class="underline underline-offset-4 hover:text-foreground">
+          {{ t('auth.signIn') }}
+        </NuxtLink>
+      </p>
+    </div>
+  </div>
+</template>

@@ -30,6 +30,17 @@ export function useAuth() {
   }
 
   /**
+   * Register a new teacher account.
+   */
+  async function register(body: { email: string, password: string, first_name: string, last_name: string }) {
+    await $fetch('/auth/register', {
+      baseURL: config.public.apiBaseUrl,
+      method: 'POST',
+      body,
+    })
+  }
+
+  /**
    * Clear both access_token and refresh_token cookies, then redirect to login.
    */
   async function logout() {
@@ -62,6 +73,7 @@ export function useAuth() {
     accessToken: readonly(accessToken),
     isAuthenticated,
     login,
+    register,
     logout,
     refresh,
   }
