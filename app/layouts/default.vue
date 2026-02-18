@@ -1,31 +1,47 @@
 <script setup lang="ts">
 import {
-  Skull,
-  LayoutDashboard,
-  Gavel,
-  Star,
-  Users,
-  School,
-  Scale,
   AlertCircle,
   FileWarning,
-  Trophy,
+  Gavel,
+  LayoutDashboard,
   LogOut,
-  Menu,
+  School,
+  Scale,
+  Skull,
+  Star,
+  Trophy,
+  Users,
 } from 'lucide-vue-next'
+import { useUserStore } from '~/stores/user'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 
 const { t } = useI18n()
 const route = useRoute()
-const { logout } = useAuth()
+const { logout: authLogout } = useAuth()
+const userStore = useUserStore()
 
-const sidebarOpen = ref(false)
+onMounted(() => {
+  userStore.fetchUser()
+})
 
-function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
-}
-
-function closeSidebar() {
-  sidebarOpen.value = false
+async function logout() {
+  userStore.clearUser()
+  await authLogout()
 }
 
 interface NavLink {
@@ -39,7 +55,7 @@ interface NavGroup {
   links: NavLink[]
 }
 
-const navGroups: NavGroup[] = [
+const navGroups = computed<NavGroup[]>(() => [
   {
     label: t('sidebar.general'),
     links: [
@@ -69,7 +85,7 @@ const navGroups: NavGroup[] = [
       { to: '/bonus-types', icon: Trophy, label: t('sidebar.bonusTypes') },
     ],
   },
-]
+])
 
 function isActive(to: string): boolean {
   return route.path === to
@@ -77,81 +93,70 @@ function isActive(to: string): boolean {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <!-- Sidebar Overlay (mobile) -->
-    <div
-      v-if="sidebarOpen"
-      class="fixed inset-0 bg-black/50 z-[39] md:hidden"
-      @click="closeSidebar"
-    />
-
-    <!-- Sidebar -->
-    <aside
-      :class="[
-        'fixed top-0 left-0 z-40 w-[260px] min-h-screen border-r border-border bg-background flex flex-col gap-6 py-6 px-3 overflow-y-auto transition-transform duration-300',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
-      ]"
-    >
-      <!-- Brand -->
-      <div class="flex items-center gap-2 px-3 mb-2">
-        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-secondary">
-          <Skull class="w-4 h-4" />
-        </div>
-        <span class="font-semibold text-sm">{{ t('app.title') }}</span>
+  <SidebarProvider>
+    <Sidebar>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg">
+              <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <Skull class="size-4" />
+              </div>
+              <div class="grid flex-1 text-left text-sm leading-tight">
+                <span class="truncate font-semibold">{{ t('app.title') }}</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup v-for="group in navGroups" :key="group.label">
+          <SidebarGroupLabel>{{ group.label }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem v-for="link in group.links" :key="link.to">
+                <SidebarMenuButton as-child :is-active="isActive(link.to)">
+                  <NuxtLink :to="link.to">
+                    <component :is="link.icon" />
+                    <span>{{ link.label }}</span>
+                  </NuxtLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <div class="flex items-center gap-2 px-2 py-1.5">
+              <div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium">
+                {{ userStore.initials }}
+              </div>
+              <div class="grid flex-1 text-left text-sm leading-tight min-w-0">
+                <span class="truncate font-semibold">{{ userStore.fullName }}</span>
+                <span class="truncate text-xs text-muted-foreground">{{ userStore.user?.email }}</span>
+              </div>
+              <SidebarMenuButton
+                size="sm"
+                class="size-8 shrink-0 cursor-pointer"
+                @click="logout"
+              >
+                <LogOut class="size-4" />
+              </SidebarMenuButton>
+            </div>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+    <SidebarInset>
+      <header class="flex h-12 items-center border-b px-3 md:px-4">
+        <SidebarTrigger />
+      </header>
+      <div class="flex-1 p-4 md:p-8">
+        <slot />
       </div>
-
-      <!-- Nav groups -->
-      <div v-for="group in navGroups" :key="group.label">
-        <p class="text-xs font-medium text-muted-foreground px-3 mb-1 uppercase tracking-wider">
-          {{ group.label }}
-        </p>
-        <nav class="space-y-0.5">
-          <NuxtLink
-            v-for="link in group.links"
-            :key="link.to"
-            :to="link.to"
-            :class="[
-              'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all',
-              isActive(link.to)
-                ? 'bg-secondary text-foreground font-medium'
-                : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
-            ]"
-            @click="closeSidebar"
-          >
-            <component :is="link.icon" class="w-4 h-4" />
-            {{ link.label }}
-          </NuxtLink>
-        </nav>
-      </div>
-
-      <!-- User footer -->
-      <div class="mt-auto border-t border-border pt-3">
-        <div class="flex items-center gap-3 px-3">
-          <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-medium">
-            JD
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">Jean Dupont</p>
-            <p class="text-xs text-muted-foreground truncate">professeur@ecole.fr</p>
-          </div>
-          <button class="text-muted-foreground hover:text-foreground cursor-pointer" @click="logout">
-            <LogOut class="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main content -->
-    <main class="md:ml-[260px] p-4 md:p-8">
-      <!-- Mobile header -->
-      <div class="flex items-center gap-3 md:hidden bg-background border-b border-border -m-4 mb-4 px-4 py-3">
-        <button class="text-muted-foreground hover:text-foreground" @click="toggleSidebar">
-          <Menu class="w-5 h-5" />
-        </button>
-        <span class="font-semibold text-sm">{{ t('app.title') }}</span>
-      </div>
-
-      <slot />
-    </main>
-  </div>
+    </SidebarInset>
+  </SidebarProvider>
 </template>

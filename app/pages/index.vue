@@ -42,14 +42,14 @@ await Promise.all([fetchAllClassrooms(), fetchDashboard()])
 <template>
   <div>
     <!-- Header & Filtre Global -->
-    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8">
-      <div class="flex items-center gap-4 shrink-0">
+    <div class="mb-8 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div class="flex flex-wrap items-center gap-4">
         <h1 class="text-2xl font-bold tracking-tight whitespace-nowrap">
           {{ t('dashboard.title') }}
         </h1>
         <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
       </div>
-      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <div class="flex flex-wrap gap-2 xl:justify-end">
         <Button variant="outline" class="justify-center">
           <Star class="w-4 h-4" />
           {{ t('dashboard.newBonus') }}
@@ -70,7 +70,7 @@ await Promise.all([fetchAllClassrooms(), fetchDashboard()])
       <DashboardKpiCards :kpis="dashboard.kpis" class="mb-8" />
 
       <!-- Historique Récent (Split View) -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <DashboardRecentPenalties :penalties="dashboard.recent_penalties" />
         <DashboardRecentBonuses :bonuses="dashboard.recent_bonuses" />
       </div>

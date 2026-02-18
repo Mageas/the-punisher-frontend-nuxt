@@ -32,7 +32,8 @@
     "rules": "Règles",
     "penaltyTypes": "Types de pénalités",
     "punishmentTypes": "Types de punitions",
-    "bonusTypes": "Types de bonus"
+    "bonusTypes": "Types de bonus",
+    "logout": "Se déconnecter"
   },
   "dashboard": {
     "title": "Tableau de bord",
