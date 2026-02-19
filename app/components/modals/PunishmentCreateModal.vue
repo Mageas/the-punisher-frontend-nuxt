@@ -4,6 +4,13 @@ const emit = defineEmits<{
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
+const props = withDefaults(defineProps<{
+  preselectedStudentId?: string | null
+  preselectedClassroomId?: string | null
+}>(), {
+  preselectedStudentId: null,
+  preselectedClassroomId: null,
+})
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -19,9 +26,11 @@ const selectedPunishmentTypeId = ref('')
 const dueAt = ref<DateValue>()
 const dueAtTime = ref('08:00')
 const submitting = ref(false)
+const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
+  if (hasPreselectedStudent.value) return
   selectedStudentId.value = ''
   fetchStudents(selectedClassroomId.value || undefined)
 })
@@ -30,12 +39,19 @@ watch(selectedClassroomId, () => {
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedClassroomId.value = ''
-    selectedStudentId.value = ''
+    selectedClassroomId.value = props.preselectedClassroomId ?? ''
+    selectedStudentId.value = props.preselectedStudentId ?? ''
     selectedPunishmentTypeId.value = ''
     dueAt.value = undefined
     dueAtTime.value = '08:00'
-    await Promise.all([fetchClassrooms(), fetchStudents(), fetchPunishmentTypes()])
+    await Promise.all([
+      hasPreselectedStudent.value ? Promise.resolve() : fetchClassrooms(),
+      fetchStudents(selectedClassroomId.value || undefined),
+      fetchPunishmentTypes(),
+    ])
+    if (props.preselectedStudentId) {
+      selectedStudentId.value = props.preselectedStudentId
+    }
   }
 })
 
@@ -86,24 +102,26 @@ async function submit() {
           <AlertDescription>{{ globalError }}</AlertDescription>
         </Alert>
 
-        <!-- Classroom -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.punishment.class') }}</Label>
-          <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
-        </div>
+        <template v-if="!hasPreselectedStudent">
+          <!-- Classroom -->
+          <div class="space-y-2">
+            <Label>{{ t('modals.punishment.class') }}</Label>
+            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
+          </div>
 
-        <!-- Student -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.punishment.student') }}</Label>
-          <StudentSelect
-            v-model="selectedStudentId"
-            :students="students"
-            :placeholder="t('modals.punishment.selectStudent')"
-            :search-placeholder="t('modals.punishment.searchStudent')"
-            :empty-text="t('modals.punishment.noStudentFound')"
-          />
-          <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>
-        </div>
+          <!-- Student -->
+          <div class="space-y-2">
+            <Label>{{ t('modals.punishment.student') }}</Label>
+            <StudentSelect
+              v-model="selectedStudentId"
+              :students="students"
+              :placeholder="t('modals.punishment.selectStudent')"
+              :search-placeholder="t('modals.punishment.searchStudent')"
+              :empty-text="t('modals.punishment.noStudentFound')"
+            />
+            <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>
+          </div>
+        </template>
 
         <!-- Punishment Type -->
         <div class="space-y-2">

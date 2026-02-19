@@ -90,6 +90,39 @@
     "listOnlyHint": "La création sera ajoutée dans une prochaine étape.",
     "count": "{count} élève | {count} élèves"
   },
+  "studentProfile": {
+    "backToStudents": "Élèves",
+    "loading": "Chargement du profil élève...",
+    "pendingPunishments": "Punitions en attente",
+    "availableBonuses": "Bonus disponibles",
+    "historyTitle": "Historique",
+    "actions": {
+      "edit": "Modifier",
+      "addBonus": "Ajouter bonus",
+      "addPenalty": "Ajouter pénalité",
+      "addPunishment": "Ajouter punition",
+      "delete": "Supprimer",
+      "resolve": "Résoudre",
+      "consume": "Consommer"
+    },
+    "kpis": {
+      "availableBonusPoints": "Points bonus dispo.",
+      "activeBonusCount": "{count} bonus actif | {count} bonus actifs",
+      "totalPenaltyCount": "Pénalités totales",
+      "pendingPunishmentCount": "Punitions en attente"
+    },
+    "empty": {
+      "pendingPunishments": "Aucune punition en attente.",
+      "availableBonuses": "Aucun bonus disponible.",
+      "history": "Aucun événement dans l'historique."
+    },
+    "history": {
+      "punishment": "Punition : {name}",
+      "punishmentAuto": "Punition déclenchée : {name}",
+      "bonus": "Bonus : {name}",
+      "penalty": "Pénalité : {name}"
+    }
+  },
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
@@ -139,17 +172,20 @@
     },
     "student": {
       "title": "Nouvel élève",
+      "editTitle": "Modifier l'élève",
       "firstName": "Prénom",
       "firstNamePlaceholder": "Jean",
       "lastName": "Nom",
       "lastNamePlaceholder": "Dupont",
       "cancel": "Annuler",
-      "submit": "Valider"
+      "submit": "Valider",
+      "save": "Enregistrer"
     },
     "delete": {
       "title": "Confirmer la suppression",
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
       "bonusMessage": "Êtes-vous sûr de vouloir supprimer ce bonus ? Cette action est irréversible.",
+      "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
     },

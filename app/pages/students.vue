@@ -91,10 +91,11 @@ await reload()
     </div>
 
     <div v-else class="space-y-3">
-      <div
+      <NuxtLink
         v-for="student in students"
         :key="student.id"
-        class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 sm:flex-nowrap sm:items-center"
+        :to="`/students/${student.id}`"
+        class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-secondary/40 sm:flex-nowrap sm:items-center"
       >
         <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-medium shrink-0">
           {{ initials(student) }}
@@ -132,7 +133,7 @@ await reload()
 
           <ChevronRight class="w-4 h-4 text-muted-foreground" />
         </div>
-      </div>
+      </NuxtLink>
     </div>
 
     <CustomPagination

@@ -88,7 +88,8 @@ const navGroups = computed<NavGroup[]>(() => [
 ])
 
 function isActive(to: string): boolean {
-  return route.path === to
+  if (to === '/') return route.path === to
+  return route.path === to || route.path.startsWith(`${to}/`)
 }
 </script>
 
