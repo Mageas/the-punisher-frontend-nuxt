@@ -120,6 +120,21 @@ export interface BonusType {
 }
 
 /**
+ * A bonus from the API (full resource).
+ */
+export interface Bonus {
+  id: string
+  student_id: string
+  student_first_name: string
+  student_last_name: string
+  bonus_type_id: string
+  bonus_type_name: string
+  points: number
+  created_at: string
+  used_at: string | null
+}
+
+/**
  * Penalty type from the API.
  */
 export interface PenaltyType {

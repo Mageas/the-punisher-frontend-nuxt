@@ -13,6 +13,7 @@
     "selectDate": "Sélectionner une date...",
     "time": "Heure",
     "resolve": "Marquer comme fait",
+    "consume": "Consommer",
     "previous": "Précédent",
     "next": "Suivant",
     "first": "Premier",
@@ -73,6 +74,13 @@
     "resolvedAt": "Résolu le {date}",
     "manualPunishment": "Punition manuelle"
   },
+  "bonuses": {
+    "title": "Bonus",
+    "newBonus": "Nouveau bonus",
+    "searchPlaceholder": "Rechercher un bonus...",
+    "noBonuses": "Aucun bonus trouvé.",
+    "usedAt": "Consommé le {date}"
+  },
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
@@ -123,6 +131,7 @@
     "delete": {
       "title": "Confirmer la suppression",
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
+      "bonusMessage": "Êtes-vous sûr de vouloir supprimer ce bonus ? Cette action est irréversible.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
     },
@@ -131,6 +140,12 @@
       "punishmentMessage": "Êtes-vous sûr de vouloir marquer cette punition comme faite ?",
       "cancel": "Annuler",
       "confirm": "Marquer comme fait"
+    },
+    "use": {
+      "title": "Confirmer la consommation",
+      "bonusMessage": "Êtes-vous sûr de vouloir consommer ce bonus ?",
+      "cancel": "Annuler",
+      "confirm": "Consommer"
     }
   },
   "auth": {
