@@ -89,6 +89,20 @@
     "noBonuses": "Aucun bonus trouvé.",
     "usedAt": "Consommé le {date}"
   },
+  "rules": {
+    "title": "Règles d'automatisation",
+    "newRule": "Nouvelle règle",
+    "noRules": "Aucune règle trouvée.",
+    "edit": "Modifier",
+    "defaultName": "Règle automatique",
+    "threshold": "Seuil : {count}",
+    "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
+    "modes": {
+      "at": "Au seuil exact",
+      "every": "À chaque multiple",
+      "after": "À partir de"
+    }
+  },
   "students": {
     "title": "Élèves",
     "newStudent": "Ajouter un élève",
@@ -207,6 +221,22 @@
       "cancel": "Annuler",
       "submit": "Valider"
     },
+    "rule": {
+      "title": "Nouvelle règle",
+      "editTitle": "Modifier la règle",
+      "penaltyType": "Déclencheur (type de pénalité)",
+      "threshold": "Seuil",
+      "mode": "Mode",
+      "punishmentType": "Conséquence (type de punition)",
+      "dueAtAfterDays": "Délai (jours pour effectuer)",
+      "selectPenaltyType": "Sélectionner un type...",
+      "noPenaltyTypeFound": "Aucun type trouvé.",
+      "selectPunishmentType": "Sélectionner un type...",
+      "noPunishmentTypeFound": "Aucun type trouvé.",
+      "cancel": "Annuler",
+      "create": "Créer",
+      "save": "Enregistrer"
+    },
     "student": {
       "title": "Nouvel élève",
       "editTitle": "Modifier l'élève",
@@ -237,6 +267,7 @@
       "penaltyMessage": "Êtes-vous sûr de vouloir supprimer cette pénalité ? Cette action est irréversible.",
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
       "bonusMessage": "Êtes-vous sûr de vouloir supprimer ce bonus ? Cette action est irréversible.",
+      "ruleMessage": "Êtes-vous sûr de vouloir supprimer cette règle ? Cette action est irréversible.",
       "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",
       "classroomMessage": "Êtes-vous sûr de vouloir supprimer la classe {name} ? Les élèves ne seront pas supprimés mais retirés de la classe. Cette action est irréversible.",
       "cancel": "Annuler",
