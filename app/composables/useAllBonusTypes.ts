@@ -1,36 +1,19 @@
-import type { BonusType, PaginatedResponse } from '~/types/api'
+import type { BonusType } from '~/types/api'
+import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL bonus types across all pages.
  */
 export function useAllBonusTypes() {
-  const { $api } = useNuxtApp()
-
-  const bonusTypes = ref<BonusType[]>([])
-  const loading = ref(false)
+  const allPaginated = useAllPaginatedCollection<BonusType>(() => '/bonus-types/')
 
   async function fetchBonusTypes() {
-    loading.value = true
-    const all: BonusType[] = []
-    let page = 1
-    let hasMore = true
-
-    while (hasMore) {
-      const res = await $api<PaginatedResponse<BonusType>>('/bonus-types/', {
-        params: { page },
-      })
-      all.push(...res.data)
-      hasMore = res.next_page !== null
-      page++
-    }
-
-    bonusTypes.value = all
-    loading.value = false
+    await allPaginated.fetchAll()
   }
 
   return {
-    bonusTypes: bonusTypes as Readonly<Ref<BonusType[]>>,
-    loading: readonly(loading),
+    bonusTypes: allPaginated.items,
+    loading: allPaginated.loading,
     fetchBonusTypes,
   }
 }

@@ -1,36 +1,19 @@
-import type { PaginatedResponse, PunishmentType } from '~/types/api'
+import type { PunishmentType } from '~/types/api'
+import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL punishment types across all pages.
  */
 export function useAllPunishmentTypes() {
-  const { $api } = useNuxtApp()
-
-  const punishmentTypes = ref<PunishmentType[]>([])
-  const loading = ref(false)
+  const allPaginated = useAllPaginatedCollection<PunishmentType>(() => '/punishment-types/')
 
   async function fetchPunishmentTypes() {
-    loading.value = true
-    const all: PunishmentType[] = []
-    let page = 1
-    let hasMore = true
-
-    while (hasMore) {
-      const res = await $api<PaginatedResponse<PunishmentType>>('/punishment-types/', {
-        params: { page },
-      })
-      all.push(...res.data)
-      hasMore = res.next_page !== null
-      page++
-    }
-
-    punishmentTypes.value = all
-    loading.value = false
+    await allPaginated.fetchAll()
   }
 
   return {
-    punishmentTypes: punishmentTypes as Readonly<Ref<PunishmentType[]>>,
-    loading: readonly(loading),
+    punishmentTypes: allPaginated.items,
+    loading: allPaginated.loading,
     fetchPunishmentTypes,
   }
 }

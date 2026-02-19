@@ -1,41 +1,26 @@
-import type { Bonus, PaginatedResponse } from '~/types/api'
+import type { Bonus } from '~/types/api'
+import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage bonuses with pagination.
  */
 export function useBonuses() {
   const { $api } = useNuxtApp()
-
-  const bonuses = ref<Bonus[]>([])
-  const loading = ref(false)
-  const page = ref(1)
-  const itemPerPage = ref(0)
-  const totalCount = ref(0)
-  const nextPage = ref<number | null>(null)
-  const previousPage = ref<number | null>(null)
+  const paginated = usePaginatedCollection<
+    Bonus,
+    {
+      page?: number
+      state?: 'used' | 'unused'
+      search?: string
+    }
+  >('/bonuses/')
 
   async function fetchBonuses(options?: {
     page?: number
     state?: 'used' | 'unused'
     search?: string
   }) {
-    loading.value = true
-    const params: Record<string, unknown> = {}
-    if (options?.page) params.page = options.page
-    if (options?.state) params.state = options.state
-    if (options?.search) params.search = options.search
-
-    const res = await $api<PaginatedResponse<Bonus>>('/bonuses/', {
-      params,
-    })
-
-    bonuses.value = res.data
-    page.value = res.page
-    itemPerPage.value = res.item_per_page
-    totalCount.value = res.total_count
-    nextPage.value = res.next_page
-    previousPage.value = res.previous_page
-    loading.value = false
+    await paginated.fetchPage(options)
   }
 
   async function useBonus(id: string) {
@@ -47,13 +32,13 @@ export function useBonuses() {
   }
 
   return {
-    bonuses: bonuses as Readonly<Ref<Bonus[]>>,
-    loading: readonly(loading),
-    page: readonly(page),
-    itemPerPage: readonly(itemPerPage),
-    totalCount: readonly(totalCount),
-    nextPage: readonly(nextPage),
-    previousPage: readonly(previousPage),
+    bonuses: paginated.items,
+    loading: paginated.loading,
+    page: paginated.page,
+    itemPerPage: paginated.itemPerPage,
+    totalCount: paginated.totalCount,
+    nextPage: paginated.nextPage,
+    previousPage: paginated.previousPage,
     fetchBonuses,
     useBonus,
     deleteBonus,
