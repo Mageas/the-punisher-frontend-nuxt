@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ConfirmActionModal from '~/components/modals/ConfirmActionModal.vue'
+
 const emit = defineEmits<{
   confirmed: []
 }>()
@@ -6,69 +8,23 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
-const { globalError, handleApiError, clearErrors } = useApiErrors()
-const submitting = ref(false)
 
 const props = defineProps<{
   bonusId: string | null
   deleteFn: (id: string) => Promise<void>
 }>()
-
-watch(open, (isOpen) => {
-  if (isOpen) {
-    clearErrors()
-  }
-})
-
-async function confirm() {
-  if (!props.bonusId) return
-  submitting.value = true
-  clearErrors()
-  try {
-    await props.deleteFn(props.bonusId)
-    open.value = false
-    emit('confirmed')
-  }
-  catch (err) {
-    handleApiError(err)
-  }
-  finally {
-    submitting.value = false
-  }
-}
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-sm">
-      <DialogHeader>
-        <DialogTitle>{{ t('modals.delete.title') }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ t('modals.delete.title') }}</DialogDescription>
-      </DialogHeader>
-
-      <!-- Global error -->
-      <Alert v-if="globalError" variant="destructive">
-        <AlertDescription>{{ globalError }}</AlertDescription>
-      </Alert>
-
-      <p class="text-sm text-muted-foreground">
-        {{ t('modals.delete.bonusMessage') }}
-      </p>
-
-      <DialogFooter>
-        <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-          {{ t('modals.delete.cancel') }}
-        </Button>
-        <Button
-          type="button"
-          variant="destructive"
-          class="cursor-pointer"
-          :disabled="submitting"
-          @click="confirm"
-        >
-          {{ t('modals.delete.confirm') }}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
+  <ConfirmActionModal
+    v-model:open="open"
+    :item-id="props.bonusId"
+    :action-fn="props.deleteFn"
+    :title="t('modals.delete.title')"
+    :message="t('modals.delete.bonusMessage')"
+    :cancel-label="t('modals.delete.cancel')"
+    :confirm-label="t('modals.delete.confirm')"
+    confirm-variant="destructive"
+    @confirmed="emit('confirmed')"
+  />
 </template>
