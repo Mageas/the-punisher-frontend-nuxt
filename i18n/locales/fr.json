@@ -105,6 +105,27 @@
     "studentCount": "{count} élève | {count} élèves",
     "penaltyCount": "{count} pénalité | {count} pénalités"
   },
+  "classProfile": {
+    "backToClasses": "Classes",
+    "loading": "Chargement de la classe...",
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "addStudent": "Ajouter",
+      "removeStudent": "Retirer de la classe"
+    },
+    "kpis": {
+      "studentCount": "Élèves",
+      "availableBonusPoints": "Points bonus dispo.",
+      "totalPenaltyCount": "Pénalités totales",
+      "classTotal": "Total de la classe"
+    },
+    "students": {
+      "title": "Élèves de la classe",
+      "searchPlaceholder": "Rechercher un élève à ajouter...",
+      "empty": "Aucun élève dans cette classe."
+    }
+  },
   "studentProfile": {
     "backToStudents": "Élèves",
     "loading": "Chargement du profil élève...",
@@ -198,12 +219,17 @@
     },
     "classroom": {
       "title": "Nouvelle classe",
+      "editTitle": "Modifier la classe",
       "name": "Nom de la classe",
       "namePlaceholder": "ex: 6ème A",
       "year": "Année scolaire",
       "yearPlaceholder": "ex: 2025-2026",
       "cancel": "Annuler",
-      "submit": "Créer"
+      "submit": "Créer",
+      "save": "Enregistrer",
+      "removeTitle": "Retirer l'élève",
+      "removeMessage": "Êtes-vous sûr de vouloir retirer {student} de la classe {classroom} ? L'élève ne sera pas supprimé, seulement retiré de cette classe.",
+      "removeConfirm": "Retirer"
     },
     "delete": {
       "title": "Confirmer la suppression",
@@ -211,6 +237,7 @@
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
       "bonusMessage": "Êtes-vous sûr de vouloir supprimer ce bonus ? Cette action est irréversible.",
       "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",
+      "classroomMessage": "Êtes-vous sûr de vouloir supprimer la classe {name} ? Les élèves ne seront pas supprimés mais retirés de la classe. Cette action est irréversible.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
     },

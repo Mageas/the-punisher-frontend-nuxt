@@ -79,9 +79,10 @@ await reload()
     </div>
 
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <article
+      <NuxtLink
         v-for="classroom in classrooms"
         :key="classroom.id"
+        :to="`/classes/${classroom.id}`"
         class="flex flex-col rounded-lg border border-border p-5 transition-colors hover:bg-secondary/40"
       >
         <div class="mb-3 flex items-center justify-between gap-2">
@@ -126,7 +127,7 @@ await reload()
             {{ t('classes.penaltyCount', classroom.total_penalty_count) }}
           </span>
         </div>
-      </article>
+      </NuxtLink>
     </div>
 
     <CustomPagination
