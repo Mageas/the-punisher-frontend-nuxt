@@ -25,6 +25,7 @@ const selectedStudentId = ref('')
 const selectedPenaltyTypeId = ref('')
 const submitting = ref(false)
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
+const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
 
 // When classroom changes, re-fetch students and reset student selection
 watch(selectedClassroomId, () => {
@@ -41,7 +42,7 @@ watch(open, async (isOpen) => {
     selectedStudentId.value = props.preselectedStudentId ?? ''
     selectedPenaltyTypeId.value = ''
     await Promise.all([
-      hasPreselectedStudent.value ? Promise.resolve() : fetchClassrooms(),
+      hasPreselectedStudent.value || hasPreselectedClassroom.value ? Promise.resolve() : fetchClassrooms(),
       fetchStudents(selectedClassroomId.value || undefined),
       fetchPenaltyTypes(),
     ])
@@ -91,7 +92,7 @@ async function submit() {
 
         <template v-if="!hasPreselectedStudent">
           <!-- Classroom -->
-          <div class="space-y-2">
+          <div v-if="!hasPreselectedClassroom" class="space-y-2">
             <Label>{{ t('modals.penalty.class') }}</Label>
             <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
           </div>

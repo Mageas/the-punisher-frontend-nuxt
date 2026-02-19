@@ -98,8 +98,20 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
     </template>
 
     <!-- Modals -->
-    <BonusCreateModal v-model:open="showBonusModal" @created="onModalCreated" />
-    <PenaltyCreateModal v-model:open="showPenaltyModal" @created="onModalCreated" />
-    <PunishmentCreateModal v-model:open="showPunishmentModal" @created="onModalCreated" />
+    <BonusCreateModal
+      v-model:open="showBonusModal"
+      :preselected-classroom-id="selectedClassroomId || null"
+      @created="onModalCreated"
+    />
+    <PenaltyCreateModal
+      v-model:open="showPenaltyModal"
+      :preselected-classroom-id="selectedClassroomId || null"
+      @created="onModalCreated"
+    />
+    <PunishmentCreateModal
+      v-model:open="showPunishmentModal"
+      :preselected-classroom-id="selectedClassroomId || null"
+      @created="onModalCreated"
+    />
   </div>
 </template>
