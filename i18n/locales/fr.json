@@ -81,6 +81,15 @@
     "noBonuses": "Aucun bonus trouvé.",
     "usedAt": "Consommé le {date}"
   },
+  "students": {
+    "title": "Élèves",
+    "newStudent": "Ajouter un élève",
+    "searchPlaceholder": "Rechercher un élève...",
+    "noStudents": "Aucun élève trouvé.",
+    "noClassroom": "Aucune classe",
+    "listOnlyHint": "La création sera ajoutée dans une prochaine étape.",
+    "count": "{count} élève | {count} élèves"
+  },
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
@@ -125,6 +134,15 @@
       "selectPunishmentType": "Sélectionner un type...",
       "searchPunishmentType": "Rechercher un type...",
       "noPunishmentTypeFound": "Aucun type trouvé.",
+      "cancel": "Annuler",
+      "submit": "Valider"
+    },
+    "student": {
+      "title": "Nouvel élève",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Jean",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Dupont",
       "cancel": "Annuler",
       "submit": "Valider"
     },
