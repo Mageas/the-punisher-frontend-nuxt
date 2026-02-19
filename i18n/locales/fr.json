@@ -97,6 +97,14 @@
     "listOnlyHint": "La création sera ajoutée dans une prochaine étape.",
     "count": "{count} élève | {count} élèves"
   },
+  "classes": {
+    "title": "Classes",
+    "newClassroom": "Nouvelle classe",
+    "noClasses": "Aucune classe trouvée.",
+    "count": "{count} classe | {count} classes",
+    "studentCount": "{count} élève | {count} élèves",
+    "penaltyCount": "{count} pénalité | {count} pénalités"
+  },
   "studentProfile": {
     "backToStudents": "Élèves",
     "loading": "Chargement du profil élève...",
@@ -187,6 +195,15 @@
       "cancel": "Annuler",
       "submit": "Valider",
       "save": "Enregistrer"
+    },
+    "classroom": {
+      "title": "Nouvelle classe",
+      "name": "Nom de la classe",
+      "namePlaceholder": "ex: 6ème A",
+      "year": "Année scolaire",
+      "yearPlaceholder": "ex: 2025-2026",
+      "cancel": "Annuler",
+      "submit": "Créer"
     },
     "delete": {
       "title": "Confirmer la suppression",
