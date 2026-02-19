@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { Search, X } from 'lucide-vue-next'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
 interface IdNameOption {
@@ -43,10 +43,24 @@ function syncQueryWithSelection() {
   query.value = selectedOption.value?.name ?? ''
 }
 
+function getInputElement() {
+  return rootRef.value?.querySelector('input[data-slot="input"]') as HTMLInputElement | null
+}
+
+function focusInput() {
+  const inputElement = getInputElement()
+  if (!inputElement || document.activeElement === inputElement) return
+  inputElement.focus()
+}
+
 function openDropdown() {
   if (props.disabled) return
   open.value = true
   highlightedIndex.value = filteredOptions.value.length > 0 ? 0 : -1
+  nextTick(() => {
+    if (!open.value) return
+    focusInput()
+  })
 }
 
 function closeDropdown() {
@@ -56,7 +70,7 @@ function closeDropdown() {
 }
 
 function blurInput() {
-  const inputElement = rootRef.value?.querySelector('input[data-slot="input"]') as HTMLInputElement | null
+  const inputElement = getInputElement()
   inputElement?.blur()
   isInputFocused.value = false
 }
@@ -170,7 +184,6 @@ watch(filteredOptions, (options) => {
       :disabled="disabled"
       @focus="handleFocus"
       @blur="handleBlur"
-      @click="openDropdown"
       @input="handleInput"
       @keydown="handleKeydown"
     />

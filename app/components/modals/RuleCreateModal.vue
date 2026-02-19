@@ -91,7 +91,7 @@ async function submit() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-md" @open-auto-focus.prevent>
+    <DialogContent class="min-w-0 overflow-visible sm:max-w-md" @open-auto-focus.prevent>
       <DialogHeader>
         <DialogTitle>{{ t('modals.rule.title') }}</DialogTitle>
         <DialogDescription class="sr-only">{{ t('modals.rule.title') }}</DialogDescription>
