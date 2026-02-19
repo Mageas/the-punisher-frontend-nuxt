@@ -39,6 +39,7 @@
     "general": "Général",
     "dashboard": "Tableau de bord",
     "tracking": "Suivi",
+    "penalties": "Pénalités",
     "punishments": "Punitions",
     "bonuses": "Bonus",
     "management": "Gestion",
@@ -73,6 +74,12 @@
     "resolved": "Résolu",
     "resolvedAt": "Résolu le {date}",
     "manualPunishment": "Punition manuelle"
+  },
+  "penalties": {
+    "title": "Pénalités",
+    "newPenalty": "Nouvelle pénalité",
+    "searchPlaceholder": "Rechercher une pénalité...",
+    "noPenalties": "Aucune pénalité trouvée."
   },
   "bonuses": {
     "title": "Bonus",
@@ -183,6 +190,7 @@
     },
     "delete": {
       "title": "Confirmer la suppression",
+      "penaltyMessage": "Êtes-vous sûr de vouloir supprimer cette pénalité ? Cette action est irréversible.",
       "punishmentMessage": "Êtes-vous sûr de vouloir supprimer cette punition ? Cette action est irréversible.",
       "bonusMessage": "Êtes-vous sûr de vouloir supprimer ce bonus ? Cette action est irréversible.",
       "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",

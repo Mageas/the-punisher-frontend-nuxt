@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   AlertCircle,
+  AlertTriangle,
   FileWarning,
   Gavel,
   LayoutDashboard,
@@ -65,6 +66,7 @@ const navGroups = computed<NavGroup[]>(() => [
   {
     label: t('sidebar.tracking'),
     links: [
+      { to: '/penalties', icon: AlertTriangle, label: t('sidebar.penalties') },
       { to: '/punishments', icon: Gavel, label: t('sidebar.punishments') },
       { to: '/bonuses', icon: Star, label: t('sidebar.bonuses') },
     ],

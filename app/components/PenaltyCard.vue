@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AlertTriangle } from 'lucide-vue-next'
-import { formatTime } from '~/lib/utils'
+import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
   penaltyTypeName: string
@@ -39,7 +39,7 @@ const hasStudentName = computed(() => Boolean(props.studentFirstName && props.st
     </div>
 
     <span class="text-xs text-muted-foreground shrink-0">
-      {{ formatTime(createdAt) }}
+      {{ formatDate(createdAt) }}
     </span>
 
     <div v-if="$slots.actions" class="flex items-center gap-1">
