@@ -99,15 +99,20 @@ await reload()
 
 <template>
   <div>
-    <div class="mb-8 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-      <h1 class="text-2xl font-bold tracking-tight">
-        {{ t('punishments.title') }}
-      </h1>
-      <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
-        <Plus class="w-4 h-4" />
-        {{ t('punishments.newPunishment') }}
-      </Button>
-    </div>
+    <PageHeaderBar align="center">
+      <template #left>
+        <h1 class="text-2xl font-bold tracking-tight">
+          {{ t('punishments.title') }}
+        </h1>
+      </template>
+
+      <template #actions>
+        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+          <Plus class="w-4 h-4" />
+          {{ t('punishments.newPunishment') }}
+        </Button>
+      </template>
+    </PageHeaderBar>
 
     <div class="relative mb-6">
       <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

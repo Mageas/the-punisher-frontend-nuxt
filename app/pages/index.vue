@@ -66,14 +66,15 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
 <template>
   <div>
     <!-- Header & Filtre Global -->
-    <div class="mb-8 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-      <div class="flex flex-wrap items-center gap-4">
+    <PageHeaderBar align="start">
+      <template #left>
         <h1 class="text-2xl font-bold tracking-tight whitespace-nowrap">
           {{ t('dashboard.title') }}
         </h1>
         <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
-      </div>
-      <div class="flex flex-wrap gap-2 xl:justify-end">
+      </template>
+
+      <template #actions>
         <Button variant="outline" class="justify-center cursor-pointer" @click="showBonusModal = true">
           <Star class="w-4 h-4" />
           {{ t('dashboard.newBonus') }}
@@ -86,8 +87,8 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
           <Gavel class="w-4 h-4" />
           {{ t('dashboard.newPunishment') }}
         </Button>
-      </div>
-    </div>
+      </template>
+    </PageHeaderBar>
 
     <template v-if="dashboard">
       <!-- KPI Cards -->
