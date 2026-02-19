@@ -304,6 +304,7 @@
       "ruleMessage": "Êtes-vous sûr de vouloir supprimer cette règle ? Cette action est irréversible.",
       "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",
       "classroomMessage": "Êtes-vous sûr de vouloir supprimer la classe {name} ? Les élèves ne seront pas supprimés mais retirés de la classe. Cette action est irréversible.",
+      "typeChildrenWarning": "Attention : la suppression entraîne aussi la suppression de tous les éléments enfants.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
     },

@@ -10,24 +10,61 @@ const props = withDefaults(defineProps<{
   actionFn: (id: string) => Promise<void>
   title: string
   message: string
+  warningMessage?: string
   cancelLabel: string
   confirmLabel: string
   confirmVariant?: 'default' | 'destructive'
+  lockDurationSeconds?: number
 }>(), {
   confirmVariant: 'default',
+  lockDurationSeconds: 0,
 })
 
 const { globalError, handleApiError, clearErrors } = useApiErrors()
 const submitting = ref(false)
+const lockSecondsLeft = ref(0)
+let lockInterval: ReturnType<typeof setInterval> | null = null
+
+const confirmButtonLabel = computed(() => {
+  if (lockSecondsLeft.value <= 0) return props.confirmLabel
+  return `${props.confirmLabel} (${lockSecondsLeft.value}s)`
+})
+
+function clearLockTimer() {
+  if (!lockInterval) return
+  clearInterval(lockInterval)
+  lockInterval = null
+}
+
+function startLockTimer() {
+  clearLockTimer()
+  lockSecondsLeft.value = props.lockDurationSeconds
+  if (lockSecondsLeft.value <= 0) return
+
+  lockInterval = setInterval(() => {
+    if (lockSecondsLeft.value <= 1) {
+      lockSecondsLeft.value = 0
+      clearLockTimer()
+      return
+    }
+
+    lockSecondsLeft.value -= 1
+  }, 1000)
+}
 
 watch(open, (isOpen) => {
   if (isOpen) {
     clearErrors()
+    startLockTimer()
+    return
   }
+
+  clearLockTimer()
+  lockSecondsLeft.value = 0
 })
 
 async function confirm() {
-  if (!props.itemId) return
+  if (!props.itemId || lockSecondsLeft.value > 0) return
   submitting.value = true
   clearErrors()
   try {
@@ -42,6 +79,10 @@ async function confirm() {
     submitting.value = false
   }
 }
+
+onBeforeUnmount(() => {
+  clearLockTimer()
+})
 </script>
 
 <template>
@@ -59,6 +100,9 @@ async function confirm() {
       <p class="text-sm text-muted-foreground">
         {{ message }}
       </p>
+      <p v-if="warningMessage" class="text-sm font-medium text-red-500">
+        {{ warningMessage }}
+      </p>
 
       <DialogFooter>
         <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
@@ -68,10 +112,10 @@ async function confirm() {
           type="button"
           :variant="confirmVariant"
           class="cursor-pointer"
-          :disabled="submitting"
+          :disabled="submitting || lockSecondsLeft > 0"
           @click="confirm"
         >
-          {{ confirmLabel }}
+          {{ confirmButtonLabel }}
         </Button>
       </DialogFooter>
     </DialogContent>
