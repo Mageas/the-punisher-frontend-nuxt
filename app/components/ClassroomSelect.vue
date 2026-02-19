@@ -10,7 +10,6 @@ const props = defineProps<{
 const modelValue = defineModel<string>({ default: '' })
 
 const { t } = useI18n()
-
 const options = computed(() =>
   props.classrooms.map(classroom => ({
     id: classroom.id,
@@ -20,14 +19,12 @@ const options = computed(() =>
 </script>
 
 <template>
-  <IdNameSelect
-    v-model="modelValue"
-    :options="options"
-    :placeholder="t('common.allStudents')"
-    :search-placeholder="t('common.searchClass')"
-    :empty-text="t('common.noClassFound')"
-    :none-option-label="t('common.allStudents')"
-    :none-value-label="t('common.allStudents')"
-    :full-width="props.fullWidth ?? false"
-  />
+  <div :class="props.fullWidth ? 'w-full' : 'w-[200px]'">
+    <IdNameSearchInput
+      v-model="modelValue"
+      :options="options"
+      :placeholder="t('common.selectClassOptional')"
+      :empty-text="t('common.noClassFound')"
+    />
+  </div>
 </template>

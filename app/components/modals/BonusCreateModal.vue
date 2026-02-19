@@ -81,7 +81,7 @@ async function submit() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 overflow-x-hidden sm:max-w-md">
+    <DialogContent class="min-w-0 sm:max-w-md" @open-auto-focus.prevent>
       <DialogHeader>
         <DialogTitle>{{ t('modals.bonus.title') }}</DialogTitle>
         <DialogDescription class="sr-only">{{ t('modals.bonus.title') }}</DialogDescription>
@@ -107,7 +107,6 @@ async function submit() {
               v-model="selectedStudentId"
               :students="students"
               :placeholder="t('modals.bonus.selectStudent')"
-              :search-placeholder="t('modals.bonus.searchStudent')"
               :empty-text="t('modals.bonus.noStudentFound')"
             />
             <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>

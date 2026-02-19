@@ -4,6 +4,7 @@
   },
   "common": {
     "allStudents": "Tous les élèves",
+    "selectClassOptional": "Sélectionner une classe (optionnel)",
     "searchClass": "Rechercher une classe...",
     "noClassFound": "Aucune classe trouvée.",
     "recent": "Récent",
