@@ -103,6 +103,40 @@
       "after": "À partir de"
     }
   },
+  "typeManagement": {
+    "name": "Nom",
+    "edit": "Modifier",
+    "create": "Créer",
+    "save": "Enregistrer",
+    "createdAt": "Créé le {date}"
+  },
+  "penaltyTypes": {
+    "title": "Types de pénalités",
+    "newType": "Ajouter",
+    "createTitle": "Nouveau type de pénalité",
+    "editTitle": "Modifier le type de pénalité",
+    "placeholder": "ex: Bavardage",
+    "noTypes": "Aucun type de pénalité trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de pénalité ? Cette action est irréversible."
+  },
+  "punishmentTypes": {
+    "title": "Types de punitions",
+    "newType": "Ajouter",
+    "createTitle": "Nouveau type de punition",
+    "editTitle": "Modifier le type de punition",
+    "placeholder": "ex: Retenue",
+    "noTypes": "Aucun type de punition trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de punition ? Cette action est irréversible."
+  },
+  "bonusTypes": {
+    "title": "Types de bonus",
+    "newType": "Ajouter",
+    "createTitle": "Nouveau type de bonus",
+    "editTitle": "Modifier le type de bonus",
+    "placeholder": "ex: Participation",
+    "noTypes": "Aucun type de bonus trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de bonus ? Cette action est irréversible."
+  },
   "students": {
     "title": "Élèves",
     "newStudent": "Ajouter un élève",
