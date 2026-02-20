@@ -2,6 +2,7 @@
 interface PendingPunishment {
   id: string
   punishment_type_name: string
+  automated: boolean
   triggering_rule_id?: string | null
   triggering_rule_name?: string | null
   due_at?: string | null

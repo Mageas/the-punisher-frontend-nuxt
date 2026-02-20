@@ -19,8 +19,13 @@ function eventDotClass(item: StudentHistoryItem): string {
   return 'bg-red-400'
 }
 
+function isPunishmentAutomated(item: StudentHistoryPunishmentItem): boolean {
+  return item.automated === true
+}
+
 function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
   if (item.triggering_rule_name) return item.triggering_rule_name
+  if (isPunishmentAutomated(item)) return t('common.auto')
   return t('punishments.manualPunishment')
 }
 </script>
@@ -47,13 +52,13 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
             <div class="flex flex-wrap items-center gap-2">
               <p class="text-sm font-medium">
                 {{
-                  item.triggering_rule_id
+                  isPunishmentAutomated(item)
                     ? t('studentProfile.history.punishmentAuto', { name: item.punishment_type_name })
                     : t('studentProfile.history.punishment', { name: item.punishment_type_name })
                 }}
               </p>
               <Badge
-                v-if="item.triggering_rule_id"
+                v-if="isPunishmentAutomated(item)"
                 variant="outline"
                 class="text-xs text-blue-400 border-blue-400/30"
               >

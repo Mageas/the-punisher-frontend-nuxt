@@ -78,6 +78,7 @@ export interface DashboardPunishment {
   student_last_name: string
   punishment_type_id: string
   punishment_type_name: string
+  automated: boolean
   triggering_rule_id: string | null
   triggering_rule_name: string | null
   created_at: string
@@ -151,6 +152,7 @@ export interface StudentHistoryPunishmentItem {
   id: string
   punishment_type_id: string
   punishment_type_name: string
+  automated: boolean
   triggering_rule_id?: string | null
   triggering_rule_name?: string | null
   due_at?: string | null
@@ -234,6 +236,7 @@ export interface Punishment {
   student_last_name: string
   punishment_type_id: string
   punishment_type_name: string
+  automated: boolean
   triggering_rule_id: string | null
   triggering_rule_name: string | null
   created_at: string

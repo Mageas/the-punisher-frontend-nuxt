@@ -6,6 +6,7 @@ interface PendingPunishment {
   id: string
   student_id?: string
   punishment_type_name: string
+  automated: boolean
   triggering_rule_id?: string | null
   triggering_rule_name?: string | null
   due_at?: string | null
@@ -73,6 +74,7 @@ function onResolved() {
         v-for="punishment in punishments"
         :key="punishment.id"
         :punishment-type-name="punishment.punishment_type_name"
+        :automated="punishment.automated"
         :triggering-rule-id="punishment.triggering_rule_id"
         :triggering-rule-name="punishment.triggering_rule_name"
         :due-at="punishment.due_at"

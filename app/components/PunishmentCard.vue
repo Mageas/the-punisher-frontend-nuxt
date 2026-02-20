@@ -4,6 +4,7 @@ import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
   punishmentTypeName: string
+  automated: boolean
   triggeringRuleId?: string | null
   triggeringRuleName?: string | null
   dueAt?: string | null
@@ -17,6 +18,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
+const isAutomated = computed(() => props.automated === true)
 
 const subtitle = computed(() => {
   if (hasStudentName.value) {
@@ -24,13 +26,14 @@ const subtitle = computed(() => {
     if (props.triggeringRuleName) {
       parts.push(props.triggeringRuleName)
     }
-    else if (!props.triggeringRuleId) {
+    else if (!isAutomated.value) {
       parts.push(t('punishments.manualPunishment'))
     }
     return parts.join(' — ')
   }
 
-  return props.triggeringRuleName ?? t('punishments.manualPunishment')
+  if (props.triggeringRuleName) return props.triggeringRuleName
+  return isAutomated.value ? t('common.auto') : t('punishments.manualPunishment')
 })
 </script>
 
@@ -63,7 +66,7 @@ const subtitle = computed(() => {
           <span v-else>{{ punishmentTypeName }}</span>
         </p>
         <Badge
-          v-if="triggeringRuleId"
+          v-if="isAutomated"
           variant="outline"
           class="text-xs text-blue-400 border-blue-400/30"
         >
