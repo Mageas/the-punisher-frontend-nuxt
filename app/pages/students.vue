@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { AlertCircle, ChevronRight, Plus, Search, Star } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
+import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { getInitials, formatPoints } = useFormat()
 const { students, loading, page, itemPerPage, totalCount, fetchStudents } = useStudents()
 
 const searchQuery = ref('')

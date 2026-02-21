@@ -2,13 +2,13 @@
 import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
 import { studentService } from '~/services/student.service'
+import { getInitials } from '~/lib/utils'
 
 definePageMeta({
   path: '/students/:studentId',
 })
 
 const { t } = useI18n()
-const { getInitials } = useFormat()
 const route = useRoute()
 
 const studentId = computed(() => {

@@ -1,75 +1,60 @@
-# Nuxt Minimal Starter
+# The Punisher Frontend (Nuxt)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Modern web application for classroom management, built with Nuxt 3, TypeScript, and Tailwind CSS.
 
-## Setup
+## 🚀 Features
 
-Make sure to install dependencies:
+- **Classroom Management:** Create, update, and manage student rosters.
+- **Behavior Tracking:** Log penalties and assign punishments based on rules.
+- **Reward System:** Distribute and track bonus points for students.
+- **Type Management:** Customizable types for bonuses, penalties, and punishments.
+- **Authentication:** Secure teacher login/registration with token rotation.
+- **Internationalization:** Full French (fr-FR) support.
 
-```bash
-# npm
-npm install
+## 🛠 Tech Stack
 
-# pnpm
-pnpm install
+- **Framework:** [Nuxt 3](https://nuxt.com/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **State Management:** [Pinia](https://pinia.vuejs.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn Vue](https://www.shadcn-vue.com/)
+- **Package Manager:** [Bun](https://bun.sh/)
+- **Testing:** [Vitest](https://vitest.dev/) (Unit) + [Playwright](https://playwright.dev/) (E2E)
 
-# yarn
-yarn install
+## 📁 Architecture
 
-# bun
-bun install
-```
+- `app/components/features`: Domain-specific components grouped by feature.
+- `app/components/ui`: Reusable UI primitives (Shadcn).
+- `app/services`: API communication layer. **All API calls must go through services.**
+- `app/composables`: Reusable business logic and state orchestration.
+- `app/types/api`: TypeScript definitions for API responses and payloads.
 
-## Development Server
+## ⚙️ Setup
 
-Start the development server on `http://localhost:3000`:
+1. **Install dependencies:**
+   ```bash
+   bun install
+   ```
 
-```bash
-# npm
-npm run dev
+2. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env and set NUXT_PUBLIC_API_BASE_URL
+   ```
 
-# pnpm
-pnpm dev
+3. **Start development server:**
+   ```bash
+   bun run dev
+   ```
 
-# yarn
-yarn dev
+## 🧪 Testing & Quality
 
-# bun
-bun run dev
-```
+- **Linting:** `bun run lint`
+- **Type Check:** `bun run typecheck`
+- **Unit Tests:** `bun run test`
+- **E2E Tests:** `bun run test:e2e`
 
-## Production
+## 📖 Documentation
 
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- [Project Overview](docs/projet.md)
+- [UI Documentation](docs/projet-ui.md)
+- [API Reference](docs/api-reference.md)

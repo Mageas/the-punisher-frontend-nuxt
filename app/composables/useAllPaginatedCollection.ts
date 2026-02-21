@@ -21,13 +21,18 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
       const all: TItem[] = []
       let page = 1
       let hasMore = true
+      const MAX_PAGES = 10
 
-      while (hasMore) {
+      while (hasMore && page <= MAX_PAGES) {
         const res = await fetcher({ page }, ...args)
 
         all.push(...res.data)
         hasMore = res.next_page !== null
         page++
+      }
+
+      if (page > MAX_PAGES) {
+        console.warn(`[useAllPaginatedCollection] Reached MAX_PAGES (${MAX_PAGES}). Stopping fetch.`)
       }
 
       items.value = all

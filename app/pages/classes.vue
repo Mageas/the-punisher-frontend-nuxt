@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { AlertCircle, Plus, Star } from 'lucide-vue-next'
 import type { Classroom } from '~/types/api'
+import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { getInitials, formatPoints } = useFormat()
 const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms } = useClassrooms()
 
 const showCreateModal = ref(false)
