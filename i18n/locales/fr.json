@@ -180,6 +180,7 @@
     "loading": "Chargement du profil élève...",
     "pendingPunishments": "Punitions en attente",
     "availableBonuses": "Bonus disponibles",
+    "penalties": "Pénalités",
     "historyTitle": "Historique",
     "actions": {
       "edit": "Modifier",
@@ -199,6 +200,7 @@
     "empty": {
       "pendingPunishments": "Aucune punition en attente.",
       "availableBonuses": "Aucun bonus disponible.",
+      "penalties": "Aucune pénalité.",
       "history": "Aucun événement dans l'historique."
     },
     "history": {

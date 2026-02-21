@@ -1,3 +1,5 @@
+import type { MaybeRefOrGetter } from 'vue'
+import { toValue } from 'vue'
 import type { PaginatedResponse } from '~/types/api'
 
 type QueryValue = string | number | boolean | null | undefined
@@ -13,7 +15,7 @@ function shouldKeepParam(value: QueryValue): boolean {
 export function usePaginatedCollection<
   TItem,
   TOptions extends QueryOptions = QueryOptions,
->(endpoint: string) {
+>(endpoint: MaybeRefOrGetter<string>) {
   const { $api } = useNuxtApp()
 
   const items = ref<TItem[]>([])
@@ -38,7 +40,7 @@ export function usePaginatedCollection<
         }
       }
 
-      const res = await $api<PaginatedResponse<TItem>>(endpoint, { params })
+      const res = await $api<PaginatedResponse<TItem>>(toValue(endpoint), { params })
 
       items.value = res.data
       page.value = res.page

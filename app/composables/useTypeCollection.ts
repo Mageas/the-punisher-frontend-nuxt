@@ -33,7 +33,7 @@ export function useTypeCollection<TType extends NamedTypeResource>(endpoint: str
   }
 
   async function deleteType(id: string) {
-    await $api(`${endpoint}${id}/force`, { method: 'DELETE' })
+    await $api(`${endpoint}${id}`, { method: 'DELETE' })
   }
 
   return {

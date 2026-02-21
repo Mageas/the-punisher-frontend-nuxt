@@ -10,9 +10,6 @@ import {
 } from 'lucide-vue-next'
 import type {
   Student,
-  StudentHistoryBonusItem,
-  StudentHistoryItem,
-  StudentHistoryPunishmentItem,
   StudentKpis,
 } from '~/types/api'
 import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
@@ -20,6 +17,8 @@ import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
 import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
 import StudentDeleteModal from '~/components/modals/StudentDeleteModal.vue'
 import StudentEditModal from '~/components/modals/StudentEditModal.vue'
+import CustomPagination from '~/components/CustomPagination.vue'
+import HistoryPenaltiesSection from '~/components/history/PenaltiesSection.vue'
 
 definePageMeta({
   path: '/students/:studentId',
@@ -31,7 +30,7 @@ const { $api } = useNuxtApp()
 
 const studentId = computed(() => {
   const routeStudentId = route.params.studentId
-  return Array.isArray(routeStudentId) ? routeStudentId[0] : routeStudentId
+  return (Array.isArray(routeStudentId) ? routeStudentId[0] : routeStudentId) as string
 })
 
 if (!studentId.value) {
@@ -43,26 +42,51 @@ if (!studentId.value) {
 
 const student = ref<Student | null>(null)
 const kpis = ref<StudentKpis | null>(null)
-const history = ref<StudentHistoryItem[]>([])
-const loading = ref(false)
+const loadingProfile = ref(false)
+
+const {
+  punishments: pendingPunishments,
+  loading: loadingPunishments,
+  page: punishmentsPage,
+  totalCount: punishmentsTotal,
+  itemPerPage: punishmentsPerPage,
+  fetchPunishments,
+  resolvePunishment: resolvePunishmentApi,
+} = useStudentPunishments(studentId)
+
+const {
+  bonuses: availableBonuses,
+  loading: loadingBonuses,
+  page: bonusesPage,
+  totalCount: bonusesTotal,
+  itemPerPage: bonusesPerPage,
+  fetchBonuses,
+  useBonus: useBonusApi,
+} = useStudentBonuses(studentId)
+
+const {
+  penalties,
+  loading: loadingPenalties,
+  page: penaltiesPage,
+  totalCount: penaltiesTotal,
+  itemPerPage: penaltiesPerPage,
+  fetchPenalties,
+} = useStudentPenalties(studentId)
+
+const {
+  items: historyItems,
+  loading: loadingHistory,
+  page: historyPage,
+  totalCount: historyTotal,
+  itemPerPage: historyPerPage,
+  fetchHistory,
+} = useStudentHistory(studentId)
 
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showBonusCreateModal = ref(false)
 const showPenaltyCreateModal = ref(false)
 const showPunishmentCreateModal = ref(false)
-
-const pendingPunishments = computed(() =>
-  history.value.filter((item): item is StudentHistoryPunishmentItem => {
-    return item.type === 'punishment' && !item.resolved_at
-  }),
-)
-
-const availableBonuses = computed(() =>
-  history.value.filter((item): item is StudentHistoryBonusItem => {
-    return item.type === 'bonus' && !item.used_at
-  }),
-)
 
 const initials = computed(() => {
   if (!student.value) return ''
@@ -72,32 +96,36 @@ const initials = computed(() => {
 })
 
 async function fetchStudentProfile() {
-  loading.value = true
+  loadingProfile.value = true
   try {
-    const [studentRes, kpisRes, historyRes] = await Promise.all([
+    const [studentRes, kpisRes] = await Promise.all([
       $api<Student>(`/students/${studentId.value}`),
       $api<StudentKpis>(`/students/${studentId.value}/kpis`),
-      $api<StudentHistoryItem[]>(`/students/${studentId.value}/history`),
     ])
     student.value = studentRes
     kpis.value = kpisRes
-    history.value = historyRes
   }
   finally {
-    loading.value = false
+    loadingProfile.value = false
   }
+}
+
+async function loadAllData() {
+  await Promise.all([
+    fetchStudentProfile(),
+    fetchPunishments({ state: 'pending', page: 1 }),
+    fetchBonuses({ state: 'unused', page: 1 }),
+    fetchPenalties({ page: 1 }),
+    fetchHistory({ page: 1 }),
+  ])
 }
 
 async function resolvePunishment(id: string) {
-  await $api(`/punishments/${id}/resolve`, {
-    method: 'POST',
-  })
+  await resolvePunishmentApi(id)
 }
 
 async function useBonus(id: string) {
-  await $api(`/bonuses/${id}/use`, {
-    method: 'POST',
-  })
+  await useBonusApi(id)
 }
 
 async function deleteStudent(id: string) {
@@ -107,7 +135,7 @@ async function deleteStudent(id: string) {
 }
 
 function onActionConfirmed() {
-  fetchStudentProfile()
+  loadAllData()
 }
 
 async function onDeleteConfirmed() {
@@ -115,14 +143,14 @@ async function onDeleteConfirmed() {
 }
 
 function onCreated() {
-  fetchStudentProfile()
+  loadAllData()
 }
 
-await fetchStudentProfile()
+await loadAllData()
 
 watch(studentId, (nextStudentId, previousStudentId) => {
   if (!nextStudentId || nextStudentId === previousStudentId) return
-  fetchStudentProfile()
+  loadAllData()
 })
 </script>
 
@@ -226,24 +254,64 @@ watch(studentId, (nextStudentId, previousStudentId) => {
         </div>
       </div>
 
-      <HistoryPendingPunishmentsSection
-        class="mb-8"
-        :punishments="pendingPunishments"
-        :resolve-fn="resolvePunishment"
-        @resolved="onActionConfirmed"
-      />
+      <div class="mb-8 space-y-4">
+        <HistoryPendingPunishmentsSection
+          :punishments="pendingPunishments"
+          :resolve-fn="resolvePunishment"
+          @resolved="onActionConfirmed"
+        />
+        <CustomPagination
+          v-if="punishmentsTotal > punishmentsPerPage"
+          :page="punishmentsPage"
+          :total="punishmentsTotal"
+          :items-per-page="punishmentsPerPage"
+          :loading="loadingPunishments"
+          @update:page="fetchPunishments({ state: 'pending', page: $event })"
+        />
+      </div>
 
-      <HistoryAvailableBonusesSection
-        class="mb-8"
-        :bonuses="availableBonuses"
-        :use-fn="useBonus"
-        @used="onActionConfirmed"
-      />
+      <div class="mb-8 space-y-4">
+        <HistoryAvailableBonusesSection
+          :bonuses="availableBonuses"
+          :use-fn="useBonus"
+          @used="onActionConfirmed"
+        />
+        <CustomPagination
+          v-if="bonusesTotal > bonusesPerPage"
+          :page="bonusesPage"
+          :total="bonusesTotal"
+          :items-per-page="bonusesPerPage"
+          :loading="loadingBonuses"
+          @update:page="fetchBonuses({ state: 'unused', page: $event })"
+        />
+      </div>
 
-      <HistoryTimelineSection :history="history" />
+      <div class="mb-8 space-y-4">
+        <HistoryPenaltiesSection :penalties="penalties" />
+        <CustomPagination
+          v-if="penaltiesTotal > penaltiesPerPage"
+          :page="penaltiesPage"
+          :total="penaltiesTotal"
+          :items-per-page="penaltiesPerPage"
+          :loading="loadingPenalties"
+          @update:page="fetchPenalties({ page: $event })"
+        />
+      </div>
+
+      <div class="mb-8 space-y-4">
+        <HistoryTimelineSection :history="historyItems" />
+        <CustomPagination
+          v-if="historyTotal > historyPerPage"
+          :page="historyPage"
+          :total="historyTotal"
+          :items-per-page="historyPerPage"
+          :loading="loadingHistory"
+          @update:page="fetchHistory({ page: $event })"
+        />
+      </div>
     </template>
 
-    <div v-else-if="loading" class="py-16 text-center text-muted-foreground">
+    <div v-else-if="loadingProfile" class="py-16 text-center text-muted-foreground">
       {{ t('studentProfile.loading') }}
     </div>
 
