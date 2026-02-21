@@ -384,5 +384,12 @@
       "validation_unknown_field": "Champ inconnu.",
       "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}."
     }
+  },
+  "errors": {
+    "pageNotFound": "Page non trouvée",
+    "serverError": "Erreur serveur",
+    "defaultMessage": "Une erreur inattendue est survenue. Notre équipe a été prévenue.",
+    "backHome": "Retour à l'accueil",
+    "goBack": "Page précédente"
   }
 }

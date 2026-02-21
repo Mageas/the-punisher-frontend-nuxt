@@ -53,6 +53,13 @@ export function getInitials(firstName?: string | null, lastName?: string | null)
 }
 
 /**
+ * Checks if a string is a valid UUID (36 characters).
+ */
+export function isUuid(value: unknown): value is string {
+  return typeof value === 'string' && /^[0-9a-fA-F-]{36}$/.test(value)
+}
+
+/**
  * Format points with optional 'pt' or 'pts' suffix.
  */
 export function formatPoints(points: number): string {

@@ -113,10 +113,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
   })
 
-  const api = (async (request: ApiRequest, options?: ApiOptions) => {
+  const api = (async (request: ApiRequest, options?: ApiOptions & { fatal?: boolean }) => {
     try {
       return await baseApi(request, options)
-    } catch (error) {
+    } catch (error: unknown) {
+      // 1. Handle 401 Unauthorized (Silent Token Refresh)
       if (isUnauthorizedError(error) && !isRequestToAuthRoute(request)) {
         if (import.meta.server) {
           clearAccessToken()
@@ -131,6 +132,24 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         clearAccessToken()
         await nuxtApp.runWithContext(() => navigateTo('/login'))
+      }
+
+      // 2. Handle Fatal Errors (500+, Network Failure)
+      // If the error is 500 or higher, or has no statusCode (connection refused),
+      // we throw a fatal error that Nuxt captures to show the error page.
+      // We skip this if options.fatal is explicitly false.
+      if (error && typeof error === 'object') {
+        const e = error as { statusCode?: number; status?: number; statusMessage?: string }
+        const statusCode = e.statusCode || e.status || 500
+        const isFatalError = statusCode >= 500 || e.statusCode === undefined
+
+        if (isFatalError && options?.fatal !== false) {
+          throw createError({
+            statusCode: statusCode,
+            statusMessage: e.statusMessage || 'Internal Server Error',
+            fatal: true,
+          })
+        }
       }
 
       throw error

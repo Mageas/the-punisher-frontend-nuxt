@@ -2,11 +2,14 @@
 import type { Classroom, Student } from '~/types/api'
 import { classroomService } from '~/services/classroom.service'
 
+const { t } = useI18n()
+const { validateUuid, catchResourceNotFound } = useResourceError()
+
 definePageMeta({
   path: '/classes/:classroomId',
+  validate: validateUuid('classroomId'),
 })
 
-const { t } = useI18n()
 const route = useRoute()
 
 const { students: classroomStudents, fetchStudents: fetchClassroomStudents } = useAllStudents()
@@ -19,16 +22,7 @@ const {
 
 const classroomId = computed<string>(() => {
   const routeClassroomId = route.params.classroomId
-  const resolvedClassroomId = Array.isArray(routeClassroomId)
-    ? routeClassroomId[0]
-    : routeClassroomId
-  if (!resolvedClassroomId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Missing classroom id',
-    })
-  }
-  return resolvedClassroomId
+  return (Array.isArray(routeClassroomId) ? routeClassroomId[0] : routeClassroomId) as string
 })
 
 const classroom = ref<Classroom | null>(null)
@@ -76,6 +70,8 @@ async function fetchClassroomProfile() {
       fetchAllStudents(),
     ])
     classroom.value = classroomRes
+  } catch (err) {
+    catchResourceNotFound(err, t('apiErrors.messages.classroom_not_found'))
   } finally {
     loading.value = false
   }

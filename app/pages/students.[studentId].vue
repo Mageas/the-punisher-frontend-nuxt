@@ -4,24 +4,20 @@ import type { Student, StudentKpis } from '~/types/api'
 import { studentService } from '~/services/student.service'
 import { getInitials } from '~/lib/utils'
 
+const { t } = useI18n()
+const { validateUuid, catchResourceNotFound } = useResourceError()
+
 definePageMeta({
   path: '/students/:studentId',
+  validate: validateUuid('studentId'),
 })
 
-const { t } = useI18n()
 const route = useRoute()
 
 const studentId = computed(() => {
   const routeStudentId = route.params.studentId
   return (Array.isArray(routeStudentId) ? routeStudentId[0] : routeStudentId) as string
 })
-
-if (!studentId.value) {
-  throw createError({
-    statusCode: 400,
-    statusMessage: 'Missing student id',
-  })
-}
 
 const student = ref<Student | null>(null)
 const kpis = ref<StudentKpis | null>(null)
@@ -86,6 +82,8 @@ async function fetchStudentProfile() {
     ])
     student.value = studentRes
     kpis.value = kpisRes
+  } catch (err) {
+    catchResourceNotFound(err, t('apiErrors.messages.student_not_found'))
   } finally {
     loadingProfile.value = false
   }
