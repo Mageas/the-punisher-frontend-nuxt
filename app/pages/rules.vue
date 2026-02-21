@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next'
 import type { Rule, RulePayload } from '~/types/api'
-import CustomPagination from '~/components/CustomPagination.vue'
-import RuleCreateModal from '~/components/modals/RuleCreateModal.vue'
-import RuleDeleteModal from '~/components/modals/RuleDeleteModal.vue'
-import RuleEditModal from '~/components/modals/RuleEditModal.vue'
 
 const { t } = useI18n()
 const {

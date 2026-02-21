@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
-import CustomPagination from '~/components/CustomPagination.vue'
-import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
-import PenaltyDeleteModal from '~/components/modals/PenaltyDeleteModal.vue'
 
 const { t } = useI18n()
 const {

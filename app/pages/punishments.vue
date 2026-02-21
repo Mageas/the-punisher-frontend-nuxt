@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { CircleCheck, Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
-import CustomPagination from '~/components/CustomPagination.vue'
-import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
-import PunishmentDeleteModal from '~/components/modals/PunishmentDeleteModal.vue'
-import PunishmentResolveModal from '~/components/modals/PunishmentResolveModal.vue'
 
 const { t } = useI18n()
 const {

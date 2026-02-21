@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { CircleCheck } from 'lucide-vue-next'
-import PunishmentResolveModal from '~/components/modals/PunishmentResolveModal.vue'
 
 interface PendingPunishment {
   id: string

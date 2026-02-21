@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
-import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
-import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
-import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()

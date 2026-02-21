@@ -2,11 +2,6 @@
 import type { Component } from 'vue'
 import { Plus } from 'lucide-vue-next'
 import type { BonusType, PenaltyType, PunishmentType } from '~/types/api'
-import CustomPagination from '~/components/CustomPagination.vue'
-import TypeCard from '~/components/type-management/TypeCard.vue'
-import TypeCreateModal from '~/components/type-management/TypeCreateModal.vue'
-import TypeDeleteModal from '~/components/type-management/TypeDeleteModal.vue'
-import TypeEditModal from '~/components/type-management/TypeEditModal.vue'
 import { useTypeCollection } from '~/composables/useTypeCollection'
 
 type ManagedType = BonusType | PenaltyType | PunishmentType

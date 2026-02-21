@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { AlertCircle, Plus, Star } from 'lucide-vue-next'
 import type { Classroom } from '~/types/api'
-import CustomPagination from '~/components/CustomPagination.vue'
-import ClassroomCreateModal from '~/components/modals/ClassroomCreateModal.vue'
 
 const { t } = useI18n()
 const {

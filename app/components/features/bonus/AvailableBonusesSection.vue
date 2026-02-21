@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Gift } from 'lucide-vue-next'
-import BonusUseModal from '~/components/modals/BonusUseModal.vue'
 
 interface AvailableBonus {
   id: string

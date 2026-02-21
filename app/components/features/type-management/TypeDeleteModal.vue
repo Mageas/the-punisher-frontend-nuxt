@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ConfirmActionModal from '~/components/modals/ConfirmActionModal.vue'
-
 const emit = defineEmits<{
   confirmed: []
 }>()

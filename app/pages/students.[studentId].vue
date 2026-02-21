@@ -12,13 +12,6 @@ import type {
   Student,
   StudentKpis,
 } from '~/types/api'
-import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
-import PenaltyCreateModal from '~/components/modals/PenaltyCreateModal.vue'
-import PunishmentCreateModal from '~/components/modals/PunishmentCreateModal.vue'
-import StudentDeleteModal from '~/components/modals/StudentDeleteModal.vue'
-import StudentEditModal from '~/components/modals/StudentEditModal.vue'
-import CustomPagination from '~/components/CustomPagination.vue'
-import HistoryPenaltiesSection from '~/components/history/PenaltiesSection.vue'
 
 definePageMeta({
   path: '/students/:studentId',

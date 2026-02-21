@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { Gift, Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
-import CustomPagination from '~/components/CustomPagination.vue'
-import BonusCreateModal from '~/components/modals/BonusCreateModal.vue'
-import BonusDeleteModal from '~/components/modals/BonusDeleteModal.vue'
-import BonusUseModal from '~/components/modals/BonusUseModal.vue'
 
 const { t } = useI18n()
 const {

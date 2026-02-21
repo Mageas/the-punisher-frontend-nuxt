@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import type { Classroom, Student } from '~/types/api'
-import ClassroomDeleteModal from '~/components/modals/ClassroomDeleteModal.vue'
-import ClassroomEditModal from '~/components/modals/ClassroomEditModal.vue'
-import ClassroomRemoveStudentModal from '~/components/modals/ClassroomRemoveStudentModal.vue'
 
 definePageMeta({
   path: '/classes/:classroomId',

@@ -8,6 +8,12 @@ export default defineNuxtConfig({
     },
   },
   modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n', '@pinia/nuxt'],
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   shadcn: {
     /**
      * Prefix for all the imported component.

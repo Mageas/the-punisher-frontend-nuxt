@@ -2,8 +2,6 @@
 import { AlertCircle, ChevronRight, Plus, Search, Star } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
 import type { Student } from '~/types/api'
-import CustomPagination from '~/components/CustomPagination.vue'
-import StudentCreateModal from '~/components/modals/StudentCreateModal.vue'
 
 const { t } = useI18n()
 const {
