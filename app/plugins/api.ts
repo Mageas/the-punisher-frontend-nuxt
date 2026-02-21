@@ -111,7 +111,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
       }
     },
-
   })
 
   const api = (async (request: ApiRequest, options?: ApiOptions) => {

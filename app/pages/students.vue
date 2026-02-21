@@ -4,9 +4,19 @@ import { refDebounced } from '@vueuse/core'
 import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { students, loading, page, itemPerPage, totalCount, fetchStudents, gotoPage } = useStudents()
+const {
+  students,
+  loading,
+  page,
+  search,
+  itemPerPage,
+  totalCount,
+  fetchStudents,
+  gotoPage,
+  applySearch,
+} = useStudents()
 
-const searchQuery = ref('')
+const searchQuery = ref(search.value)
 const searchDebounced = refDebounced(searchQuery, 300)
 const showCreateModal = ref(false)
 
@@ -30,8 +40,8 @@ async function onCreated() {
   await reload(1)
 }
 
-watch(searchDebounced, async () => {
-  await reload(1)
+watch(searchDebounced, async (newSearch) => {
+  await applySearch(newSearch)
 })
 
 await reload()

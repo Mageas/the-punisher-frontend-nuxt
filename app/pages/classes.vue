@@ -4,7 +4,8 @@ import type { Classroom } from '~/types/api'
 import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms, gotoPage } = useClassrooms()
+const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms, gotoPage } =
+  useClassrooms()
 
 const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)

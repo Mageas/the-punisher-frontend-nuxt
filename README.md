@@ -31,11 +31,13 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## ⚙️ Setup
 
 1. **Install dependencies:**
+
    ```bash
    bun install
    ```
 
 2. **Configure environment:**
+
    ```bash
    cp .env.example .env
    # Edit .env and set NUXT_PUBLIC_API_BASE_URL

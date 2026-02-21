@@ -1,4 +1,4 @@
-import type { AuthResponse, RegisterRequest } from '~/types/api'
+import type { RegisterRequest } from '~/types/api'
 import { authService } from '~/services/auth.service'
 
 /**

@@ -17,7 +17,7 @@ export const authService = {
    */
   async register(body: RegisterRequest) {
     const { $api } = useNuxtApp()
-    return $api<void>('/auth/register', {
+    return $api<unknown>('/auth/register', {
       method: 'POST',
       body,
     })
@@ -28,7 +28,7 @@ export const authService = {
    */
   async logout() {
     const { $api } = useNuxtApp()
-    return $api<void>('/auth/logout', {
+    return $api<unknown>('/auth/logout', {
       method: 'POST',
     })
   },

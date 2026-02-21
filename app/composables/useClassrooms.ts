@@ -20,7 +20,10 @@ export function useClassrooms() {
     return await classroomService.createClassroom(data)
   }
 
-  async function updateClassroom(classroomId: string, data: { name?: string; year?: string | null }) {
+  async function updateClassroom(
+    classroomId: string,
+    data: { name?: string; year?: string | null },
+  ) {
     return await classroomService.updateClassroom(classroomId, data)
   }
 

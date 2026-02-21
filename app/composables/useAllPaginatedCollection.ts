@@ -33,7 +33,9 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
       }
 
       if (page > MAX_PAGES) {
-        console.warn(`[useAllPaginatedCollection] Reached MAX_PAGES (${MAX_PAGES}). Stopping fetch.`)
+        console.warn(
+          `[useAllPaginatedCollection] Reached MAX_PAGES (${MAX_PAGES}). Stopping fetch.`,
+        )
       }
 
       items.value = all

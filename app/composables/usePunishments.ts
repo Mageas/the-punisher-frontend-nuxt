@@ -12,7 +12,10 @@ export function usePunishments() {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >((options) => punishmentService.getPunishments(options), { queryKey: 'page' })
+  >((options) => punishmentService.getPunishments(options), {
+    queryKey: 'page',
+    searchKey: 'search',
+  })
 
   async function fetchPunishments(options?: {
     page?: number
@@ -34,12 +37,14 @@ export function usePunishments() {
     punishments: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    search: paginated.search,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPunishments,
     gotoPage: paginated.gotoPage,
+    applySearch: paginated.applySearch,
     resolvePunishment,
     deletePunishment,
   }

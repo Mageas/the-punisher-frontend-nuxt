@@ -19,7 +19,9 @@ const {
 
 const classroomId = computed<string>(() => {
   const routeClassroomId = route.params.classroomId
-  const resolvedClassroomId = Array.isArray(routeClassroomId) ? routeClassroomId[0] : routeClassroomId
+  const resolvedClassroomId = Array.isArray(routeClassroomId)
+    ? routeClassroomId[0]
+    : routeClassroomId
   if (!resolvedClassroomId) {
     throw createError({
       statusCode: 400,
