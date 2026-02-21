@@ -11,11 +11,11 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
   const paginated = usePaginatedCollection<
     Penalty,
     {
-      page?: number
       search?: string
     }
   >((options) => studentService.getStudentPenalties(toValue(studentId), options), {
-    queryKey: 'penalties_page',
+    pageKey: 'penalties_page',
+    filterKeys: ['search'],
   })
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {
@@ -30,12 +30,14 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
     penalties: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPenalties,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     deletePenalty,
   }
 }

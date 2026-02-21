@@ -8,13 +8,12 @@ export function usePunishments() {
   const paginated = usePaginatedCollection<
     Punishment,
     {
-      page?: number
       state?: 'pending' | 'resolved'
       search?: string
     }
   >((options) => punishmentService.getPunishments(options), {
-    queryKey: 'page',
-    searchKey: 'search',
+    pageKey: 'page',
+    filterKeys: ['search', 'state'],
   })
 
   async function fetchPunishments(options?: {
@@ -37,14 +36,14 @@ export function usePunishments() {
     punishments: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
-    search: paginated.search,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPunishments,
     gotoPage: paginated.gotoPage,
-    applySearch: paginated.applySearch,
+    applyFilters: paginated.applyFilters,
     resolvePunishment,
     deletePunishment,
   }

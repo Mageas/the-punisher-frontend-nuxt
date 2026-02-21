@@ -8,15 +8,15 @@ const {
   students,
   loading,
   page,
-  search,
+  filters,
   itemPerPage,
   totalCount,
   fetchStudents,
   gotoPage,
-  applySearch,
+  applyFilters,
 } = useStudents()
 
-const searchQuery = ref(search.value)
+const searchQuery = ref(filters.search || '')
 const searchDebounced = refDebounced(searchQuery, 300)
 const showCreateModal = ref(false)
 
@@ -41,10 +41,13 @@ async function onCreated() {
 }
 
 watch(searchDebounced, async (newSearch) => {
-  await applySearch(newSearch)
+  await applyFilters({ search: newSearch })
 })
 
-await reload()
+// Initial fetch if not already loading (e.g. from watcher)
+if (students.value.length === 0 && !loading.value) {
+  await reload()
+}
 </script>
 
 <template>

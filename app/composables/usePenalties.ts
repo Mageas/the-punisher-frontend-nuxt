@@ -8,12 +8,11 @@ export function usePenalties() {
   const paginated = usePaginatedCollection<
     Penalty,
     {
-      page?: number
       search?: string
     }
   >((options) => penaltyService.getPenalties(options), {
-    queryKey: 'page',
-    searchKey: 'search',
+    pageKey: 'page',
+    filterKeys: ['search'],
   })
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {
@@ -28,14 +27,14 @@ export function usePenalties() {
     penalties: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
-    search: paginated.search,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPenalties,
     gotoPage: paginated.gotoPage,
-    applySearch: paginated.applySearch,
+    applyFilters: paginated.applyFilters,
     deletePenalty,
   }
 }

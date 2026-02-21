@@ -7,18 +7,18 @@ const {
   bonuses,
   loading,
   page,
-  search,
+  filters,
   itemPerPage,
   totalCount,
   fetchBonuses,
   gotoPage,
-  applySearch,
+  applyFilters,
   useBonus,
   deleteBonus,
 } = useBonuses()
 
 // Search
-const searchQuery = ref(search.value)
+const searchQuery = ref(filters.search || '')
 const searchDebounced = refDebounced(searchQuery, 300)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -37,6 +37,7 @@ async function reload(pageToLoad = page.value || 1) {
   await fetchBonuses({
     page: pageToLoad,
     search: searchDebounced.value || undefined,
+    state: filters.state,
   })
 }
 
@@ -72,10 +73,13 @@ async function onCreated() {
 }
 
 watch(searchDebounced, async (newSearch) => {
-  await applySearch(newSearch)
+  await applyFilters({ search: newSearch })
 })
 
-await reload()
+// Initial fetch if not already loading (e.g. from watcher)
+if (bonuses.value.length === 0 && !loading.value) {
+  await reload()
+}
 </script>
 
 <template>

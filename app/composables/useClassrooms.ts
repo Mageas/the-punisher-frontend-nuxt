@@ -10,7 +10,7 @@ export function useClassrooms() {
     {
       page?: number
     }
-  >((options) => classroomService.getClassrooms(options), { queryKey: 'page' })
+  >((options) => classroomService.getClassrooms(options), { pageKey: 'page' })
 
   async function fetchClassrooms(options?: { page?: number }) {
     await paginated.fetchPage(options)
@@ -35,12 +35,14 @@ export function useClassrooms() {
     classrooms: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchClassrooms,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     createClassroom,
     updateClassroom,
     deleteClassroom,

@@ -8,12 +8,11 @@ export function useStudents() {
   const paginated = usePaginatedCollection<
     Student,
     {
-      page?: number
       search?: string
     }
   >((options) => studentService.getStudents(options), {
-    queryKey: 'page',
-    searchKey: 'search',
+    pageKey: 'page',
+    filterKeys: ['search'],
   })
 
   async function fetchStudents(options?: { page?: number; search?: string }) {
@@ -39,14 +38,14 @@ export function useStudents() {
     students: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
-    search: paginated.search,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchStudents,
     gotoPage: paginated.gotoPage,
-    applySearch: paginated.applySearch,
+    applyFilters: paginated.applyFilters,
     createStudent,
     updateStudent,
     deleteStudent,

@@ -7,18 +7,18 @@ const {
   punishments,
   loading,
   page,
-  search,
+  filters,
   itemPerPage,
   totalCount,
   fetchPunishments,
   gotoPage,
-  applySearch,
+  applyFilters,
   resolvePunishment,
   deletePunishment,
 } = usePunishments()
 
 // Search
-const searchQuery = ref(search.value)
+const searchQuery = ref(filters.search || '')
 const searchDebounced = refDebounced(searchQuery, 300)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -37,6 +37,7 @@ async function reload(pageToLoad = page.value || 1) {
   await fetchPunishments({
     page: pageToLoad,
     search: searchDebounced.value || undefined,
+    state: filters.state,
   })
 }
 
@@ -79,11 +80,13 @@ async function onCreated() {
 
 // Watch search changes
 watch(searchDebounced, async (newSearch) => {
-  await applySearch(newSearch)
+  await applyFilters({ search: newSearch })
 })
 
-// Initial load
-await reload()
+// Initial fetch if not already loading (e.g. from watcher)
+if (punishments.value.length === 0 && !loading.value) {
+  await reload()
+}
 </script>
 
 <template>

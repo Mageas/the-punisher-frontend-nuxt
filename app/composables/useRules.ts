@@ -10,7 +10,7 @@ export function useRules() {
     {
       page?: number
     }
-  >((options) => ruleService.getRules(options), { queryKey: 'page' })
+  >((options) => ruleService.getRules(options), { pageKey: 'page' })
 
   async function fetchRules(options?: { page?: number }) {
     await paginated.fetchPage(options)
@@ -32,12 +32,14 @@ export function useRules() {
     rules: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchRules,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     createRule,
     updateRule,
     deleteRule,

@@ -22,7 +22,7 @@ export function useTypeCollection<TType extends NamedTypeResource>(
 ) {
   const paginated = usePaginatedCollection<TType, { page?: number }>(
     (options) => services.getTypes(options),
-    { queryKey: 'page' },
+    { pageKey: 'page' },
   )
 
   async function fetchTypes(options?: { page?: number }) {
@@ -45,12 +45,14 @@ export function useTypeCollection<TType extends NamedTypeResource>(
     types: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchTypes,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     createType,
     updateType,
     deleteType,

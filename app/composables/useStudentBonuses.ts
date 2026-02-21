@@ -11,12 +11,12 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   const paginated = usePaginatedCollection<
     Bonus,
     {
-      page?: number
       state?: 'used' | 'unused'
       search?: string
     }
   >((options) => studentService.getStudentBonuses(toValue(studentId), options), {
-    queryKey: 'bonuses_page',
+    pageKey: 'bonuses_page',
+    filterKeys: ['search', 'state'],
   })
 
   async function fetchBonuses(options?: {
@@ -39,12 +39,14 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
     bonuses: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchBonuses,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     useBonus,
     deleteBonus,
   }

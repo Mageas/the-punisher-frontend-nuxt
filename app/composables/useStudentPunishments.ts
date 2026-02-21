@@ -11,12 +11,12 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
   const paginated = usePaginatedCollection<
     Punishment,
     {
-      page?: number
       state?: 'pending' | 'resolved'
       search?: string
     }
   >((options) => studentService.getStudentPunishments(toValue(studentId), options), {
-    queryKey: 'punishments_page',
+    pageKey: 'punishments_page',
+    filterKeys: ['search', 'state'],
   })
 
   async function fetchPunishments(options?: {
@@ -39,12 +39,14 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
     punishments: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPunishments,
     gotoPage: paginated.gotoPage,
+    applyFilters: paginated.applyFilters,
     resolvePunishment,
     deletePunishment,
   }

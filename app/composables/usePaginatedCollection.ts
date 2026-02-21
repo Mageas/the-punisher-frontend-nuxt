@@ -10,69 +10,114 @@ type FetchSource<TItem, TOptions> = (
   options?: TOptions & { page?: number },
 ) => Promise<PaginatedResponse<TItem>>
 
-export interface PaginatedCollectionOptions {
+export interface PaginatedCollectionOptions<TFilters> {
   /**
    * Optional key to sync the current page with the URL query parameters.
-   * If provided, the composable will automatically read from and update this query parameter.
+   * Defaults to 'page'. Set to null to disable URL sync for pagination.
    */
-  queryKey?: string
+  pageKey?: string | null
   /**
-   * Optional key to sync the search query with the URL query parameters.
-   * If provided, the composable will automatically read from and update this query parameter.
+   * List of keys from the filters object that should be synchronized with the URL.
    */
-  searchKey?: string
+  filterKeys?: (keyof TFilters & string)[]
+  /**
+   * Default filter values.
+   */
+  defaultFilters?: Partial<TFilters>
 }
 
 /**
- * Shared parent composable for paginated resources.
+ * Shared parent composable for paginated resources with modular filter support.
  */
-export function usePaginatedCollection<TItem, TOptions extends QueryOptions = QueryOptions>(
-  source: FetchSource<TItem, TOptions>,
-  options: PaginatedCollectionOptions = {},
+export function usePaginatedCollection<TItem, TFilters extends QueryOptions = QueryOptions>(
+  source: FetchSource<TItem, TFilters>,
+  options: PaginatedCollectionOptions<TFilters> = {},
 ) {
   const route = useRoute()
   const router = useRouter()
-  const { queryKey, searchKey } = options
+
+  const pageKey = options.pageKey === undefined ? 'page' : options.pageKey
+  const filterKeys = options.filterKeys || []
+  const defaultFilters = (options.defaultFilters || {}) as Partial<TFilters>
 
   // -- Reactive State --
   const items = ref<TItem[]>([]) as Ref<TItem[]>
   const loading = ref(false)
   const page = ref(1)
-  const search = ref('')
+  const filters = reactive({ ...defaultFilters }) as TFilters
   const itemPerPage = ref(0)
   const totalCount = ref(0)
   const nextPage = ref<number | null>(null)
   const previousPage = ref<number | null>(null)
 
-  // Initialize page from route if queryKey is provided
-  if (queryKey && route.query[queryKey]) {
-    const p = parseInt(route.query[queryKey] as string)
-    if (!isNaN(p) && p > 0) {
-      page.value = p
+  function getQueryStringValue(value: unknown): string | undefined {
+    if (typeof value === 'string') return value
+    if (Array.isArray(value)) {
+      const firstValue = value[0]
+      return typeof firstValue === 'string' ? firstValue : undefined
+    }
+    return undefined
+  }
+
+  function applyFilterState(nextFilters: Partial<TFilters>) {
+    for (const key of filterKeys) {
+      // @ts-expect-error - dynamic key assignment
+      filters[key] = nextFilters[key]
     }
   }
 
-  // Initialize search from route if searchKey is provided
-  if (searchKey && route.query[searchKey]) {
-    search.value = route.query[searchKey] as string
+  /**
+   * Extract state from current URL
+   */
+  function getStateFromRoute() {
+    const query = route.query
+    const routeFilters = {} as Partial<TFilters>
+
+    for (const key of filterKeys) {
+      // Ensure keys are always present so removed URL params are also removed from reactive filters.
+      routeFilters[key] = defaultFilters[key]
+    }
+
+    const newState: { page: number; filters: Partial<TFilters> } = {
+      page: 1,
+      filters: routeFilters,
+    }
+
+    const routePage = pageKey ? getQueryStringValue(query[pageKey]) : undefined
+    if (pageKey && routePage) {
+      const p = parseInt(routePage)
+      if (!isNaN(p) && p > 0) newState.page = p
+    }
+
+    for (const key of filterKeys) {
+      const queryValue = getQueryStringValue(query[key])
+      if (queryValue !== undefined) {
+        // @ts-expect-error - dynamic key assignment
+        newState.filters[key] = queryValue
+      }
+    }
+
+    return newState
   }
 
-  /**
-   * Resolves the data source and performs the API call.
-   */
-  async function resolveData(
-    fetchOptions?: TOptions & { page?: number },
-  ): Promise<PaginatedResponse<TItem>> {
-    return await source(fetchOptions)
-  }
+  // Initialize state from route
+  const initialState = getStateFromRoute()
+  page.value = initialState.page
+  applyFilterState(initialState.filters)
 
   /**
-   * Main action to fetch a specific page with options.
+   * Main action to fetch data based on current state.
    */
-  async function fetchPage(fetchOptions?: TOptions & { page?: number }) {
+  async function fetchPage(overrideOptions?: Partial<TFilters> & { page?: number }) {
     loading.value = true
     try {
-      const res = await resolveData(fetchOptions)
+      const fetchParams = {
+        ...filters,
+        page: page.value,
+        ...overrideOptions,
+      } as TFilters & { page?: number }
+
+      const res = await source(fetchParams)
 
       items.value = res.data
       page.value = res.page
@@ -86,27 +131,32 @@ export function usePaginatedCollection<TItem, TOptions extends QueryOptions = Qu
   }
 
   /**
-   * Updates the URL with the provided parameters.
+   * Updates the URL based on current state or provided overrides.
+   * This will trigger the route watcher.
    */
-  async function syncUrl(newParams: { page?: number; search?: string }) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nextQuery: Record<string, any> = { ...route.query }
+  async function syncUrl(updates: { page?: number; filters?: Partial<TFilters> }) {
+    const nextQuery = { ...route.query }
 
-    if (queryKey) {
-      const p = newParams.page ?? page.value
+    // Handle Page
+    if (pageKey) {
+      const p = updates.page ?? page.value
       if (p > 1) {
-        nextQuery[queryKey] = p.toString()
+        nextQuery[pageKey] = p.toString()
       } else {
-        delete nextQuery[queryKey]
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete nextQuery[pageKey]
       }
     }
 
-    if (searchKey) {
-      const s = newParams.search !== undefined ? newParams.search : search.value
-      if (s) {
-        nextQuery[searchKey] = s
+    // Handle Filters
+    const newFilters = { ...filters, ...(updates.filters || {}) }
+    for (const key of filterKeys) {
+      const val = newFilters[key]
+      if (val !== undefined && val !== null && val !== '' && val !== defaultFilters[key]) {
+        nextQuery[key] = String(val)
       } else {
-        delete nextQuery[searchKey]
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete nextQuery[key]
       }
     }
 
@@ -114,63 +164,62 @@ export function usePaginatedCollection<TItem, TOptions extends QueryOptions = Qu
   }
 
   /**
-   * Updates the page and optionally synchronizes with the URL.
+   * Changes page and syncs with URL.
    */
-  async function gotoPage(newPage: number, fetchOptions?: TOptions) {
-    if (queryKey || searchKey) {
+  async function gotoPage(newPage: number) {
+    if (pageKey) {
       await syncUrl({ page: newPage })
     } else {
-      await fetchPage({ ...fetchOptions, page: newPage } as TOptions & { page?: number })
+      page.value = newPage
+      await fetchPage()
     }
   }
 
   /**
-   * Updates the search and optionally synchronizes with the URL.
-   * Resetting to page 1 is the default behavior when search changes.
+   * Applies new filters, resets to page 1, and syncs with URL.
    */
-  async function applySearch(newSearch: string, fetchOptions?: TOptions) {
-    if (queryKey || searchKey) {
-      await syncUrl({ search: newSearch, page: 1 })
+  async function applyFilters(newFilters: Partial<TFilters>) {
+    if (filterKeys.length > 0 || pageKey) {
+      await syncUrl({ page: 1, filters: newFilters })
     } else {
-      await fetchPage({
-        ...fetchOptions,
-        search: newSearch,
-        page: 1,
-      } as unknown as TOptions & { page?: number })
+      Object.assign(filters, newFilters)
+      page.value = 1
+      await fetchPage()
     }
   }
 
-  // Watch for route query changes if queryKey or searchKey is provided
-  if (queryKey || searchKey) {
-    watch(
-      () => [queryKey ? route.query[queryKey] : null, searchKey ? route.query[searchKey] : null],
-      async ([nextPageVal, nextSearchVal]) => {
-        const p = nextPageVal ? parseInt(nextPageVal as string) || 1 : 1
-        const s = (nextSearchVal as string) || ''
+  // Watch for route changes to keep state in sync and re-fetch
+  watch(
+    () => route.query,
+    async () => {
+      const newState = getStateFromRoute()
 
-        if (p !== page.value || s !== search.value) {
-          page.value = p
-          search.value = s
-          await fetchPage({
-            page: p,
-            search: s || undefined,
-          } as unknown as TOptions & { page?: number })
-        }
-      },
-    )
-  }
+      // Check if anything actually changed to avoid redundant fetches
+      const pageChanged = newState.page !== page.value
+      const filtersChanged = filterKeys.some(
+        (key) => String(newState.filters[key] ?? '') !== String(filters[key] ?? ''),
+      )
+
+      if (pageChanged || filtersChanged) {
+        page.value = newState.page
+        applyFilterState(newState.filters)
+        await fetchPage()
+      }
+    },
+    { deep: true },
+  )
 
   return {
     items: items as Readonly<Ref<TItem[]>>,
     loading: readonly(loading),
     page: readonly(page),
-    search: readonly(search),
+    filters: readonly(filters),
     itemPerPage: readonly(itemPerPage),
     totalCount: readonly(totalCount),
     nextPage: readonly(nextPage),
     previousPage: readonly(previousPage),
     fetchPage,
     gotoPage,
-    applySearch,
+    applyFilters,
   }
 }

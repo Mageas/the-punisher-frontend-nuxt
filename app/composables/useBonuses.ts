@@ -8,13 +8,12 @@ export function useBonuses() {
   const paginated = usePaginatedCollection<
     Bonus,
     {
-      page?: number
       state?: 'used' | 'unused'
       search?: string
     }
   >((options) => bonusService.getBonuses(options), {
-    queryKey: 'page',
-    searchKey: 'search',
+    pageKey: 'page',
+    filterKeys: ['search', 'state'],
   })
 
   async function fetchBonuses(options?: {
@@ -37,14 +36,14 @@ export function useBonuses() {
     bonuses: paginated.items,
     loading: paginated.loading,
     page: paginated.page,
-    search: paginated.search,
+    filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
     totalCount: paginated.totalCount,
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchBonuses,
     gotoPage: paginated.gotoPage,
-    applySearch: paginated.applySearch,
+    applyFilters: paginated.applyFilters,
     useBonus,
     deleteBonus,
   }
