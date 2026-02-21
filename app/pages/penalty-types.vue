@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { AlertCircle } from 'lucide-vue-next'
+import { typeService } from '~/services/type.service'
 
 const { t } = useI18n()
+
+const penaltyTypeServices = {
+  getTypes: typeService.getPenaltyTypes,
+  createType: typeService.createPenaltyType,
+  updateType: typeService.updatePenaltyType,
+  deleteType: typeService.deletePenaltyType,
+}
 </script>
 
 <template>
   <TypeManagementPage
-    endpoint="/penalty-types/"
+    :service="penaltyTypeServices"
     :title="t('penaltyTypes.title')"
     :new-label="t('penaltyTypes.newType')"
     :empty-label="t('penaltyTypes.noTypes')"

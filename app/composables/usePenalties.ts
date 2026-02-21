@@ -1,4 +1,5 @@
 import type { Penalty } from '~/types/api'
+import { penaltyService } from '~/services/penalty.service'
 
 /**
  * Composable to fetch and manage penalties with pagination.
@@ -11,7 +12,7 @@ export function usePenalties() {
       page?: number
       search?: string
     }
-  >('/penalties/')
+  >((options) => penaltyService.getPenalties($api, options))
 
   async function fetchPenalties(options?: {
     page?: number
@@ -21,7 +22,7 @@ export function usePenalties() {
   }
 
   async function deletePenalty(id: string) {
-    await $api(`/penalties/${id}`, { method: 'DELETE' })
+    await penaltyService.deletePenalty($api, id)
   }
 
   return {

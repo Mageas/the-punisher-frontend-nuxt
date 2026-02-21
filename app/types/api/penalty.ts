@@ -20,3 +20,11 @@ export interface Penalty {
   penalty_type_name: string
   created_at: string
 }
+
+/**
+ * Data required to create a penalty.
+ */
+export interface PenaltyCreateData {
+  student_id: string
+  penalty_type_id: string
+}

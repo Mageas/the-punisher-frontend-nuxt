@@ -11,13 +11,11 @@ const open = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<{
   title: string
-  endpoint: string
-  id: string | null
-  name: string
+  item: { id: string; name: string } | null
+  updateFn: (id: string, name: string) => Promise<unknown>
 }>()
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 
 const schema = toTypedSchema(zod.object({
@@ -29,7 +27,7 @@ const schema = toTypedSchema(zod.object({
 const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
-    name: props.name,
+    name: props.item?.name ?? '',
   },
 })
 
@@ -38,20 +36,17 @@ watch(open, (isOpen) => {
     clearErrors()
     resetForm({
       values: {
-        name: props.name,
+        name: props.item?.name ?? '',
       },
     })
   }
 })
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!props.id) return
+  if (!props.item?.id) return
   clearErrors()
   try {
-    await $api(`${props.endpoint}${props.id}`, {
-      method: 'PUT',
-      body: values,
-    })
+    await props.updateFn(props.item.id, values.name)
     open.value = false
     emit('updated')
   }

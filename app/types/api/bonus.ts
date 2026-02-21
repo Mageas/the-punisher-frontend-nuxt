@@ -22,3 +22,17 @@ export interface Bonus {
   created_at: string
   used_at: string | null
 }
+
+/**
+ * Data required to create a bonus.
+ */
+export interface BonusCreateData {
+  student_id: string
+  bonus_type_id: string
+  points: number
+}
+
+/**
+ * Data required to use/consume a bonus.
+ */
+export interface BonusUseData {}

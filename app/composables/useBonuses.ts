@@ -1,4 +1,5 @@
 import type { Bonus } from '~/types/api'
+import { bonusService } from '~/services/bonus.service'
 
 /**
  * Composable to fetch and manage bonuses with pagination.
@@ -12,7 +13,7 @@ export function useBonuses() {
       state?: 'used' | 'unused'
       search?: string
     }
-  >('/bonuses/')
+  >((options) => bonusService.getBonuses($api, options))
 
   async function fetchBonuses(options?: {
     page?: number
@@ -23,11 +24,11 @@ export function useBonuses() {
   }
 
   async function useBonus(id: string) {
-    await $api<Bonus>(`/bonuses/${id}/use`, { method: 'POST' })
+    await bonusService.useBonus($api, id, {})
   }
 
   async function deleteBonus(id: string) {
-    await $api(`/bonuses/${id}`, { method: 'DELETE' })
+    await bonusService.deleteBonus($api, id)
   }
 
   return {

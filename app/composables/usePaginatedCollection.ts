@@ -5,9 +5,15 @@ import type { PaginatedResponse } from '~/types/api'
 type QueryValue = string | number | boolean | null | undefined
 type QueryOptions = Record<string, QueryValue>
 
-function shouldKeepParam(value: QueryValue): boolean {
-  return value !== undefined && value !== null && value !== ''
-}
+/**
+ * Defines possible sources for the collection:
+ * 1. A function returning a response promise (pure Fetcher)
+ * 2. A function returning a URL string (URL Getter)
+ * 3. A direct URL (string, ref, or getter)
+ */
+type FetchSource<TItem, TOptions> =
+  | ((options?: TOptions & { page?: number }) => Promise<PaginatedResponse<TItem>> | string)
+  | MaybeRefOrGetter<string>
 
 /**
  * Shared parent composable for paginated resources.
@@ -15,10 +21,11 @@ function shouldKeepParam(value: QueryValue): boolean {
 export function usePaginatedCollection<
   TItem,
   TOptions extends QueryOptions = QueryOptions,
->(endpoint: MaybeRefOrGetter<string>) {
+>(source: FetchSource<TItem, TOptions>) {
   const { $api } = useNuxtApp()
 
-  const items = ref<TItem[]>([])
+  // -- Reactive State --
+  const items = ref<TItem[]>([]) as Ref<TItem[]>
   const loading = ref(false)
   const page = ref(1)
   const itemPerPage = ref(0)
@@ -26,21 +33,47 @@ export function usePaginatedCollection<
   const nextPage = ref<number | null>(null)
   const previousPage = ref<number | null>(null)
 
+  /**
+   * Filters out empty, null, or undefined parameters from query object.
+   */
+  const filterParams = (options?: QueryOptions) => {
+    if (!options) return {}
+    return Object.fromEntries(
+      Object.entries(options).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+    )
+  }
+
+  /**
+   * Resolves the data source and performs the API call if needed.
+   */
+  async function resolveData(options?: TOptions & { page?: number }): Promise<PaginatedResponse<TItem>> {
+    if (typeof source === 'function') {
+      const result = await source(options)
+
+      // If function returns a string, treat it as a URL
+      if (typeof result === 'string') {
+        return $api<PaginatedResponse<TItem>>(result, {
+          params: filterParams(options),
+        })
+      }
+      // Otherwise, it was a fetcher that already returned the response
+      return result
+    }
+
+    // Direct URL case (string, ref, or computed)
+    const url = toValue(source)
+    return $api<PaginatedResponse<TItem>>(url, {
+      params: filterParams(options),
+    })
+  }
+
+  /**
+   * Main action to fetch a specific page with options.
+   */
   async function fetchPage(options?: TOptions & { page?: number }) {
     loading.value = true
-
     try {
-      const params: Record<string, unknown> = {}
-
-      if (options) {
-        for (const [key, value] of Object.entries(options)) {
-          if (shouldKeepParam(value)) {
-            params[key] = value
-          }
-        }
-      }
-
-      const res = await $api<PaginatedResponse<TItem>>(toValue(endpoint), { params })
+      const res = await resolveData(options)
 
       items.value = res.data
       page.value = res.page

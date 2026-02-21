@@ -1,3 +1,10 @@
+import type { $Fetch as NitroFetch } from 'nitropack'
+
+/**
+ * Re-export $Fetch for easier use in the app.
+ */
+export type $Fetch = NitroFetch
+
 /**
  * Standard API error response from the backend.
  */

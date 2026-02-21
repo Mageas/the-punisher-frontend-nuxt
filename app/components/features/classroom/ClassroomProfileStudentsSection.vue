@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AlertCircle, Plus, Star, X } from 'lucide-vue-next'
 import type { Student } from '~/types/api'
+import { getInitials, formatPoints } from '~/lib/utils'
 
 defineProps<{
   students: readonly Student[]
@@ -24,14 +25,11 @@ function studentFullName(student: Student): string {
 }
 
 function initials(student: Student): string {
-  const firstInitial = student.first_name?.charAt(0) ?? ''
-  const lastInitial = student.last_name?.charAt(0) ?? ''
-  return `${firstInitial}${lastInitial}`.toUpperCase()
+  return getInitials(student.first_name, student.last_name)
 }
 
 function formatBonusPoints(points: number): string {
-  const suffix = points > 1 ? 'pts' : 'pt'
-  return `${points} ${suffix}`
+  return formatPoints(points)
 }
 
 function onSubmit() {

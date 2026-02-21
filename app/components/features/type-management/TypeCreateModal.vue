@@ -11,11 +11,11 @@ const open = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<{
   title: string
-  endpoint: string
+  placeholder: string
+  createFn: (name: string) => Promise<unknown>
 }>()
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 
 const schema = toTypedSchema(zod.object({
@@ -41,10 +41,7 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (values) => {
   clearErrors()
   try {
-    await $api(props.endpoint, {
-      method: 'POST',
-      body: values,
-    })
+    await props.createFn(values.name)
     open.value = false
     emit('created')
   }
@@ -70,7 +67,7 @@ const onSubmit = handleSubmit(async (values) => {
         <FormControl>
           <Input
             type="text"
-            :placeholder="t('typeManagement.name')"
+            :placeholder="props.placeholder"
             v-bind="componentField"
           />
         </FormControl>

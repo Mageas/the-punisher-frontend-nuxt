@@ -65,7 +65,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     async onResponseError({ response, options, request }) {
       // Only attempt refresh on 401 and not on auth endpoints themselves
-      const url = typeof request === 'string' ? request : request.url
+      const resolvedRequest = await request
+      const url = typeof resolvedRequest === 'string' ? resolvedRequest : (resolvedRequest as any).url
+
       if (response.status === 401 && !url.includes('/auth/')) {
         const refreshed = await refreshToken()
 
@@ -86,8 +88,13 @@ export default defineNuxtPlugin((nuxtApp) => {
 
           retryHeaders.Authorization = `Bearer ${accessToken.value}`
 
-          throw await $fetch(request, {
+          // We must ensure the retry uses the full URL if we use the plain $fetch, 
+          // as the original request might be relative.
+          const retryUrl = typeof resolvedRequest === 'string' ? resolvedRequest : (resolvedRequest as any).url
+
+          throw await $fetch(retryUrl, {
             ...options,
+            baseURL: config.public.apiBaseUrl,
             method: options.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
             headers: retryHeaders,
           })

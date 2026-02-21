@@ -1,4 +1,5 @@
 import type { Rule, RulePayload } from '~/types/api'
+import { ruleService } from '~/services/rule.service'
 
 /**
  * Composable to fetch and manage rules with pagination.
@@ -10,7 +11,7 @@ export function useRules() {
     {
       page?: number
     }
-  >('/rules/')
+  >((options) => ruleService.getRules($api, options))
 
   async function fetchRules(options?: {
     page?: number
@@ -18,15 +19,16 @@ export function useRules() {
     await paginated.fetchPage(options)
   }
 
+  async function createRule(data: RulePayload) {
+    return await ruleService.createRule($api, data)
+  }
+
   async function updateRule(id: string, body: RulePayload) {
-    await $api<Rule>(`/rules/${id}`, {
-      method: 'PUT',
-      body,
-    })
+    await ruleService.updateRule($api, id, body)
   }
 
   async function deleteRule(id: string) {
-    await $api(`/rules/${id}`, { method: 'DELETE' })
+    await ruleService.deleteRule($api, id)
   }
 
   return {
@@ -38,6 +40,7 @@ export function useRules() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchRules,
+    createRule,
     updateRule,
     deleteRule,
   }

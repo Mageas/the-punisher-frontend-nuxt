@@ -1,10 +1,11 @@
 import type { PenaltyType } from '~/types/api'
+import { typeService } from '~/services/type.service'
 
 /**
  * Composable to fetch ALL penalty types across all pages.
  */
 export function useAllPenaltyTypes() {
-  const allPaginated = useAllPaginatedCollection<PenaltyType>(() => '/penalty-types/')
+  const allPaginated = useAllPaginatedCollection<PenaltyType>(($api, options) => typeService.getPenaltyTypes($api, options))
 
   async function fetchPenaltyTypes() {
     await allPaginated.fetchAll()

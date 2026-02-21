@@ -13,6 +13,11 @@ export interface Student {
 }
 
 /**
+ * Alias for Student when used in detail routes.
+ */
+export type StudentDetail = Student
+
+/**
  * Student KPI counters from /students/{id}/kpis.
  */
 export interface StudentKpis {

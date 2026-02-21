@@ -1,4 +1,5 @@
 import type { Punishment } from '~/types/api'
+import { punishmentService } from '~/services/punishment.service'
 
 /**
  * Composable to fetch and manage punishments with pagination.
@@ -12,7 +13,7 @@ export function usePunishments() {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >('/punishments/')
+  >((options) => punishmentService.getPunishments($api, options))
 
   async function fetchPunishments(options?: {
     page?: number
@@ -23,11 +24,11 @@ export function usePunishments() {
   }
 
   async function resolvePunishment(id: string) {
-    await $api<Punishment>(`/punishments/${id}/resolve`, { method: 'POST' })
+    await punishmentService.resolvePunishment($api, id, {})
   }
 
   async function deletePunishment(id: string) {
-    await $api(`/punishments/${id}`, { method: 'DELETE' })
+    await punishmentService.deletePunishment($api, id)
   }
 
   return {

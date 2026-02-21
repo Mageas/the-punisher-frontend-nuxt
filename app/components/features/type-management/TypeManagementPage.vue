@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { Plus } from 'lucide-vue-next'
-import type { BonusType, PenaltyType, PunishmentType } from '~/types/api'
+import type { BonusType, PenaltyType, PunishmentType, PaginatedResponse } from '~/types/api'
+import type { TypeServiceFunctions, NamedTypeResource } from '~/composables/useTypeCollection'
 
-type ManagedType = BonusType | PenaltyType | PunishmentType
+type ManagedType = (BonusType | PenaltyType | PunishmentType) & NamedTypeResource
 
 const props = withDefaults(defineProps<{
-  endpoint: string
+  service: TypeServiceFunctions<ManagedType>
   title: string
   newLabel: string
   emptyLabel: string
@@ -32,7 +33,12 @@ const {
   createType,
   updateType,
   deleteType,
-} = useTypeCollection<ManagedType>(props.endpoint)
+} = useTypeCollection<ManagedType>(props.service)
+
+// Wrappers to pass to modals
+const handleCreate = (name: string) => createType(name)
+const handleUpdate = (id: string, name: string) => updateType(id, name)
+const handleDelete = (id: string) => deleteType(id)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
@@ -127,20 +133,20 @@ await reload()
       v-model:open="showCreateModal"
       :title="props.createTitle"
       :placeholder="props.createPlaceholder"
-      :create-fn="createType"
+      :create-fn="handleCreate"
       @created="onCreated"
     />
     <TypeEditModal
       v-model:open="showEditModal"
       :item="typeToEdit"
       :title="props.editTitle"
-      :update-fn="updateType"
+      :update-fn="handleUpdate"
       @updated="onUpdated"
     />
     <TypeDeleteModal
       v-model:open="showDeleteModal"
       :type-id="typeToDeleteId"
-      :delete-fn="deleteType"
+      :delete-fn="handleDelete"
       :message="props.deleteMessage"
       @confirmed="onDeleteConfirmed"
     />

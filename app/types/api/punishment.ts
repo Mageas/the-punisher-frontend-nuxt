@@ -25,3 +25,17 @@ export interface Punishment {
   due_at: string | null
   resolved_at: string | null
 }
+
+/**
+ * Data required to create a punishment.
+ */
+export interface PunishmentCreateData {
+  student_id: string
+  punishment_type_id: string
+  due_at?: string
+}
+
+/**
+ * Data required to resolve a punishment.
+ */
+export interface PunishmentResolveData {}

@@ -13,3 +13,8 @@ export interface Classroom {
   created_at: string
   updated_at: string
 }
+
+/**
+ * Alias for Classroom when used in detail routes.
+ */
+export type ClassroomDetail = Classroom

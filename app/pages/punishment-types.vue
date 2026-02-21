@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { FileWarning } from 'lucide-vue-next'
+import { typeService } from '~/services/type.service'
 
 const { t } = useI18n()
+
+const punishmentTypeServices = {
+  getTypes: typeService.getPunishmentTypes,
+  createType: typeService.createPunishmentType,
+  updateType: typeService.updatePunishmentType,
+  deleteType: typeService.deletePunishmentType,
+}
 </script>
 
 <template>
   <TypeManagementPage
-    endpoint="/punishment-types/"
+    :service="punishmentTypeServices"
     :title="t('punishmentTypes.title')"
     :new-label="t('punishmentTypes.newType')"
     :empty-label="t('punishmentTypes.noTypes')"
