@@ -4,7 +4,6 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
-import { punishmentService } from '~/services/punishment.service'
 
 const emit = defineEmits<{
   created: []
@@ -27,6 +26,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
+const punishmentService = usePunishmentService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)

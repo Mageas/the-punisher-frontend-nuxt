@@ -1,10 +1,9 @@
 import type { Punishment } from '~/types/api'
-import { punishmentService } from '~/services/punishment.service'
-
 /**
  * Composable to fetch and manage punishments with pagination.
  */
 export function usePunishments() {
+  const punishmentService = usePunishmentService()
   const paginated = usePaginatedCollection<
     Punishment,
     {

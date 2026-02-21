@@ -1,10 +1,9 @@
 import type { Student } from '~/types/api'
-import { studentService } from '~/services/student.service'
-
 /**
  * Composable to fetch and manage students with pagination.
  */
 export function useStudents() {
+  const studentService = useStudentService()
   const paginated = usePaginatedCollection<
     Student,
     {

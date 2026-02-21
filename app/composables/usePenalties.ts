@@ -1,10 +1,9 @@
 import type { Penalty } from '~/types/api'
-import { penaltyService } from '~/services/penalty.service'
-
 /**
  * Composable to fetch and manage penalties with pagination.
  */
 export function usePenalties() {
+  const penaltyService = usePenaltyService()
   const paginated = usePaginatedCollection<
     Penalty,
     {

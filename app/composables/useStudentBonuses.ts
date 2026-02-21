@@ -1,13 +1,12 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Bonus } from '~/types/api'
-import { bonusService } from '~/services/bonus.service'
-import { studentService } from '~/services/student.service'
-
 /**
  * Composable to fetch and manage a student's bonuses with pagination.
  */
 export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
+  const bonusService = useBonusService()
+  const studentService = useStudentService()
   const paginated = usePaginatedCollection<
     Bonus,
     {

@@ -1,13 +1,12 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Penalty } from '~/types/api'
-import { studentService } from '~/services/student.service'
-import { penaltyService } from '~/services/penalty.service'
-
 /**
  * Composable to fetch and manage a student's penalties with pagination.
  */
 export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
+  const studentService = useStudentService()
+  const penaltyService = usePenaltyService()
   const paginated = usePaginatedCollection<
     Penalty,
     {

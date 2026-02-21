@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Classroom, Student } from '~/types/api'
-import { classroomService } from '~/services/classroom.service'
 
 const { t } = useI18n()
 const { validateUuid, catchResourceNotFound } = useResourceError()
+const classroomService = useClassroomService()
 
 definePageMeta({
   path: '/classes/:classroomId',

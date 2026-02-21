@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
-import { studentService } from '~/services/student.service'
 import { getInitials } from '~/lib/utils'
 
 const { t } = useI18n()
 const { validateUuid, catchResourceNotFound } = useResourceError()
+const studentService = useStudentService()
 
 definePageMeta({
   path: '/students/:studentId',

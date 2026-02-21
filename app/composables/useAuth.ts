@@ -1,5 +1,4 @@
 import type { RegisterRequest } from '~/types/api'
-import { authService } from '~/services/auth.service'
 
 /**
  * Composable for managing authentication state.
@@ -10,6 +9,7 @@ import { authService } from '~/services/auth.service'
  * - Logout requests server-side refresh token revocation.
  */
 export function useAuth() {
+  const authService = useAuthService()
   const accessToken = useState<string | null>('auth.access-token', () => null)
   const accessTokenCookie = useCookie<string | null>('access_token', {
     path: '/',

@@ -3,7 +3,6 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { Rule, RuleMode } from '~/types/api'
-import { ruleService } from '~/services/rule.service'
 
 const emit = defineEmits<{
   updated: []
@@ -19,6 +18,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
+const ruleService = useRuleService()
 
 const schema = toTypedSchema(
   zod.object({

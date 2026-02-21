@@ -2,7 +2,6 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { bonusService } from '~/services/bonus.service'
 
 const emit = defineEmits<{
   created: []
@@ -25,6 +24,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
+const bonusService = useBonusService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)

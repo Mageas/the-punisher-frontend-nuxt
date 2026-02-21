@@ -2,7 +2,6 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { classroomService } from '~/services/classroom.service'
 
 const emit = defineEmits<{
   updated: []
@@ -18,6 +17,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const classroomService = useClassroomService()
 
 const schema = toTypedSchema(
   zod.object({

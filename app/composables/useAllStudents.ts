@@ -1,12 +1,11 @@
 import type { Student } from '~/types/api'
-import { studentService } from '~/services/student.service'
-import { classroomService } from '~/services/classroom.service'
-
 /**
  * Composable to fetch ALL students across all pages.
  * Optionally filtered by classroom ID.
  */
 export function useAllStudents() {
+  const studentService = useStudentService()
+  const classroomService = useClassroomService()
   const allPaginated = useAllPaginatedCollection<Student, [string?]>((options, classroomId) => {
     if (classroomId) {
       return classroomService.getClassroomStudents(classroomId, options)

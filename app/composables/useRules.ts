@@ -1,10 +1,9 @@
 import type { Rule, RulePayload } from '~/types/api'
-import { ruleService } from '~/services/rule.service'
-
 /**
  * Composable to fetch and manage rules with pagination.
  */
 export function useRules() {
+  const ruleService = useRuleService()
   const paginated = usePaginatedCollection<
     Rule,
     {

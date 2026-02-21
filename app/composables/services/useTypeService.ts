@@ -1,75 +1,80 @@
 import type { BonusType, PenaltyType, PunishmentType, PaginatedResponse } from '~/types/api'
 
-export const typeService = {
+export function useTypeService() {
+  const { $api } = useNuxtApp()
+
   // Bonus Types
-  async getBonusTypes(options?: { page?: number }) {
-    const { $api } = useNuxtApp()
+  async function getBonusTypes(options?: { page?: number }) {
     return $api<PaginatedResponse<BonusType>>('/bonus-types', {
       params: options,
     })
-  },
-  async createBonusType(data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function createBonusType(data: { name: string }) {
     return $api<BonusType>('/bonus-types', { method: 'POST', body: data })
-  },
-  async updateBonusType(typeId: string, data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function updateBonusType(typeId: string, data: { name: string }) {
     return $api<BonusType>(`/bonus-types/${typeId}`, {
       method: 'PUT',
       body: data,
     })
-  },
-  async deleteBonusType(typeId: string): Promise<void> {
-    const { $api } = useNuxtApp()
+  }
+  async function deleteBonusType(typeId: string): Promise<void> {
     await $api(`/bonus-types/${typeId}`, { method: 'DELETE' })
-  },
+  }
 
   // Penalty Types
-  async getPenaltyTypes(options?: { page?: number }) {
-    const { $api } = useNuxtApp()
+  async function getPenaltyTypes(options?: { page?: number }) {
     return $api<PaginatedResponse<PenaltyType>>('/penalty-types', {
       params: options,
     })
-  },
-  async createPenaltyType(data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function createPenaltyType(data: { name: string }) {
     return $api<PenaltyType>('/penalty-types', { method: 'POST', body: data })
-  },
-  async updatePenaltyType(typeId: string, data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function updatePenaltyType(typeId: string, data: { name: string }) {
     return $api<PenaltyType>(`/penalty-types/${typeId}`, {
       method: 'PUT',
       body: data,
     })
-  },
-  async deletePenaltyType(typeId: string): Promise<void> {
-    const { $api } = useNuxtApp()
+  }
+  async function deletePenaltyType(typeId: string): Promise<void> {
     await $api(`/penalty-types/${typeId}`, { method: 'DELETE' })
-  },
+  }
 
   // Punishment Types
-  async getPunishmentTypes(options?: { page?: number }) {
-    const { $api } = useNuxtApp()
+  async function getPunishmentTypes(options?: { page?: number }) {
     return $api<PaginatedResponse<PunishmentType>>('/punishment-types', {
       params: options,
     })
-  },
-  async createPunishmentType(data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function createPunishmentType(data: { name: string }) {
     return $api<PunishmentType>('/punishment-types', {
       method: 'POST',
       body: data,
     })
-  },
-  async updatePunishmentType(typeId: string, data: { name: string }) {
-    const { $api } = useNuxtApp()
+  }
+  async function updatePunishmentType(typeId: string, data: { name: string }) {
     return $api<PunishmentType>(`/punishment-types/${typeId}`, {
       method: 'PUT',
       body: data,
     })
-  },
-  async deletePunishmentType(typeId: string): Promise<void> {
-    const { $api } = useNuxtApp()
+  }
+  async function deletePunishmentType(typeId: string): Promise<void> {
     await $api(`/punishment-types/${typeId}`, { method: 'DELETE' })
-  },
+  }
+
+  return {
+    getBonusTypes,
+    createBonusType,
+    updateBonusType,
+    deleteBonusType,
+    getPenaltyTypes,
+    createPenaltyType,
+    updatePenaltyType,
+    deletePenaltyType,
+    getPunishmentTypes,
+    createPunishmentType,
+    updatePunishmentType,
+    deletePunishmentType,
+  }
 }

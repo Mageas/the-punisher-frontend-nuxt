@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
-import { dashboardService } from '~/services/dashboard.service'
-import { punishmentService } from '~/services/punishment.service'
 
 const { t } = useI18n()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
+
+// Services
+const dashboardService = useDashboardService()
+const punishmentService = usePunishmentService()
 
 // Classroom filter
 const { classrooms, fetchClassrooms } = useAllClassrooms()

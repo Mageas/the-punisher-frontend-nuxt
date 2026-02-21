@@ -1,10 +1,9 @@
 import type { Bonus } from '~/types/api'
-import { bonusService } from '~/services/bonus.service'
-
 /**
  * Composable to fetch and manage bonuses with pagination.
  */
 export function useBonuses() {
+  const bonusService = useBonusService()
   const paginated = usePaginatedCollection<
     Bonus,
     {

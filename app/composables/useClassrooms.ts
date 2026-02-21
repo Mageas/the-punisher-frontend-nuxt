@@ -1,10 +1,9 @@
 import type { Classroom } from '~/types/api'
-import { classroomService } from '~/services/classroom.service'
-
 /**
  * Composable to fetch and manage classrooms with pagination.
  */
 export function useClassrooms() {
+  const classroomService = useClassroomService()
   const paginated = usePaginatedCollection<
     Classroom,
     {

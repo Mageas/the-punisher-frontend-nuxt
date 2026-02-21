@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Trophy } from 'lucide-vue-next'
-import { typeService } from '~/services/type.service'
 
 const { t } = useI18n()
+const typeService = useTypeService()
 
 const bonusTypeServices = {
   getTypes: typeService.getBonusTypes,

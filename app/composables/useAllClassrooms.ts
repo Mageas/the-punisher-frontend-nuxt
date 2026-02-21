@@ -1,10 +1,9 @@
 import type { Classroom } from '~/types/api'
-import { classroomService } from '~/services/classroom.service'
-
 /**
  * Composable to fetch ALL classrooms across all pages.
  */
 export function useAllClassrooms() {
+  const classroomService = useClassroomService()
   const allPaginated = useAllPaginatedCollection<Classroom>((options) =>
     classroomService.getClassrooms(options),
   )

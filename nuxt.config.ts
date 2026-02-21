@@ -8,6 +8,9 @@ export default defineNuxtConfig({
     },
   },
   modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/i18n', '@pinia/nuxt', '@nuxt/eslint'],
+  imports: {
+    dirs: ['composables', 'composables/services'],
+  },
   components: [
     {
       path: '~/components',
