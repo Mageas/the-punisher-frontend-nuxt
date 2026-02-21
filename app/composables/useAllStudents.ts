@@ -21,6 +21,7 @@ export function useAllStudents() {
   return {
     students: allPaginated.items,
     loading: allPaginated.loading,
+    error: allPaginated.error,
     fetchStudents,
   }
 }

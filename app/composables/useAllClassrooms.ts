@@ -16,6 +16,7 @@ export function useAllClassrooms() {
   return {
     classrooms: allPaginated.items,
     loading: allPaginated.loading,
+    error: allPaginated.error,
     fetchClassrooms,
   }
 }

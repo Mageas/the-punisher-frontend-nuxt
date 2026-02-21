@@ -16,6 +16,7 @@ export function useAllPunishmentTypes() {
   return {
     punishmentTypes: allPaginated.items,
     loading: allPaginated.loading,
+    error: allPaginated.error,
     fetchPunishmentTypes,
   }
 }

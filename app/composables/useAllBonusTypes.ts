@@ -16,6 +16,7 @@ export function useAllBonusTypes() {
   return {
     bonusTypes: allPaginated.items,
     loading: allPaginated.loading,
+    error: allPaginated.error,
     fetchBonusTypes,
   }
 }

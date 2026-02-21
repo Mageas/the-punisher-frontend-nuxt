@@ -16,6 +16,7 @@ export function useAllPenaltyTypes() {
   return {
     penaltyTypes: allPaginated.items,
     loading: allPaginated.loading,
+    error: allPaginated.error,
     fetchPenaltyTypes,
   }
 }
