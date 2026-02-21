@@ -1,8 +1,7 @@
 <script setup lang="ts">
-interface EditableType {
-  id: string
-  name: string
-}
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
 
 const emit = defineEmits<{
   updated: []
@@ -11,73 +10,79 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<{
-  item: EditableType | null
   title: string
-  updateFn: (id: string, name: string) => Promise<void>
+  endpoint: string
+  id: string | null
+  name: string
 }>()
 
 const { t } = useI18n()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { $api } = useNuxtApp()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 
-const name = ref('')
-const submitting = ref(false)
-const canSubmit = computed(() => !!props.item?.id && name.value.trim().length > 0)
+const schema = toTypedSchema(zod.object({
+  name: zod.string()
+    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+    .max(100, t('apiErrors.details.validation_max_length', { value: 100 })),
+}))
 
-watch(open, (isOpen) => {
-  if (!isOpen || !props.item) return
-  clearErrors()
-  name.value = props.item.name
+const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    name: props.name,
+  },
 })
 
-async function submit() {
-  if (!props.item?.id || !canSubmit.value) return
-  submitting.value = true
-  clearErrors()
+watch(open, (isOpen) => {
+  if (isOpen) {
+    clearErrors()
+    resetForm({
+      values: {
+        name: props.name,
+      },
+    })
+  }
+})
 
+const onSubmit = handleSubmit(async (values) => {
+  if (!props.id) return
+  clearErrors()
   try {
-    await props.updateFn(props.item.id, name.value.trim())
+    await $api(`${props.endpoint}${props.id}`, {
+      method: 'PUT',
+      body: values,
+    })
     open.value = false
     emit('updated')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 sm:max-w-md" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle>{{ props.title }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ props.title }}</DialogDescription>
-      </DialogHeader>
-
-      <form class="space-y-4" @submit.prevent="submit">
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <div class="space-y-2">
-          <Label>{{ t('typeManagement.name') }}</Label>
-          <Input v-model="name" type="text" />
-          <p v-if="fieldErrors.name" class="text-sm text-destructive">
-            {{ fieldErrors.name }}
-          </p>
-        </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.delete.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !canSubmit">
-            {{ t('typeManagement.save') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+  <BaseModal
+    v-model:open="open"
+    :title="title"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('typeManagement.save')"
+    @submit="onSubmit"
+  >
+    <FormField v-slot="{ componentField }" name="name">
+      <FormItem>
+        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormControl>
+          <Input
+            type="text"
+            :placeholder="t('typeManagement.name')"
+            v-bind="componentField"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+  </BaseModal>
 </template>

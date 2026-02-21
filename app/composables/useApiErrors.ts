@@ -114,10 +114,24 @@ export function useApiErrors() {
     delete fieldErrors.value[field]
   }
 
+  /**
+   * Processes an API error and sets errors on a vee-validate form.
+   */
+  function setFormErrors<T extends string>(
+    setFieldError: (field: T, message: string | undefined) => void,
+    err: unknown
+  ): void {
+    handleApiError(err)
+    Object.entries(fieldErrors.value).forEach(([field, message]) => {
+      setFieldError(field as T, message)
+    })
+  }
+
   return {
     fieldErrors: readonly(fieldErrors),
     globalError: readonly(globalError),
     handleApiError,
+    setFormErrors,
     clearErrors,
     clearFieldError,
   }

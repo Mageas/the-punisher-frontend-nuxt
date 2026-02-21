@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
+
 const emit = defineEmits<{
   created: []
 }>()
@@ -14,129 +18,154 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
 
-// Form
-const selectedClassroomId = ref('')
-const selectedStudentId = ref('')
-const selectedBonusTypeId = ref('')
-const points = ref<number>(1)
-const submitting = ref(false)
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
 
+const schema = toTypedSchema(zod.object({
+  classroom_id: zod.string().optional(),
+  student_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+  bonus_type_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+  points: zod.number().gt(0, t('apiErrors.details.validation_min_length', { value: 0 })),
+}))
+
+const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    classroom_id: props.preselectedClassroomId ?? '',
+    student_id: props.preselectedStudentId ?? '',
+    bonus_type_id: '',
+    points: 1,
+  },
+})
+
 // When classroom changes, re-fetch students and reset student selection
-watch(selectedClassroomId, () => {
+watch(() => values.classroom_id, (newClassroomId) => {
   if (hasPreselectedStudent.value) return
-  selectedStudentId.value = ''
-  fetchStudents(selectedClassroomId.value || undefined)
+  setFieldValue('student_id', '', false)
+  fetchStudents(newClassroomId || undefined)
 })
 
 // Load data when modal opens
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedClassroomId.value = props.preselectedClassroomId ?? ''
-    selectedStudentId.value = props.preselectedStudentId ?? ''
-    selectedBonusTypeId.value = ''
-    points.value = 1
+    resetForm({
+      values: {
+        classroom_id: props.preselectedClassroomId ?? '',
+        student_id: props.preselectedStudentId ?? '',
+        bonus_type_id: '',
+        points: 1,
+      },
+    })
     await Promise.all([
       hasPreselectedStudent.value || hasPreselectedClassroom.value ? Promise.resolve() : fetchClassrooms(),
-      fetchStudents(selectedClassroomId.value || undefined),
+      fetchStudents(values.classroom_id || undefined),
       fetchBonusTypes(),
     ])
-    if (props.preselectedStudentId) {
-      selectedStudentId.value = props.preselectedStudentId
-    }
   }
 })
 
-async function submit() {
-  if (!selectedStudentId.value || !selectedBonusTypeId.value) return
-  submitting.value = true
+const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
-
   try {
     await $api('/bonuses/', {
       method: 'POST',
       body: {
-        student_id: selectedStudentId.value,
-        bonus_type_id: selectedBonusTypeId.value,
-        points: points.value,
+        student_id: formValues.student_id,
+        bonus_type_id: formValues.bonus_type_id,
+        points: formValues.points,
       },
     })
     open.value = false
     emit('created')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 sm:max-w-md" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle>{{ t('modals.bonus.title') }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ t('modals.bonus.title') }}</DialogDescription>
-      </DialogHeader>
+  <BaseModal
+    v-model:open="open"
+    :title="t('modals.bonus.title')"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('modals.bonus.submit')"
+    prevent-auto-focus
+    @submit="onSubmit"
+  >
+    <template v-if="!hasPreselectedStudent">
+      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value, handleChange }" name="classroom_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.bonus.class') }}</FormLabel>
+          <FormControl>
+            <ClassroomSelect
+              :model-value="value"
+              :classrooms="classrooms"
+              full-width
+              @update:model-value="handleChange"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-      <form class="min-w-0 space-y-4" @submit.prevent="submit">
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <template v-if="!hasPreselectedStudent">
-          <!-- Classroom -->
-          <div v-if="!hasPreselectedClassroom" class="space-y-2">
-            <Label>{{ t('modals.bonus.class') }}</Label>
-            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
-          </div>
-
-          <!-- Student -->
-          <div class="space-y-2">
-            <Label>{{ t('modals.bonus.student') }}</Label>
+      <FormField v-slot="{ value, handleChange }" name="student_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.bonus.student') }}</FormLabel>
+          <FormControl>
             <StudentSelect
-              v-model="selectedStudentId"
+              :model-value="value"
               :students="students"
               :placeholder="t('modals.bonus.selectStudent')"
               :empty-text="t('modals.bonus.noStudentFound')"
+              @update:model-value="handleChange"
             />
-            <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>
-          </div>
-        </template>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </template>
 
-        <!-- Bonus Type -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.bonus.bonusType') }}</Label>
-          <BonusTypeSelect v-model="selectedBonusTypeId" :bonus-types="bonusTypes" />
-          <p v-if="fieldErrors.bonus_type_id" class="text-sm text-destructive">{{ fieldErrors.bonus_type_id }}</p>
-        </div>
+    <FormField v-slot="{ value, handleChange }" name="bonus_type_id">
+      <FormItem>
+        <FormLabel>{{ t('modals.bonus.bonusType') }}</FormLabel>
+        <FormControl>
+          <BonusTypeSelect
+            :model-value="value"
+            :bonus-types="bonusTypes"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-        <!-- Points -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.bonus.points') }}</Label>
-          <Input v-model.number="points" type="number" step="0.1" min="0" :placeholder="t('modals.bonus.pointsPlaceholder')" />
-          <p v-if="fieldErrors.points" class="text-sm text-destructive">{{ fieldErrors.points }}</p>
-        </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.bonus.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !selectedStudentId || !selectedBonusTypeId">
-            {{ t('modals.bonus.submit') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+    <FormField v-slot="{ componentField }" name="points">
+      <FormItem>
+        <FormLabel>{{ t('modals.bonus.points') }}</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="number"
+            step="0.1"
+            min="0"
+            :placeholder="t('modals.bonus.pointsPlaceholder')"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+  </BaseModal>
 </template>

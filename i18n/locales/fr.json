@@ -3,6 +3,8 @@
     "title": "The Punisher"
   },
   "common": {
+    "cancel": "Annuler",
+    "submit": "Valider",
     "allStudents": "Tous les élèves",
     "selectClassOptional": "Sélectionner une classe (optionnel)",
     "searchClass": "Rechercher une classe...",

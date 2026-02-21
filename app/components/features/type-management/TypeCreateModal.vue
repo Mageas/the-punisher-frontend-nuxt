@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
+
 const emit = defineEmits<{
   created: []
 }>()
@@ -7,72 +11,71 @@ const open = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<{
   title: string
-  placeholder: string
-  createFn: (name: string) => Promise<void>
+  endpoint: string
 }>()
 
 const { t } = useI18n()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { $api } = useNuxtApp()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 
-const name = ref('')
-const submitting = ref(false)
-const canSubmit = computed(() => name.value.trim().length > 0)
+const schema = toTypedSchema(zod.object({
+  name: zod.string()
+    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+    .max(100, t('apiErrors.details.validation_max_length', { value: 100 })),
+}))
 
-watch(open, (isOpen) => {
-  if (!isOpen) return
-  clearErrors()
-  name.value = ''
+const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    name: '',
+  },
 })
 
-async function submit() {
-  if (!canSubmit.value) return
-  submitting.value = true
-  clearErrors()
+watch(open, (isOpen) => {
+  if (isOpen) {
+    clearErrors()
+    resetForm()
+  }
+})
 
+const onSubmit = handleSubmit(async (values) => {
+  clearErrors()
   try {
-    await props.createFn(name.value.trim())
+    await $api(props.endpoint, {
+      method: 'POST',
+      body: values,
+    })
     open.value = false
     emit('created')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 sm:max-w-md" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle>{{ props.title }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ props.title }}</DialogDescription>
-      </DialogHeader>
-
-      <form class="space-y-4" @submit.prevent="submit">
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <div class="space-y-2">
-          <Label>{{ t('typeManagement.name') }}</Label>
-          <Input v-model="name" type="text" :placeholder="props.placeholder" />
-          <p v-if="fieldErrors.name" class="text-sm text-destructive">
-            {{ fieldErrors.name }}
-          </p>
-        </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.delete.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !canSubmit">
-            {{ t('typeManagement.create') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+  <BaseModal
+    v-model:open="open"
+    :title="title"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('typeManagement.create')"
+    @submit="onSubmit"
+  >
+    <FormField v-slot="{ componentField }" name="name">
+      <FormItem>
+        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormControl>
+          <Input
+            type="text"
+            :placeholder="t('typeManagement.name')"
+            v-bind="componentField"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+  </BaseModal>
 </template>

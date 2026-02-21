@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
+
 const emit = defineEmits<{
   created: []
 }>()
@@ -14,118 +18,134 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 
-// Form
-const selectedClassroomId = ref('')
-const selectedStudentId = ref('')
-const selectedPenaltyTypeId = ref('')
-const submitting = ref(false)
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
 
+const schema = toTypedSchema(zod.object({
+  classroom_id: zod.string().optional(),
+  student_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+  penalty_type_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+}))
+
+const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    classroom_id: props.preselectedClassroomId ?? '',
+    student_id: props.preselectedStudentId ?? '',
+    penalty_type_id: '',
+  },
+})
+
 // When classroom changes, re-fetch students and reset student selection
-watch(selectedClassroomId, () => {
+watch(() => values.classroom_id, (newClassroomId) => {
   if (hasPreselectedStudent.value) return
-  selectedStudentId.value = ''
-  fetchStudents(selectedClassroomId.value || undefined)
+  setFieldValue('student_id', '', false)
+  fetchStudents(newClassroomId || undefined)
 })
 
 // Load data when modal opens
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedClassroomId.value = props.preselectedClassroomId ?? ''
-    selectedStudentId.value = props.preselectedStudentId ?? ''
-    selectedPenaltyTypeId.value = ''
+    resetForm({
+      values: {
+        classroom_id: props.preselectedClassroomId ?? '',
+        student_id: props.preselectedStudentId ?? '',
+        penalty_type_id: '',
+      },
+    })
     await Promise.all([
       hasPreselectedStudent.value || hasPreselectedClassroom.value ? Promise.resolve() : fetchClassrooms(),
-      fetchStudents(selectedClassroomId.value || undefined),
+      fetchStudents(values.classroom_id || undefined),
       fetchPenaltyTypes(),
     ])
-    if (props.preselectedStudentId) {
-      selectedStudentId.value = props.preselectedStudentId
-    }
   }
 })
 
-async function submit() {
-  if (!selectedStudentId.value || !selectedPenaltyTypeId.value) return
-  submitting.value = true
+const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
     await $api('/penalties/', {
       method: 'POST',
       body: {
-        student_id: selectedStudentId.value,
-        penalty_type_id: selectedPenaltyTypeId.value,
+        student_id: formValues.student_id,
+        penalty_type_id: formValues.penalty_type_id,
       },
     })
     open.value = false
     emit('created')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 sm:max-w-md" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle>{{ t('modals.penalty.title') }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ t('modals.penalty.title') }}</DialogDescription>
-      </DialogHeader>
+  <BaseModal
+    v-model:open="open"
+    :title="t('modals.penalty.title')"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('modals.penalty.submit')"
+    prevent-auto-focus
+    @submit="onSubmit"
+  >
+    <template v-if="!hasPreselectedStudent">
+      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value, handleChange }" name="classroom_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.penalty.class') }}</FormLabel>
+          <FormControl>
+            <ClassroomSelect
+              :model-value="value"
+              :classrooms="classrooms"
+              full-width
+              @update:model-value="handleChange"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-      <form class="min-w-0 space-y-4" @submit.prevent="submit">
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <template v-if="!hasPreselectedStudent">
-          <!-- Classroom -->
-          <div v-if="!hasPreselectedClassroom" class="space-y-2">
-            <Label>{{ t('modals.penalty.class') }}</Label>
-            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
-          </div>
-
-          <!-- Student -->
-          <div class="space-y-2">
-            <Label>{{ t('modals.penalty.student') }}</Label>
+      <FormField v-slot="{ value, handleChange }" name="student_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.penalty.student') }}</FormLabel>
+          <FormControl>
             <StudentSelect
-              v-model="selectedStudentId"
+              :model-value="value"
               :students="students"
               :placeholder="t('modals.penalty.selectStudent')"
               :empty-text="t('modals.penalty.noStudentFound')"
+              @update:model-value="handleChange"
             />
-            <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>
-          </div>
-        </template>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </template>
 
-        <!-- Penalty Type -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.penalty.penaltyType') }}</Label>
-          <PenaltyTypeSelect v-model="selectedPenaltyTypeId" :penalty-types="penaltyTypes" />
-          <p v-if="fieldErrors.penalty_type_id" class="text-sm text-destructive">{{ fieldErrors.penalty_type_id }}</p>
-        </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.penalty.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !selectedStudentId || !selectedPenaltyTypeId">
-            {{ t('modals.penalty.submit') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+    <FormField v-slot="{ value, handleChange }" name="penalty_type_id">
+      <FormItem>
+        <FormLabel>{{ t('modals.penalty.penaltyType') }}</FormLabel>
+        <FormControl>
+          <PenaltyTypeSelect
+            :model-value="value"
+            :penalty-types="penaltyTypes"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+  </BaseModal>
 </template>

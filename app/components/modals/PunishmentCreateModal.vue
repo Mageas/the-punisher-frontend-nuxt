@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
+import type { DateValue } from '@internationalized/date'
+import { getLocalTimeZone } from '@internationalized/date'
+
 const emit = defineEmits<{
   created: []
 }>()
@@ -14,148 +20,164 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 
-// Form
-const selectedClassroomId = ref('')
-const selectedStudentId = ref('')
-const selectedPunishmentTypeId = ref('')
-const dueAt = ref<DateValue>()
-const dueAtTime = ref('08:00')
-const submitting = ref(false)
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
 
+const schema = toTypedSchema(zod.object({
+  classroom_id: zod.string().optional(),
+  student_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+  punishment_type_id: zod.string()
+    .min(1, t('apiErrors.details.validation_field_required'))
+    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
+  due_at: zod.any().refine(val => !!val, t('apiErrors.details.validation_field_required')),
+  due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+}))
+
+const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    classroom_id: props.preselectedClassroomId ?? '',
+    student_id: props.preselectedStudentId ?? '',
+    punishment_type_id: '',
+    due_at: undefined as DateValue | undefined,
+    due_at_time: '08:00',
+  },
+})
+
 // When classroom changes, re-fetch students and reset student selection
-watch(selectedClassroomId, () => {
+watch(() => values.classroom_id, (newClassroomId) => {
   if (hasPreselectedStudent.value) return
-  selectedStudentId.value = ''
-  fetchStudents(selectedClassroomId.value || undefined)
+  setFieldValue('student_id', '', false)
+  fetchStudents(newClassroomId || undefined)
 })
 
 // Load data when modal opens
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedClassroomId.value = props.preselectedClassroomId ?? ''
-    selectedStudentId.value = props.preselectedStudentId ?? ''
-    selectedPunishmentTypeId.value = ''
-    dueAt.value = undefined
-    dueAtTime.value = '08:00'
+    resetForm({
+      values: {
+        classroom_id: props.preselectedClassroomId ?? '',
+        student_id: props.preselectedStudentId ?? '',
+        punishment_type_id: '',
+        due_at: undefined,
+        due_at_time: '08:00',
+      },
+    })
     await Promise.all([
       hasPreselectedStudent.value || hasPreselectedClassroom.value ? Promise.resolve() : fetchClassrooms(),
-      fetchStudents(selectedClassroomId.value || undefined),
+      fetchStudents(values.classroom_id || undefined),
       fetchPunishmentTypes(),
     ])
-    if (props.preselectedStudentId) {
-      selectedStudentId.value = props.preselectedStudentId
-    }
   }
 })
 
-async function submit() {
-  if (!selectedStudentId.value || !selectedPunishmentTypeId.value) return
-  submitting.value = true
+const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    const body: Record<string, unknown> = {
-      student_id: selectedStudentId.value,
-      punishment_type_id: selectedPunishmentTypeId.value,
-    }
-    if (dueAt.value) {
-      const date = dueAt.value.toDate(getLocalTimeZone())
-      if (dueAtTime.value) {
-        const [h, m] = dueAtTime.value.split(':')
-        date.setHours(Number(h), Number(m), 0, 0)
-      }
-      body.due_at = date.toISOString()
-    }
+    const date = (formValues.due_at as DateValue).toDate(getLocalTimeZone())
+    const [h, m] = formValues.due_at_time.split(':')
+    date.setHours(Number(h), Number(m), 0, 0)
+
     await $api('/punishments/', {
       method: 'POST',
-      body,
+      body: {
+        student_id: formValues.student_id,
+        punishment_type_id: formValues.punishment_type_id,
+        due_at: date.toISOString(),
+      },
     })
     open.value = false
     emit('created')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 sm:max-w-md">
-      <DialogHeader>
-        <DialogTitle>{{ t('modals.punishment.title') }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ t('modals.punishment.title') }}</DialogDescription>
-      </DialogHeader>
+  <BaseModal
+    v-model:open="open"
+    :title="t('modals.punishment.title')"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('modals.punishment.submit')"
+    prevent-auto-focus
+    @submit="onSubmit"
+  >
+    <template v-if="!hasPreselectedStudent">
+      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value, handleChange }" name="classroom_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.punishment.class') }}</FormLabel>
+          <FormControl>
+            <ClassroomSelect
+              :model-value="value"
+              :classrooms="classrooms"
+              full-width
+              @update:model-value="handleChange"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-      <form class="min-w-0 space-y-4" @submit.prevent="submit">
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <template v-if="!hasPreselectedStudent">
-          <!-- Classroom -->
-          <div v-if="!hasPreselectedClassroom" class="space-y-2">
-            <Label>{{ t('modals.punishment.class') }}</Label>
-            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" full-width />
-          </div>
-
-          <!-- Student -->
-          <div class="space-y-2">
-            <Label>{{ t('modals.punishment.student') }}</Label>
+      <FormField v-slot="{ value, handleChange }" name="student_id">
+        <FormItem>
+          <FormLabel>{{ t('modals.punishment.student') }}</FormLabel>
+          <FormControl>
             <StudentSelect
-              v-model="selectedStudentId"
+              :model-value="value"
               :students="students"
               :placeholder="t('modals.punishment.selectStudent')"
               :empty-text="t('modals.punishment.noStudentFound')"
+              @update:model-value="handleChange"
             />
-            <p v-if="fieldErrors.student_id" class="text-sm text-destructive">{{ fieldErrors.student_id }}</p>
-          </div>
-        </template>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </template>
 
-        <!-- Punishment Type -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.punishment.punishmentType') }}</Label>
-          <PunishmentTypeSelect v-model="selectedPunishmentTypeId" :punishment-types="punishmentTypes" />
-          <p v-if="fieldErrors.punishment_type_id" class="text-sm text-destructive">{{ fieldErrors.punishment_type_id }}</p>
-        </div>
-
-        <!-- Due date -->
-        <div class="space-y-2">
-          <Label>{{ t('modals.punishment.dueAt') }}</Label>
-          <DatePicker
-            v-model="dueAt"
-            v-model:time="dueAtTime"
-            :placeholder="t('modals.punishment.selectDate')"
-            show-time
+    <FormField v-slot="{ value, handleChange }" name="punishment_type_id">
+      <FormItem>
+        <FormLabel>{{ t('modals.punishment.punishmentType') }}</FormLabel>
+        <FormControl>
+          <PunishmentTypeSelect
+            :model-value="value"
+            :punishment-types="punishmentTypes"
+            @update:model-value="handleChange"
           />
-          <p v-if="fieldErrors.due_at" class="text-sm text-destructive">{{ fieldErrors.due_at }}</p>
-        </div>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.punishment.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !selectedStudentId || !selectedPunishmentTypeId">
-            {{ t('modals.punishment.submit') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+    <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="due_at">
+      <FormField v-slot="{ value: timeValue, handleChange: handleChangeTime }" name="due_at_time">
+        <FormItem>
+          <FormLabel>{{ t('modals.punishment.dueAt') }}</FormLabel>
+          <FormControl>
+            <DatePicker
+              :model-value="dateValue"
+              :time="timeValue"
+              :placeholder="t('modals.punishment.selectDate')"
+              show-time
+              @update:model-value="handleChangeDate"
+              @update:time="handleChangeTime"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </FormField>
+  </BaseModal>
 </template>
-
-<script lang="ts">
-import type { DateValue } from '@internationalized/date'
-import { getLocalTimeZone } from '@internationalized/date'
-</script>

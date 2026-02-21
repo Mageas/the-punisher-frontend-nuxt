@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
 import type { Rule, RuleMode } from '~/types/api'
 
 const emit = defineEmits<{
@@ -13,59 +16,61 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 
-const selectedPenaltyTypeId = ref('')
-const selectedPunishmentTypeId = ref('')
-const threshold = ref<number>(1)
-const mode = ref<RuleMode>('at')
-const dueAtAfterDays = ref<number>(1)
-const submitting = ref(false)
+const schema = toTypedSchema(zod.object({
+  name: zod.string()
+    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+    .max(120, t('apiErrors.details.validation_max_length', { value: 120 })),
+  penalty_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+  resulting_punishment_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+  threshold: zod.number().min(1, t('apiErrors.details.validation_min_length', { value: 1 })),
+  mode: zod.enum(['at', 'every', 'after'] as const),
+  due_at_after_days: zod.number().min(0, t('apiErrors.details.validation_min_length', { value: 0 })),
+}))
 
-const canSubmit = computed(() =>
-  !!props.rule?.id
-  && selectedPenaltyTypeId.value
-  && selectedPunishmentTypeId.value
-  && Number.isFinite(threshold.value)
-  && Number.isFinite(dueAtAfterDays.value)
-  && threshold.value > 0
-  && dueAtAfterDays.value > 0,
-)
-
-watch(open, async (isOpen) => {
-  if (!isOpen || !props.rule) return
-
-  clearErrors()
-  selectedPenaltyTypeId.value = props.rule.penalty_type_id
-  selectedPunishmentTypeId.value = props.rule.resulting_punishment_type_id
-  threshold.value = props.rule.threshold
-  mode.value = props.rule.mode
-  dueAtAfterDays.value = props.rule.due_at_after_days
-
-  await Promise.all([
-    fetchPenaltyTypes(),
-    fetchPunishmentTypes(),
-  ])
+const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    name: props.rule?.name ?? '',
+    penalty_type_id: props.rule?.penalty_type_id ?? '',
+    resulting_punishment_type_id: props.rule?.resulting_punishment_type_id ?? '',
+    threshold: props.rule?.threshold ?? 3,
+    mode: (props.rule?.mode ?? 'at') as RuleMode,
+    due_at_after_days: props.rule?.due_at_after_days ?? 7,
+  },
 })
 
-async function submit() {
-  if (!props.rule?.id || !canSubmit.value) return
+watch(open, async (isOpen) => {
+  if (isOpen && props.rule) {
+    clearErrors()
+    resetForm({
+      values: {
+        name: props.rule.name,
+        penalty_type_id: props.rule.penalty_type_id,
+        resulting_punishment_type_id: props.rule.resulting_punishment_type_id,
+        threshold: props.rule.threshold,
+        mode: props.rule.mode,
+        due_at_after_days: props.rule.due_at_after_days,
+      },
+    })
+    await Promise.all([
+      fetchPenaltyTypes(),
+      fetchPunishmentTypes(),
+    ])
+  }
+})
 
-  submitting.value = true
+const onSubmit = handleSubmit(async (formValues) => {
+  if (!props.rule?.id) return
   clearErrors()
-
   try {
     await $api(`/rules/${props.rule.id}`, {
       method: 'PUT',
       body: {
-        name: props.rule.name,
-        resulting_punishment_type_id: selectedPunishmentTypeId.value,
-        penalty_type_id: selectedPenaltyTypeId.value,
-        threshold: Math.trunc(threshold.value),
-        due_at_after_days: Math.trunc(dueAtAfterDays.value),
-        mode: mode.value,
+        ...formValues,
         is_active: props.rule.is_active,
       },
     })
@@ -73,92 +78,106 @@ async function submit() {
     emit('updated')
   }
   catch (err) {
-    handleApiError(err)
+    setFormErrors(setFieldError, err)
   }
-  finally {
-    submitting.value = false
-  }
-}
+})
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogContent class="min-w-0 overflow-visible sm:max-w-md" @open-auto-focus.prevent>
-      <DialogHeader>
-        <DialogTitle>{{ t('modals.rule.editTitle') }}</DialogTitle>
-        <DialogDescription class="sr-only">{{ t('modals.rule.editTitle') }}</DialogDescription>
-      </DialogHeader>
+  <BaseModal
+    v-model:open="open"
+    :title="t('modals.rule.editTitle')"
+    :global-error="globalError"
+    :submitting="isSubmitting"
+    :can-submit="meta.valid"
+    :submit-text="t('modals.rule.save')"
+    @submit="onSubmit"
+  >
+    <FormField v-slot="{ componentField }" name="name">
+      <FormItem>
+        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormControl>
+          <Input v-bind="componentField" type="text" />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-      <form class="min-w-0 space-y-4" @submit.prevent="submit">
-        <Alert v-if="globalError" variant="destructive">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
-        <div class="space-y-2">
-          <Label>{{ t('modals.rule.penaltyType') }}</Label>
+    <FormField v-slot="{ value, handleChange }" name="penalty_type_id">
+      <FormItem>
+        <FormLabel>{{ t('modals.rule.penaltyType') }}</FormLabel>
+        <FormControl>
           <PenaltyTypeSelect
-            v-model="selectedPenaltyTypeId"
+            :model-value="value"
             :penalty-types="penaltyTypes"
             :placeholder="t('modals.rule.selectPenaltyType')"
             :empty-text="t('modals.rule.noPenaltyTypeFound')"
+            @update:model-value="handleChange"
           />
-          <p v-if="fieldErrors.penalty_type_id" class="text-sm text-destructive">
-            {{ fieldErrors.penalty_type_id }}
-          </p>
-        </div>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div class="space-y-2">
-            <Label>{{ t('modals.rule.threshold') }}</Label>
-            <Input v-model.number="threshold" type="number" min="1" />
-            <p v-if="fieldErrors.threshold" class="text-sm text-destructive">
-              {{ fieldErrors.threshold }}
-            </p>
-          </div>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <FormField v-slot="{ componentField }" name="threshold">
+        <FormItem>
+          <FormLabel>{{ t('modals.rule.threshold') }}</FormLabel>
+          <FormControl>
+            <Input v-bind="componentField" type="number" min="1" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-          <div class="space-y-2">
-            <Label>{{ t('modals.rule.mode') }}</Label>
-            <NativeSelect v-model="mode" class="w-full">
-              <option value="at">{{ t('rules.modes.at') }}</option>
-              <option value="every">{{ t('rules.modes.every') }}</option>
-              <option value="after">{{ t('rules.modes.after') }}</option>
+      <FormField v-slot="{ value, handleChange }" name="mode">
+        <FormItem>
+          <FormLabel>{{ t('modals.rule.mode') }}</FormLabel>
+          <FormControl>
+            <NativeSelect
+              :model-value="value"
+              @update:model-value="handleChange as any"
+            >
+              <option value="at">
+                {{ t('rules.modes.at') }}
+              </option>
+              <option value="every">
+                {{ t('rules.modes.every') }}
+              </option>
+              <option value="after">
+                {{ t('rules.modes.after') }}
+              </option>
             </NativeSelect>
-            <p v-if="fieldErrors.mode" class="text-sm text-destructive">
-              {{ fieldErrors.mode }}
-            </p>
-          </div>
-        </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </div>
 
-        <div class="space-y-2">
-          <Label>{{ t('modals.rule.punishmentType') }}</Label>
+    <FormField v-slot="{ value, handleChange }" name="resulting_punishment_type_id">
+      <FormItem>
+        <FormLabel>{{ t('modals.rule.punishmentType') }}</FormLabel>
+        <FormControl>
           <PunishmentTypeSelect
-            v-model="selectedPunishmentTypeId"
+            :model-value="value"
             :punishment-types="punishmentTypes"
             :placeholder="t('modals.rule.selectPunishmentType')"
             :empty-text="t('modals.rule.noPunishmentTypeFound')"
+            @update:model-value="handleChange"
           />
-          <p v-if="fieldErrors.resulting_punishment_type_id" class="text-sm text-destructive">
-            {{ fieldErrors.resulting_punishment_type_id }}
-          </p>
-        </div>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-        <div class="space-y-2">
-          <Label>{{ t('modals.rule.dueAtAfterDays') }}</Label>
-          <Input v-model.number="dueAtAfterDays" type="number" min="1" />
-          <p v-if="fieldErrors.due_at_after_days" class="text-sm text-destructive">
-            {{ fieldErrors.due_at_after_days }}
-          </p>
-        </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ t('modals.rule.cancel') }}
-          </Button>
-          <Button type="submit" class="cursor-pointer" :disabled="submitting || !canSubmit">
-            {{ t('modals.rule.save') }}
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+    <FormField v-slot="{ componentField }" name="due_at_after_days">
+      <FormItem>
+        <FormLabel>{{ t('modals.rule.dueAtAfterDays') }}</FormLabel>
+        <FormControl>
+          <Input v-bind="componentField" type="number" min="0" />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+  </BaseModal>
 </template>
