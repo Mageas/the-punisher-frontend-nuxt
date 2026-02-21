@@ -32,15 +32,6 @@ const showResolveModal = ref(false)
 const punishmentToDeleteId = ref<string | null>(null)
 const punishmentToResolveId = ref<string | null>(null)
 
-// Fetch with current filters
-async function reload(pageToLoad = page.value || 1) {
-  await fetchPunishments({
-    page: pageToLoad,
-    search: searchDebounced.value || undefined,
-    state: filters.state,
-  })
-}
-
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
@@ -65,17 +56,17 @@ function openResolveModal(id: string) {
 
 // After delete confirmed
 async function onDeleteConfirmed() {
-  await reload(page.value)
+  // Store handles refresh
 }
 
 // After resolve confirmed
 async function onResolveConfirmed() {
-  await reload(page.value)
+  // Store handles refresh
 }
 
 // After creation
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
 // Watch search changes
@@ -85,7 +76,7 @@ watch(searchDebounced, async (newSearch) => {
 
 // Initial fetch if not already loading (e.g. from watcher)
 if (punishments.value.length === 0 && !loading.value) {
-  await reload()
+  await fetchPunishments()
 }
 </script>
 
@@ -176,13 +167,11 @@ if (punishments.value.length === 0 && !loading.value) {
     <PunishmentDeleteModal
       v-model:open="showDeleteModal"
       :punishment-id="punishmentToDeleteId"
-      :delete-fn="deletePunishment"
       @confirmed="onDeleteConfirmed"
     />
     <PunishmentResolveModal
       v-model:open="showResolveModal"
       :punishment-id="punishmentToResolveId"
-      :resolve-fn="handleResolve"
       @confirmed="onResolveConfirmed"
     />
   </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useBonuses } from '~/composables/useBonuses'
+
 const emit = defineEmits<{
   confirmed: []
 }>()
@@ -6,10 +8,10 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
+const { useBonus } = useBonuses()
 
 const props = defineProps<{
   bonusId: string | null
-  useFn: (id: string) => Promise<void>
 }>()
 </script>
 
@@ -17,7 +19,7 @@ const props = defineProps<{
   <ConfirmActionModal
     v-model:open="open"
     :item-id="props.bonusId"
-    :action-fn="props.useFn"
+    :action-fn="useBonus"
     :title="t('modals.use.title')"
     :message="t('modals.use.bonusMessage')"
     :cancel-label="t('modals.use.cancel')"

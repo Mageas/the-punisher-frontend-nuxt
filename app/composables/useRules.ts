@@ -1,47 +1,136 @@
-import type { Rule, RulePayload } from '~/types/api'
+import { storeToRefs } from 'pinia'
+import { markRaw, ref, reactive, computed, watch } from 'vue'
+import { useRulesStore } from '~/stores/rules.store'
 import { ruleService } from '~/services/rule.service'
+import type { Rule } from '~/types/api'
 
-/**
- * Composable to fetch and manage rules with pagination.
- */
 export function useRules() {
-  const paginated = usePaginatedCollection<
-    Rule,
-    {
-      page?: number
+  const store = useRulesStore()
+  const route = useRoute()
+  const router = useRouter()
+
+  // -- Store --
+  const { 
+    items: storeItems, 
+    loading: storeLoading, 
+    currentPage: storePage, 
+    totalCount: storeTotal, 
+    itemPerPage: storeLimit,
+    nextPage: storeNext,
+    previousPage: storePrev
+  } = storeToRefs(store)
+
+  // -- Local Search --
+  const search = ref('')
+  const searchResults = ref<Rule[]>([])
+  const searchLoading = ref(false)
+  const searchPagination = reactive({
+    page: 1,
+    totalCount: 0,
+    itemPerPage: 0,
+    nextPage: null as number | null,
+    previousPage: null as number | null,
+  })
+  
+  let lastSearchId = 0
+  const isSearchActive = computed(() => search.value.trim().length > 0)
+
+  // -- Unified --
+  const items = computed(() => isSearchActive.value ? searchResults.value : storeItems.value)
+  const loading = computed(() => isSearchActive.value ? searchLoading.value : storeLoading.value)
+  const page = computed(() => isSearchActive.value ? searchPagination.page : storePage.value)
+  const totalCount = computed(() => isSearchActive.value ? searchPagination.totalCount : storeTotal.value)
+  const itemPerPage = computed(() => isSearchActive.value ? searchPagination.itemPerPage : storeLimit.value)
+  const nextPage = computed(() => isSearchActive.value ? searchPagination.nextPage : storeNext.value)
+  const previousPage = computed(() => isSearchActive.value ? searchPagination.previousPage : storePrev.value)
+
+  // -- Fetch --
+  async function fetchRules(options?: { page?: number; search?: string; force?: boolean }) {
+    const p = options?.page ?? (isSearchActive.value ? searchPagination.page : storePage.value)
+    const s = options?.search !== undefined ? options.search : search.value
+    const force = options?.force ?? false
+
+    if (s.trim().length > 0) {
+      searchLoading.value = true
+      const currentId = ++lastSearchId
+      try {
+        const res = await ruleService.getRules({ page: p, search: s })
+        if (currentId === lastSearchId) {
+          searchResults.value = markRaw(res.data)
+          searchPagination.page = res.page
+          searchPagination.totalCount = res.total_count
+          searchPagination.itemPerPage = res.item_per_page
+          searchPagination.nextPage = res.next_page
+          searchPagination.previousPage = res.previous_page
+        }
+      } catch (err) {
+        if (currentId === lastSearchId) {
+          console.error('Search failed', err)
+          searchResults.value = []
+        }
+      } finally {
+        if (currentId === lastSearchId) searchLoading.value = false
+      }
+    } else {
+      await store.fetchPage({ page: p, force })
     }
-  >((options) => ruleService.getRules(options), { pageKey: 'page' })
-
-  async function fetchRules(options?: { page?: number }) {
-    await paginated.fetchPage(options)
   }
 
-  async function createRule(data: RulePayload) {
-    return await ruleService.createRule(data)
+  // -- Navigation --
+  async function gotoPage(newPage: number) {
+    const query = { ...route.query, page: String(newPage) }
+    await router.push({ query })
   }
 
-  async function updateRule(id: string, body: RulePayload) {
-    await ruleService.updateRule(id, body)
+  async function applyFilters(newFilters: { search?: string }) {
+    const query = { ...route.query }
+    if (newFilters.search !== undefined) {
+      if (newFilters.search) query.search = newFilters.search
+      else delete query.search
+    }
+    query.page = '1'
+    await router.push({ query })
   }
 
-  async function deleteRule(id: string) {
-    await ruleService.deleteRule(id)
-  }
+  // -- URL Sync --
+  watch(
+    () => route.query,
+    async (newQuery) => {
+      const p = Number(newQuery.page) || 1
+      const s = String(newQuery.search || '')
+      search.value = s
+      await fetchRules({ page: p, search: s })
+    },
+    { immediate: true, deep: true }
+  )
 
   return {
-    rules: paginated.items,
-    loading: paginated.loading,
-    page: paginated.page,
-    filters: paginated.filters,
-    itemPerPage: paginated.itemPerPage,
-    totalCount: paginated.totalCount,
-    nextPage: paginated.nextPage,
-    previousPage: paginated.previousPage,
+    rules: items,
+    loading,
+    page,
+    filters: computed(() => ({ search: search.value })),
+    itemPerPage,
+    totalCount,
+    nextPage,
+    previousPage,
     fetchRules,
-    gotoPage: paginated.gotoPage,
-    applyFilters: paginated.applyFilters,
-    createRule,
-    updateRule,
-    deleteRule,
+    gotoPage,
+    applyFilters,
+    
+    // Mutations
+    createRule: async (payload: any) => {
+      const res = await store.createOne(payload)
+      if (isSearchActive.value) await fetchRules()
+      return res
+    },
+    updateRule: async (id: string, payload: any) => {
+      const res = await store.updateOne(id, payload)
+      if (isSearchActive.value) await fetchRules()
+      return res
+    },
+    deleteRule: async (id: string) => {
+      await store.deleteOne(id)
+      if (isSearchActive.value) await fetchRules()
+    },
   }
 }

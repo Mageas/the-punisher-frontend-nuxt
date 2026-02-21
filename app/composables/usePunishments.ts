@@ -1,50 +1,150 @@
-import type { Punishment } from '~/types/api'
+import { storeToRefs } from 'pinia'
+import { markRaw, ref, reactive, computed, watch } from 'vue'
+import { usePunishmentsStore } from '~/stores/punishments.store'
 import { punishmentService } from '~/services/punishment.service'
+import type { Punishment } from '~/types/api'
 
-/**
- * Composable to fetch and manage punishments with pagination.
- */
 export function usePunishments() {
-  const paginated = usePaginatedCollection<
-    Punishment,
-    {
-      state?: 'pending' | 'resolved'
-      search?: string
-    }
-  >((options) => punishmentService.getPunishments(options), {
-    pageKey: 'page',
-    filterKeys: ['search', 'state'],
+  const store = usePunishmentsStore()
+  const route = useRoute()
+  const router = useRouter()
+
+  // -- Store --
+  const { 
+    items: storeItems, 
+    loading: storeLoading, 
+    currentPage: storePage, 
+    totalCount: storeTotal, 
+    itemPerPage: storeLimit,
+    nextPage: storeNext,
+    previousPage: storePrev
+  } = storeToRefs(store)
+
+  // -- Local Search --
+  const search = ref('')
+  const searchResults = ref<Punishment[]>([])
+  const searchLoading = ref(false)
+  const searchPagination = reactive({
+    page: 1,
+    totalCount: 0,
+    itemPerPage: 0,
+    nextPage: null as number | null,
+    previousPage: null as number | null,
   })
+  
+  let lastSearchId = 0
+  const isSearchActive = computed(() => search.value.trim().length > 0)
 
-  async function fetchPunishments(options?: {
-    page?: number
-    state?: 'pending' | 'resolved'
-    search?: string
-  }) {
-    await paginated.fetchPage(options)
+  // -- Unified --
+  const items = computed(() => isSearchActive.value ? searchResults.value : storeItems.value)
+  const loading = computed(() => isSearchActive.value ? searchLoading.value : storeLoading.value)
+  const page = computed(() => isSearchActive.value ? searchPagination.page : storePage.value)
+  const totalCount = computed(() => isSearchActive.value ? searchPagination.totalCount : storeTotal.value)
+  const itemPerPage = computed(() => isSearchActive.value ? searchPagination.itemPerPage : storeLimit.value)
+  const nextPage = computed(() => isSearchActive.value ? searchPagination.nextPage : storeNext.value)
+  const previousPage = computed(() => isSearchActive.value ? searchPagination.previousPage : storePrev.value)
+
+  // -- Fetch --
+  async function fetchPunishments(options?: { page?: number; search?: string; state?: string; force?: boolean }) {
+    const p = options?.page ?? (isSearchActive.value ? searchPagination.page : storePage.value)
+    const s = options?.search !== undefined ? options.search : search.value
+    const st = options?.state ?? (route.query.state as string | undefined)
+    const force = options?.force ?? false
+
+    if (s.trim().length > 0) {
+      searchLoading.value = true
+      const currentId = ++lastSearchId
+      try {
+        const res = await punishmentService.getPunishments({ page: p, search: s, state: st })
+        if (currentId === lastSearchId) {
+          searchResults.value = markRaw(res.data)
+          searchPagination.page = res.page
+          searchPagination.totalCount = res.total_count
+          searchPagination.itemPerPage = res.item_per_page
+          searchPagination.nextPage = res.next_page
+          searchPagination.previousPage = res.previous_page
+        }
+      } catch (err) {
+        if (currentId === lastSearchId) {
+          console.error('Search failed', err)
+          searchResults.value = []
+        }
+      } finally {
+        if (currentId === lastSearchId) searchLoading.value = false
+      }
+    } else {
+      await store.fetchPage({ page: p, filters: { state: st }, force })
+    }
   }
 
-  async function resolvePunishment(id: string) {
-    await punishmentService.resolvePunishment(id, {})
+  // -- Navigation --
+  async function gotoPage(newPage: number) {
+    const query = { ...route.query, page: String(newPage) }
+    await router.push({ query })
   }
 
-  async function deletePunishment(id: string) {
-    await punishmentService.deletePunishment(id)
+  async function applyFilters(newFilters: { search?: string; state?: string }) {
+    const query = { ...route.query }
+    if (newFilters.search !== undefined) {
+      if (newFilters.search) query.search = newFilters.search
+      else delete query.search
+    }
+    if (newFilters.state !== undefined) {
+      if (newFilters.state) query.state = newFilters.state
+      else delete query.state
+    }
+    query.page = '1'
+    await router.push({ query })
   }
+
+  // -- URL Sync --
+  watch(
+    () => route.query,
+    async (newQuery) => {
+      const p = Number(newQuery.page) || 1
+      const s = String(newQuery.search || '')
+      const st = String(newQuery.state || '')
+      
+      search.value = s
+      
+      await fetchPunishments({ page: p, search: s, state: st || undefined })
+    },
+    { immediate: true, deep: true }
+  )
 
   return {
-    punishments: paginated.items,
-    loading: paginated.loading,
-    page: paginated.page,
-    filters: paginated.filters,
-    itemPerPage: paginated.itemPerPage,
-    totalCount: paginated.totalCount,
-    nextPage: paginated.nextPage,
-    previousPage: paginated.previousPage,
+    punishments: items,
+    loading,
+    page,
+    filters: computed(() => ({ search: search.value, state: (route.query.state as string) || undefined })),
+    itemPerPage,
+    totalCount,
+    nextPage,
+    previousPage,
     fetchPunishments,
-    gotoPage: paginated.gotoPage,
-    applyFilters: paginated.applyFilters,
-    resolvePunishment,
-    deletePunishment,
+    gotoPage,
+    applyFilters,
+    
+    // Mutations
+    resolvePunishment: async (id: string) => {
+      await punishmentService.resolvePunishment(id, {})
+      store.invalidateAll()
+      store.invalidateDependencies()
+      await fetchPunishments({ force: true })
+    },
+    deletePunishment: async (id: string) => {
+      await store.deleteOne(id)
+      if (isSearchActive.value) await fetchPunishments()
+    },
+    createPunishment: async (payload: any) => {
+      const res = await store.createOne(payload)
+      if (isSearchActive.value) await fetchPunishments()
+      return res
+    },
+    updatePunishment: async (id: string, payload: any) => {
+      const res = await store.updateOne(id, payload)
+      if (isSearchActive.value) await fetchPunishments()
+      return res
+    }
   }
 }

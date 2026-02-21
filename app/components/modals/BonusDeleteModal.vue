@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useBonusesStore } from '~/stores/bonuses.store'
+
 const emit = defineEmits<{
   confirmed: []
 }>()
@@ -6,18 +8,22 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
+const store = useBonusesStore()
 
 const props = defineProps<{
   bonusId: string | null
-  deleteFn: (id: string) => Promise<void>
 }>()
+
+async function deleteBonus(id: string) {
+  await store.deleteOne(id)
+}
 </script>
 
 <template>
   <ConfirmActionModal
     v-model:open="open"
     :item-id="props.bonusId"
-    :action-fn="props.deleteFn"
+    :action-fn="deleteBonus"
     :title="t('modals.delete.title')"
     :message="t('modals.delete.bonusMessage')"
     :cancel-label="t('modals.delete.cancel')"

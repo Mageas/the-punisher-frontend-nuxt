@@ -40,15 +40,12 @@ function buildRulePayload(rule: Rule, overrides: Partial<RulePayload> = {}): Rul
   }
 }
 
-async function reload(pageToLoad = page.value || 1) {
-  await fetchRules({ page: pageToLoad })
-}
-
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
 }
 
+// Toggle logic: updateRule invalidates store, but we might want to stay on current page
 async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   if (togglingById.value[rule.id]) return
 
@@ -56,11 +53,12 @@ async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   togglingById.value = { ...togglingById.value, [rule.id]: true }
 
   try {
-    await updateRule(rule.id, buildRulePayload(rule, { is_active: nextIsActive }))
-    await reload(page.value)
+    // updateRule automatically invalidates and refetches current page
+    await updateRule(rule.id, { is_active: nextIsActive })
   } catch (err) {
     handleApiError(err)
   } finally {
+     
     const { [rule.id]: _ignored, ...rest } = togglingById.value
     togglingById.value = rest
   }
@@ -77,18 +75,20 @@ function openDeleteModal(ruleId: string) {
 }
 
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
 async function onUpdated() {
-  await reload(page.value)
+  // Store handles refetch, no action needed unless we want to change page
 }
 
 async function onDeleteConfirmed() {
-  await reload(page.value)
+  // Store handles refetch
 }
 
-await reload()
+if (rules.value.length === 0 && !loading.value) {
+  await fetchRules()
+}
 </script>
 
 <template>
@@ -151,7 +151,6 @@ await reload()
     <RuleDeleteModal
       v-model:open="showDeleteModal"
       :rule-id="ruleToDeleteId"
-      :delete-fn="deleteRule"
       @confirmed="onDeleteConfirmed"
     />
   </div>

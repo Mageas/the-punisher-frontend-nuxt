@@ -2,7 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { penaltyService } from '~/services/penalty.service'
+import { usePenaltiesStore } from '~/stores/penalties.store'
 
 const emit = defineEmits<{
   created: []
@@ -25,6 +25,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
+const store = usePenaltiesStore()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
@@ -95,7 +96,7 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await penaltyService.createPenalty({
+    await store.createOne({
       student_id: formValues.student_id,
       penalty_type_id: formValues.penalty_type_id,
     })

@@ -32,21 +32,13 @@ const showUseModal = ref(false)
 const bonusToDeleteId = ref<string | null>(null)
 const bonusToUseId = ref<string | null>(null)
 
-// Fetch with current filters
-async function reload(pageToLoad = page.value || 1) {
-  await fetchBonuses({
-    page: pageToLoad,
-    search: searchDebounced.value || undefined,
-    state: filters.state,
-  })
-}
-
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
 }
 
 async function handleUse(id: string) {
+  // useBonus already handles fetching
   await useBonus(id)
 }
 
@@ -61,15 +53,15 @@ function openUseModal(id: string) {
 }
 
 async function onDeleteConfirmed() {
-  await reload(page.value)
+  // Store handles refresh
 }
 
 async function onUseConfirmed() {
-  await reload(page.value)
+  // Store handles refresh
 }
 
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
 watch(searchDebounced, async (newSearch) => {
@@ -78,7 +70,7 @@ watch(searchDebounced, async (newSearch) => {
 
 // Initial fetch if not already loading (e.g. from watcher)
 if (bonuses.value.length === 0 && !loading.value) {
-  await reload()
+  await fetchBonuses()
 }
 </script>
 
@@ -164,13 +156,11 @@ if (bonuses.value.length === 0 && !loading.value) {
     <BonusDeleteModal
       v-model:open="showDeleteModal"
       :bonus-id="bonusToDeleteId"
-      :delete-fn="deleteBonus"
       @confirmed="onDeleteConfirmed"
     />
     <BonusUseModal
       v-model:open="showUseModal"
       :bonus-id="bonusToUseId"
-      :use-fn="handleUse"
       @confirmed="onUseConfirmed"
     />
   </div>

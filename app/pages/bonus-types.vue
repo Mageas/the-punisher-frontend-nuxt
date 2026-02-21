@@ -1,20 +1,14 @@
 <script setup lang="ts">
 import { Trophy } from 'lucide-vue-next'
-import { typeService } from '~/services/type.service'
+import { useBonusTypesStore } from '~/stores/types/bonus-types.store'
 
 const { t } = useI18n()
-
-const bonusTypeServices = {
-  getTypes: typeService.getBonusTypes,
-  createType: typeService.createBonusType,
-  updateType: typeService.updateBonusType,
-  deleteType: typeService.deleteBonusType,
-}
+const store = useBonusTypesStore()
 </script>
 
 <template>
   <TypeManagementPage
-    :service="bonusTypeServices"
+    :store="store"
     :title="t('bonusTypes.title')"
     :new-label="t('bonusTypes.newType')"
     :empty-label="t('bonusTypes.noTypes')"

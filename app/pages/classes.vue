@@ -20,20 +20,18 @@ function previewStudents(classroom: Classroom): Classroom['students_preview'] {
   return classroom.students_preview.slice(0, 3)
 }
 
-async function reload(pageToLoad = page.value || 1) {
-  await fetchClassrooms({ page: pageToLoad })
-}
-
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
 }
 
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
-await reload()
+if (classrooms.value.length === 0 && !loading.value) {
+  await fetchClassrooms()
+}
 </script>
 
 <template>

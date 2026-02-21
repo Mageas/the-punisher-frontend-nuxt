@@ -24,10 +24,11 @@ const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
 
-async function reload(pageToLoad = page.value || 1) {
+async function reload(pageToLoad = page.value || 1, force = false) {
   await fetchStudents({
     page: pageToLoad,
     search: searchDebounced.value || undefined,
+    force,
   })
 }
 
@@ -37,7 +38,7 @@ async function onPageChange(nextPage: number) {
 }
 
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
 watch(searchDebounced, async (newSearch) => {

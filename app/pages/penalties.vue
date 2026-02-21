@@ -29,14 +29,6 @@ const showCreateModal = ref(false)
 const showDeleteModal = ref(false)
 const penaltyToDeleteId = ref<string | null>(null)
 
-// Fetch with current filters
-async function reload(pageToLoad = page.value || 1) {
-  await fetchPenalties({
-    page: pageToLoad,
-    search: searchDebounced.value || undefined,
-  })
-}
-
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
@@ -48,11 +40,11 @@ function openDeleteModal(id: string) {
 }
 
 async function onDeleteConfirmed() {
-  await reload(page.value)
+  // Store handles refresh
 }
 
 async function onCreated() {
-  await reload(1)
+  await gotoPage(1)
 }
 
 watch(searchDebounced, async (newSearch) => {
@@ -61,7 +53,7 @@ watch(searchDebounced, async (newSearch) => {
 
 // Initial fetch if not already loading (e.g. from watcher)
 if (penalties.value.length === 0 && !loading.value) {
-  await reload()
+  await fetchPenalties()
 }
 </script>
 
@@ -133,7 +125,6 @@ if (penalties.value.length === 0 && !loading.value) {
     <PenaltyDeleteModal
       v-model:open="showDeleteModal"
       :penalty-id="penaltyToDeleteId"
-      :delete-fn="deletePenalty"
       @confirmed="onDeleteConfirmed"
     />
   </div>

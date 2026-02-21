@@ -2,7 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { classroomService } from '~/services/classroom.service'
+import { useClassroomsStore } from '~/stores/classrooms.store'
 
 const emit = defineEmits<{
   created: []
@@ -12,6 +12,7 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const store = useClassroomsStore()
 
 const schema = toTypedSchema(
   zod.object({
@@ -45,7 +46,7 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (values) => {
   clearErrors()
   try {
-    await classroomService.createClassroom({
+    await store.createOne({
       name: values.name,
       year: values.year || null,
     })

@@ -2,12 +2,10 @@
 import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
 import { dashboardService } from '~/services/dashboard.service'
-import { punishmentService } from '~/services/punishment.service'
+import { usePunishments } from '~/composables/usePunishments'
 
 const { t } = useI18n()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
-
-// Classroom filter
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const selectedClassroomId = ref<string>('')
 
@@ -19,6 +17,8 @@ const loading = ref(true)
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
+
+const { resolvePunishment: resolvePunishmentAction } = usePunishments()
 
 // Fetch dashboard data
 async function fetchDashboard() {
@@ -41,7 +41,9 @@ async function resolvePunishment(id: string) {
   clearErrors()
 
   try {
-    await punishmentService.resolvePunishment(id, {})
+    await resolvePunishmentAction(id)
+    // Refresh dashboard after resolution
+    await fetchDashboard()
   } catch (err) {
     handleApiError(err)
     throw err

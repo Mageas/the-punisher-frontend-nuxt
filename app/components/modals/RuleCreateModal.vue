@@ -3,7 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { RuleMode } from '~/types/api'
-import { ruleService } from '~/services/rule.service'
+import { useRulesStore } from '~/stores/rules.store'
 
 const emit = defineEmits<{
   created: []
@@ -15,6 +15,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
+const store = useRulesStore()
 
 const schema = toTypedSchema(
   zod.object({
@@ -69,7 +70,7 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await ruleService.createRule({
+    await store.createOne({
       ...formValues,
       name: generatedRuleName.value.substring(0, 120), // Max 120 per DTO
       is_active: true,

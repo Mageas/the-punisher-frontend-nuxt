@@ -4,7 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
-import { punishmentService } from '~/services/punishment.service'
+import { usePunishmentsStore } from '~/stores/punishments.store'
 
 const emit = defineEmits<{
   created: []
@@ -27,6 +27,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
+const store = usePunishmentsStore()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
@@ -107,7 +108,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     const [h, m] = formValues.due_at_time.split(':')
     date.setHours(Number(h), Number(m), 0, 0)
 
-    await punishmentService.createPunishment({
+    await store.createOne({
       student_id: formValues.student_id,
       punishment_type_id: formValues.punishment_type_id,
       due_at: date.toISOString(),

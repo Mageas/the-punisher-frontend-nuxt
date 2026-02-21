@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useRulesStore } from '~/stores/rules.store'
+
 const emit = defineEmits<{
   confirmed: []
 }>()
@@ -6,18 +8,22 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
+const store = useRulesStore()
 
 const props = defineProps<{
   ruleId: string | null
-  deleteFn: (id: string) => Promise<void>
 }>()
+
+async function deleteRule(id: string) {
+  await store.deleteOne(id)
+}
 </script>
 
 <template>
   <ConfirmActionModal
     v-model:open="open"
     :item-id="props.ruleId"
-    :action-fn="props.deleteFn"
+    :action-fn="deleteRule"
     :title="t('modals.delete.title')"
     :message="t('modals.delete.ruleMessage')"
     :cancel-label="t('modals.delete.cancel')"

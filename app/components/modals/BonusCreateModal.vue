@@ -2,7 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { bonusService } from '~/services/bonus.service'
+import { useBonusesStore } from '~/stores/bonuses.store'
 
 const emit = defineEmits<{
   created: []
@@ -25,6 +25,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
+const store = useBonusesStore()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
@@ -98,7 +99,7 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await bonusService.createBonus({
+    await store.createOne({
       student_id: formValues.student_id,
       bonus_type_id: formValues.bonus_type_id,
       points: formValues.points,
