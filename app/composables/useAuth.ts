@@ -64,8 +64,7 @@ export function useAuth() {
 
       accessToken.value = data.access_token
       return true
-    }
-    catch {
+    } catch {
       accessToken.value = null
       return false
     }

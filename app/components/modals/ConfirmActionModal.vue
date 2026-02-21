@@ -5,20 +5,24 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>('open', { default: false })
 
-const props = withDefaults(defineProps<{
-  itemId: string | null
-  actionFn: (id: string) => Promise<void>
-  title: string
-  message: string
-  warningMessage?: string
-  cancelLabel: string
-  confirmLabel: string
-  confirmVariant?: 'default' | 'destructive'
-  lockDurationSeconds?: number
-}>(), {
-  confirmVariant: 'default',
-  lockDurationSeconds: 0,
-})
+const props = withDefaults(
+  defineProps<{
+    itemId: string | null
+    actionFn: (id: string) => Promise<void>
+    title: string
+    message: string
+    warningMessage?: string
+    cancelLabel: string
+    confirmLabel: string
+    confirmVariant?: 'default' | 'destructive'
+    lockDurationSeconds?: number
+  }>(),
+  {
+    confirmVariant: 'default',
+    lockDurationSeconds: 0,
+    warningMessage: undefined,
+  },
+)
 
 const { globalError, handleApiError, clearErrors } = useApiErrors()
 const submitting = ref(false)
@@ -71,11 +75,9 @@ async function confirm() {
     await props.actionFn(props.itemId)
     open.value = false
     emit('confirmed')
-  }
-  catch (err) {
+  } catch (err) {
     handleApiError(err)
-  }
-  finally {
+  } finally {
     submitting.value = false
   }
 }

@@ -26,7 +26,9 @@ const bonusToUseId = ref<string | null>(null)
 
 const hasConsumeAction = computed(() => typeof props.useFn === 'function')
 const sectionTitle = computed(() => props.title ?? t('studentProfile.availableBonuses'))
-const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.availableBonuses'))
+const sectionEmptyLabel = computed(
+  () => props.emptyLabel ?? t('studentProfile.empty.availableBonuses'),
+)
 
 function openUseBonusModal(id: string) {
   if (!hasConsumeAction.value) return
@@ -50,7 +52,10 @@ function onUsed() {
       {{ sectionTitle }}
     </h2>
 
-    <div v-if="bonuses.length === 0" class="rounded-lg border border-border p-6 text-sm text-muted-foreground">
+    <div
+      v-if="bonuses.length === 0"
+      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
+    >
       {{ sectionEmptyLabel }}
     </div>
 

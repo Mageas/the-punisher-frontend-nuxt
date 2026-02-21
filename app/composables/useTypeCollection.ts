@@ -1,4 +1,4 @@
-import type { PaginatedResponse, $Fetch } from '~/types/api'
+import type { PaginatedResponse } from '~/types/api'
 
 export interface NamedTypeResource {
   id: string
@@ -8,21 +8,20 @@ export interface NamedTypeResource {
 }
 
 export interface TypeServiceFunctions<TType> {
-  getTypes: ($api: $Fetch, options?: { page?: number }) => Promise<PaginatedResponse<TType>>
-  createType: ($api: $Fetch, data: { name: string }) => Promise<TType>
-  updateType: ($api: $Fetch, id: string, data: { name: string }) => Promise<TType>
-  deleteType: ($api: $Fetch, id: string) => Promise<void>
+  getTypes: (options?: { page?: number }) => Promise<PaginatedResponse<TType>>
+  createType: (data: { name: string }) => Promise<TType>
+  updateType: (id: string, data: { name: string }) => Promise<TType>
+  deleteType: (id: string) => Promise<void>
 }
 
 /**
  * Shared parent composable for type resources (penalty/punishment/bonus).
  */
 export function useTypeCollection<TType extends NamedTypeResource>(
-  services: TypeServiceFunctions<TType>
+  services: TypeServiceFunctions<TType>,
 ) {
-  const { $api } = useNuxtApp()
-  const paginated = usePaginatedCollection<TType, { page?: number }>(
-    (options) => services.getTypes($api, options)
+  const paginated = usePaginatedCollection<TType, { page?: number }>((options) =>
+    services.getTypes(options),
   )
 
   async function fetchTypes(options?: { page?: number }) {
@@ -30,15 +29,15 @@ export function useTypeCollection<TType extends NamedTypeResource>(
   }
 
   async function createType(name: string) {
-    await services.createType($api, { name })
+    await services.createType({ name })
   }
 
   async function updateType(id: string, name: string) {
-    await services.updateType($api, id, { name })
+    await services.updateType(id, { name })
   }
 
   async function deleteType(id: string) {
-    await services.deleteType($api, id)
+    await services.deleteType(id)
   }
 
   return {

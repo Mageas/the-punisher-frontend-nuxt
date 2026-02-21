@@ -3,16 +3,19 @@ import type { Component } from 'vue'
 import { Pencil, Trash2 } from 'lucide-vue-next'
 import { formatDate } from '~/lib/utils'
 
-const props = withDefaults(defineProps<{
-  name: string
-  createdAt: string
-  icon: Component
-  iconClass?: string
-  iconWrapperClass?: string
-}>(), {
-  iconClass: 'text-muted-foreground',
-  iconWrapperClass: 'bg-secondary',
-})
+const props = withDefaults(
+  defineProps<{
+    name: string
+    createdAt: string
+    icon: Component
+    iconClass?: string
+    iconWrapperClass?: string
+  }>(),
+  {
+    iconClass: 'text-muted-foreground',
+    iconWrapperClass: 'bg-secondary',
+  },
+)
 
 const emit = defineEmits<{
   edit: []

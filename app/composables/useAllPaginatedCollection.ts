@@ -1,6 +1,9 @@
-import type { PaginatedResponse, $Fetch } from '~/types/api'
+import type { PaginatedResponse } from '~/types/api'
 
-type Fetcher<TItem, TArgs extends unknown[]> = ($api: $Fetch, options: { page: number }, ...args: TArgs) => Promise<PaginatedResponse<TItem>>
+type Fetcher<TItem, TArgs extends unknown[]> = (
+  options: { page: number },
+  ...args: TArgs
+) => Promise<PaginatedResponse<TItem>>
 
 /**
  * Shared parent composable to fetch every page for a resource.
@@ -8,8 +11,6 @@ type Fetcher<TItem, TArgs extends unknown[]> = ($api: $Fetch, options: { page: n
 export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
   fetcher: Fetcher<TItem, TArgs>,
 ) {
-  const { $api } = useNuxtApp()
-
   const items = ref<TItem[]>([])
   const loading = ref(false)
 
@@ -22,7 +23,7 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
       let hasMore = true
 
       while (hasMore) {
-        const res = await fetcher($api, { page }, ...args)
+        const res = await fetcher({ page }, ...args)
 
         all.push(...res.data)
         hasMore = res.next_page !== null
@@ -30,8 +31,7 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
       }
 
       items.value = all
-    }
-    finally {
+    } finally {
       loading.value = false
     }
   }

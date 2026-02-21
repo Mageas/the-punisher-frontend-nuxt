@@ -5,24 +5,20 @@ import { penaltyService } from '~/services/penalty.service'
  * Composable to fetch and manage penalties with pagination.
  */
 export function usePenalties() {
-  const { $api } = useNuxtApp()
   const paginated = usePaginatedCollection<
     Penalty,
     {
       page?: number
       search?: string
     }
-  >((options) => penaltyService.getPenalties($api, options))
+  >((options) => penaltyService.getPenalties(options))
 
-  async function fetchPenalties(options?: {
-    page?: number
-    search?: string
-  }) {
+  async function fetchPenalties(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
   }
 
   async function deletePenalty(id: string) {
-    await penaltyService.deletePenalty($api, id)
+    await penaltyService.deletePenalty(id)
   }
 
   return {

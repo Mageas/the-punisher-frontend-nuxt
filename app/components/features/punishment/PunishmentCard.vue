@@ -25,8 +25,7 @@ const subtitle = computed(() => {
     const parts = [props.punishmentTypeName]
     if (props.triggeringRuleName) {
       parts.push(props.triggeringRuleName)
-    }
-    else if (!isAutomated.value) {
+    } else if (!isAutomated.value) {
       parts.push(t('punishments.manualPunishment'))
     }
     return parts.join(' — ')
@@ -40,10 +39,7 @@ const subtitle = computed(() => {
 <template>
   <div
     class="flex flex-wrap items-center rounded-lg border border-border sm:flex-nowrap"
-    :class="[
-      { 'opacity-60': resolvedAt },
-      compact ? 'gap-3 p-3' : 'gap-4 p-4',
-    ]"
+    :class="[{ 'opacity-60': resolvedAt }, compact ? 'gap-3 p-3' : 'gap-4 p-4']"
   >
     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
       <Gavel class="h-4 w-4 text-red-400" />
@@ -80,18 +76,10 @@ const subtitle = computed(() => {
 
     <!-- Status -->
     <div class="text-left sm:text-right">
-      <Badge
-        v-if="!resolvedAt"
-        variant="outline"
-        class="text-amber-400 border-amber-400/30"
-      >
+      <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
         {{ t('punishments.pending') }}
       </Badge>
-      <Badge
-        v-else
-        variant="outline"
-        class="text-green-400 border-green-400/30"
-      >
+      <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
         {{ t('punishments.resolved') }}
       </Badge>
       <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">

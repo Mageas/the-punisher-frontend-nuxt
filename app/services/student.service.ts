@@ -1,10 +1,11 @@
-import type { Student, PaginatedResponse, StudentDetail, $Fetch } from '~/types/api'
+import type { Student, PaginatedResponse, StudentDetail } from '~/types/api'
 
 export const studentService = {
   /**
    * Fetch all students with pagination.
    */
-  async getStudents($api: $Fetch, options?: { page?: number; search?: string }) {
+  async getStudents(options?: { page?: number; search?: string }) {
+    const { $api } = useNuxtApp()
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
@@ -15,14 +16,16 @@ export const studentService = {
   /**
    * Get a student by ID.
    */
-  async getStudentById($api: $Fetch, studentId: string) {
+  async getStudentById(studentId: string) {
+    const { $api } = useNuxtApp()
     return $api<StudentDetail>(`/students/${studentId}`)
   },
 
   /**
    * Create a new student.
    */
-  async createStudent($api: $Fetch, data: { first_name: string; last_name: string }) {
+  async createStudent(data: { first_name: string; last_name: string }) {
+    const { $api } = useNuxtApp()
     return $api<Student>('/students', {
       method: 'POST',
       body: data,
@@ -32,7 +35,8 @@ export const studentService = {
   /**
    * Update an existing student.
    */
-  async updateStudent($api: $Fetch, studentId: string, data: { first_name?: string; last_name?: string }) {
+  async updateStudent(studentId: string, data: { first_name?: string; last_name?: string }) {
+    const { $api } = useNuxtApp()
     return $api<Student>(`/students/${studentId}`, {
       method: 'PUT',
       body: data,
@@ -42,9 +46,10 @@ export const studentService = {
   /**
    * Delete a student.
    */
-  async deleteStudent($api: $Fetch, studentId: string): Promise<void> {
+  async deleteStudent(studentId: string): Promise<void> {
+    const { $api } = useNuxtApp()
     await $api(`/students/${studentId}`, {
       method: 'DELETE',
     })
-  }
+  },
 }

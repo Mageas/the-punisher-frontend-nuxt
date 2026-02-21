@@ -11,7 +11,9 @@ const { t } = useI18n()
 <template>
   <div>
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">{{ t('dashboard.recentPenalties') }}</h2>
+      <h2 class="text-lg font-semibold">
+        {{ t('dashboard.recentPenalties') }}
+      </h2>
       <Badge variant="outline" class="text-muted-foreground">{{ t('common.recent') }}</Badge>
     </div>
     <div class="space-y-3">

@@ -7,6 +7,7 @@ import type { Bonus } from '~/types/api'
  */
 export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   const { $api } = useNuxtApp()
+
   const paginated = usePaginatedCollection<
     Bonus,
     {

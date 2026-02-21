@@ -13,9 +13,7 @@ export function useStudentHistory(studentId: MaybeRefOrGetter<string>) {
     }
   >(() => `/students/${toValue(studentId)}/history`)
 
-  async function fetchHistory(options?: {
-    page?: number
-  }) {
+  async function fetchHistory(options?: { page?: number }) {
     await paginated.fetchPage(options)
   }
 

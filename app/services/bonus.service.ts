@@ -1,10 +1,11 @@
-import type { Bonus, PaginatedResponse, BonusCreateData, BonusUseData, $Fetch } from '~/types/api'
+import type { Bonus, PaginatedResponse, BonusCreateData, BonusUseData } from '~/types/api'
 
 export const bonusService = {
   /**
    * Fetch all bonuses with pagination.
    */
-  async getBonuses($api: $Fetch, options?: { page?: number; search?: string; state?: string }) {
+  async getBonuses(options?: { page?: number; search?: string; state?: string }) {
+    const { $api } = useNuxtApp()
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
@@ -15,7 +16,8 @@ export const bonusService = {
   /**
    * Create a new bonus.
    */
-  async createBonus($api: $Fetch, data: BonusCreateData) {
+  async createBonus(data: BonusCreateData) {
+    const { $api } = useNuxtApp()
     return $api<Bonus>('/bonuses', {
       method: 'POST',
       body: data,
@@ -25,7 +27,8 @@ export const bonusService = {
   /**
    * Update an existing bonus.
    */
-  async updateBonus($api: $Fetch, bonusId: string, data: Partial<BonusCreateData>) {
+  async updateBonus(bonusId: string, data: Partial<BonusCreateData>) {
+    const { $api } = useNuxtApp()
     return $api<Bonus>(`/bonuses/${bonusId}`, {
       method: 'PATCH',
       body: data,
@@ -35,7 +38,8 @@ export const bonusService = {
   /**
    * Delete a bonus.
    */
-  async deleteBonus($api: $Fetch, bonusId: string): Promise<void> {
+  async deleteBonus(bonusId: string): Promise<void> {
+    const { $api } = useNuxtApp()
     await $api(`/bonuses/${bonusId}`, {
       method: 'DELETE',
     })
@@ -44,10 +48,11 @@ export const bonusService = {
   /**
    * Use a bonus.
    */
-  async useBonus($api: $Fetch, bonusId: string, data: BonusUseData) {
+  async useBonus(bonusId: string, data: BonusUseData) {
+    const { $api } = useNuxtApp()
     return $api<Bonus>(`/bonuses/${bonusId}/use`, {
       method: 'POST',
       body: data,
     })
-  }
+  },
 }

@@ -1,6 +1,4 @@
 export function useFormat() {
-  const { t } = useI18n()
-
   /**
    * Get initials from a person's first and last name.
    */

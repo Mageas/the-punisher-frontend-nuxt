@@ -5,7 +5,6 @@ import { bonusService } from '~/services/bonus.service'
  * Composable to fetch and manage bonuses with pagination.
  */
 export function useBonuses() {
-  const { $api } = useNuxtApp()
   const paginated = usePaginatedCollection<
     Bonus,
     {
@@ -13,7 +12,7 @@ export function useBonuses() {
       state?: 'used' | 'unused'
       search?: string
     }
-  >((options) => bonusService.getBonuses($api, options))
+  >((options) => bonusService.getBonuses(options))
 
   async function fetchBonuses(options?: {
     page?: number
@@ -24,11 +23,11 @@ export function useBonuses() {
   }
 
   async function useBonus(id: string) {
-    await bonusService.useBonus($api, id, {})
+    await bonusService.useBonus(id, {})
   }
 
   async function deleteBonus(id: string) {
-    await bonusService.deleteBonus($api, id)
+    await bonusService.deleteBonus(id)
   }
 
   return {

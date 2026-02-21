@@ -13,7 +13,7 @@ const modelValue = defineModel<string>({ default: '' })
 const { t } = useI18n()
 
 const options = computed(() =>
-  props.students.map(student => ({
+  props.students.map((student) => ({
     id: student.id,
     name: `${student.first_name} ${student.last_name}`,
   })),

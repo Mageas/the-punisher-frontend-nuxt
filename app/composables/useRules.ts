@@ -5,30 +5,27 @@ import { ruleService } from '~/services/rule.service'
  * Composable to fetch and manage rules with pagination.
  */
 export function useRules() {
-  const { $api } = useNuxtApp()
   const paginated = usePaginatedCollection<
     Rule,
     {
       page?: number
     }
-  >((options) => ruleService.getRules($api, options))
+  >((options) => ruleService.getRules(options))
 
-  async function fetchRules(options?: {
-    page?: number
-  }) {
+  async function fetchRules(options?: { page?: number }) {
     await paginated.fetchPage(options)
   }
 
   async function createRule(data: RulePayload) {
-    return await ruleService.createRule($api, data)
+    return await ruleService.createRule(data)
   }
 
   async function updateRule(id: string, body: RulePayload) {
-    await ruleService.updateRule($api, id, body)
+    await ruleService.updateRule(id, body)
   }
 
   async function deleteRule(id: string) {
-    await ruleService.deleteRule($api, id)
+    await ruleService.deleteRule(id)
   }
 
   return {

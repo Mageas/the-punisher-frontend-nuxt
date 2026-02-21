@@ -33,7 +33,9 @@ const punishmentToResolveId = ref<string | null>(null)
 
 const hasResolveAction = computed(() => typeof props.resolveFn === 'function')
 const sectionTitle = computed(() => props.title ?? t('studentProfile.pendingPunishments'))
-const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.pendingPunishments'))
+const sectionEmptyLabel = computed(
+  () => props.emptyLabel ?? t('studentProfile.empty.pendingPunishments'),
+)
 const useCompactMode = computed(() => props.compact ?? false)
 const showCountBadge = computed(() => props.showCount ?? false)
 
@@ -64,7 +66,10 @@ function onResolved() {
       </Badge>
     </div>
 
-    <div v-if="punishments.length === 0" class="rounded-lg border border-border p-6 text-sm text-muted-foreground">
+    <div
+      v-if="punishments.length === 0"
+      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
+    >
       {{ sectionEmptyLabel }}
     </div>
 

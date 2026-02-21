@@ -1,27 +1,30 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { Plus } from 'lucide-vue-next'
-import type { BonusType, PenaltyType, PunishmentType, PaginatedResponse } from '~/types/api'
+import type { BonusType, PenaltyType, PunishmentType } from '~/types/api'
 import type { TypeServiceFunctions, NamedTypeResource } from '~/composables/useTypeCollection'
 
 type ManagedType = (BonusType | PenaltyType | PunishmentType) & NamedTypeResource
 
-const props = withDefaults(defineProps<{
-  service: TypeServiceFunctions<ManagedType>
-  title: string
-  newLabel: string
-  emptyLabel: string
-  createTitle: string
-  createPlaceholder: string
-  editTitle: string
-  deleteMessage: string
-  icon: Component
-  iconClass?: string
-  iconWrapperClass?: string
-}>(), {
-  iconClass: 'text-muted-foreground',
-  iconWrapperClass: 'bg-secondary',
-})
+const props = withDefaults(
+  defineProps<{
+    service: TypeServiceFunctions<ManagedType>
+    title: string
+    newLabel: string
+    emptyLabel: string
+    createTitle: string
+    createPlaceholder: string
+    editTitle: string
+    deleteMessage: string
+    icon: Component
+    iconClass?: string
+    iconWrapperClass?: string
+  }>(),
+  {
+    iconClass: 'text-muted-foreground',
+    iconWrapperClass: 'bg-secondary',
+  },
+)
 
 const {
   types,
@@ -94,7 +97,10 @@ await reload()
       </template>
 
       <template #actions>
-        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+        <Button
+          class="w-full justify-center cursor-pointer xl:w-auto"
+          @click="showCreateModal = true"
+        >
           <Plus class="h-4 w-4" />
           {{ props.newLabel }}
         </Button>

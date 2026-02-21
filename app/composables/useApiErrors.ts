@@ -9,7 +9,7 @@ export type FieldErrors = Record<string, string>
  * Parses an API error detail entry (e.g. "validation_min_length:8")
  * into an i18n key and an optional parameter value.
  */
-function parseDetailError(error: string): { key: string, value?: string } {
+function parseDetailError(error: string): { key: string; value?: string } {
   const colonIndex = error.indexOf(':')
   if (colonIndex === -1) {
     return { key: error }
@@ -111,7 +111,8 @@ export function useApiErrors() {
    * Clear error for a specific field.
    */
   function clearFieldError(field: string): void {
-    delete fieldErrors.value[field]
+    const { [field]: _, ...next } = fieldErrors.value
+    fieldErrors.value = next
   }
 
   /**
@@ -119,7 +120,7 @@ export function useApiErrors() {
    */
   function setFormErrors<T extends string>(
     setFieldError: (field: T, message: string | undefined) => void,
-    err: unknown
+    err: unknown,
   ): void {
     handleApiError(err)
     Object.entries(fieldErrors.value).forEach(([field, message]) => {

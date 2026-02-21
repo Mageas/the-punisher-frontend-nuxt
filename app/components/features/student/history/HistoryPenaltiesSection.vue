@@ -19,7 +19,10 @@ const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.e
       {{ sectionTitle }}
     </h2>
 
-    <div v-if="penalties.length === 0" class="rounded-lg border border-border p-6 text-sm text-muted-foreground">
+    <div
+      v-if="penalties.length === 0"
+      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
+    >
       {{ sectionEmptyLabel }}
     </div>
 

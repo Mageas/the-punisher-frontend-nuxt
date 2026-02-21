@@ -13,9 +13,11 @@ declare module '@vue/runtime-dom' {
   }
 }
 
+/*
 declare module 'vue' {
   interface ComponentCustomProperties {
   }
 }
+*/
 
 export {}

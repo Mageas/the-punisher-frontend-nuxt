@@ -41,12 +41,14 @@ const studentToRemove = ref<Student | null>(null)
 
 const classroomName = computed(() => classroom.value?.name ?? '')
 
-const classStudentIds = computed(() => new Set(classroomStudents.value.map(student => student.id)))
+const classStudentIds = computed(
+  () => new Set(classroomStudents.value.map((student) => student.id)),
+)
 const assignableStudents = computed(() =>
-  allStudents.value.filter(student => !classStudentIds.value.has(student.id)),
+  allStudents.value.filter((student) => !classStudentIds.value.has(student.id)),
 )
 const assignableStudentOptions = computed(() =>
-  assignableStudents.value.map(student => ({
+  assignableStudents.value.map((student) => ({
     id: student.id,
     name: studentFullName(student),
   })),
@@ -58,7 +60,7 @@ function studentFullName(student: Student): string {
 
 const selectedStudentToAdd = computed(() => {
   if (!addStudentId.value) return null
-  return assignableStudents.value.find(student => student.id === addStudentId.value) ?? null
+  return assignableStudents.value.find((student) => student.id === addStudentId.value) ?? null
 })
 
 const canAddStudent = computed(() => !!selectedStudentToAdd.value && !submittingAddStudent.value)
@@ -72,8 +74,7 @@ async function fetchClassroomProfile() {
       fetchAllStudents(),
     ])
     classroom.value = classroomRes
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -94,11 +95,9 @@ async function addStudentToClassroom() {
     })
     addStudentId.value = ''
     await fetchClassroomProfile()
-  }
-  catch (err) {
+  } catch (err) {
     handleAddStudentError(err)
-  }
-  finally {
+  } finally {
     submittingAddStudent.value = false
   }
 }
@@ -139,10 +138,7 @@ watch(classroomId, (nextClassroomId, previousClassroomId) => {
 <template>
   <div>
     <AppBreadcrumb
-      :items="[
-        { label: t('classes.title'), to: '/classes' },
-        { label: classroom?.name ?? '...' }
-      ]"
+      :items="[{ label: t('classes.title'), to: '/classes' }, { label: classroom?.name ?? '...' }]"
     />
 
     <template v-if="classroom">

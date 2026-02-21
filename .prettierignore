@@ -1,0 +1,5 @@
+app/components/ui/
+node_modules/
+.nuxt/
+dist/
+docs/

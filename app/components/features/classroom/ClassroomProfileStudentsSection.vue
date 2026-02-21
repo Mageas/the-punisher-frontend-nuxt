@@ -6,7 +6,7 @@ import { getInitials, formatPoints } from '~/lib/utils'
 defineProps<{
   students: readonly Student[]
   studentCount: number
-  assignableStudentOptions: readonly { id: string, name: string }[]
+  assignableStudentOptions: readonly { id: string; name: string }[]
   canAddStudent: boolean
   addStudentError?: string | null
 }>()
@@ -84,7 +84,9 @@ function onRemoveStudent(student: Student) {
       :to="`/students/${student.id}`"
       class="flex items-center gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-secondary/40"
     >
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium">
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium"
+      >
         {{ initials(student) }}
       </div>
 
@@ -95,14 +97,18 @@ function onRemoveStudent(student: Student) {
       </div>
 
       <div class="flex items-center gap-1.5 text-xs">
-        <span class="inline-flex items-center gap-1 rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400">
+        <span
+          class="inline-flex items-center gap-1 rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400"
+        >
           <Star class="h-3 w-3" />
           {{ formatBonusPoints(student.available_bonus_points) }}
         </span>
       </div>
 
       <div class="flex items-center gap-1.5 text-xs">
-        <span class="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-muted-foreground">
+        <span
+          class="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-muted-foreground"
+        >
           <AlertCircle class="h-3 w-3" />
           {{ student.penalty_count }}
         </span>

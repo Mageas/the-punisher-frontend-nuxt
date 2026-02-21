@@ -4,14 +4,7 @@ import type { Classroom } from '~/types/api'
 
 const { t } = useI18n()
 const { getInitials, formatPoints } = useFormat()
-const {
-  classrooms,
-  loading,
-  page,
-  itemPerPage,
-  totalCount,
-  fetchClassrooms,
-} = useClassrooms()
+const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms } = useClassrooms()
 
 const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -55,7 +48,10 @@ await reload()
       </template>
 
       <template #actions>
-        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+        <Button
+          class="w-full justify-center cursor-pointer xl:w-auto"
+          @click="showCreateModal = true"
+        >
           <Plus class="w-4 h-4" />
           {{ t('classes.newClassroom') }}
         </Button>
@@ -117,7 +113,6 @@ await reload()
         </div>
       </NuxtLink>
     </div>
-
 
     <CustomPagination
       v-show="showPagination"

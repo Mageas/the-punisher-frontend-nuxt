@@ -13,6 +13,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   siblingCount: 1,
+  class: undefined,
 })
 const { t } = useI18n()
 

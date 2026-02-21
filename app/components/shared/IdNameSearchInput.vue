@@ -9,14 +9,17 @@ interface IdNameOption {
   name: string
 }
 
-const props = withDefaults(defineProps<{
-  options: readonly IdNameOption[]
-  placeholder: string
-  emptyText: string
-  disabled?: boolean
-}>(), {
-  disabled: false,
-})
+const props = withDefaults(
+  defineProps<{
+    options: readonly IdNameOption[]
+    placeholder: string
+    emptyText: string
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  },
+)
 
 const modelValue = defineModel<string>({ default: '' })
 
@@ -26,17 +29,17 @@ const open = ref(false)
 const highlightedIndex = ref(-1)
 const isInputFocused = ref(false)
 
-const selectedOption = computed(() =>
-  props.options.find(option => option.id === modelValue.value) ?? null,
+const selectedOption = computed(
+  () => props.options.find((option) => option.id === modelValue.value) ?? null,
 )
 
 const filteredOptions = computed(() => {
   const normalizedQuery = query.value.trim().toLocaleLowerCase()
   if (!normalizedQuery) return props.options
-  return props.options.filter(option => option.name.toLocaleLowerCase().includes(normalizedQuery))
+  return props.options.filter((option) => option.name.toLocaleLowerCase().includes(normalizedQuery))
 })
-const showClearButton = computed(() =>
-  !props.disabled && (query.value.length > 0 || isInputFocused.value),
+const showClearButton = computed(
+  () => !props.disabled && (query.value.length > 0 || isInputFocused.value),
 )
 
 function syncQueryWithSelection() {
@@ -123,14 +126,16 @@ function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowDown') {
     event.preventDefault()
     if (filteredOptions.value.length === 0) return
-    highlightedIndex.value = (highlightedIndex.value + 1 + filteredOptions.value.length) % filteredOptions.value.length
+    highlightedIndex.value =
+      (highlightedIndex.value + 1 + filteredOptions.value.length) % filteredOptions.value.length
     return
   }
 
   if (event.key === 'ArrowUp') {
     event.preventDefault()
     if (filteredOptions.value.length === 0) return
-    highlightedIndex.value = (highlightedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length
+    highlightedIndex.value =
+      (highlightedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length
     return
   }
 
@@ -146,20 +151,28 @@ onClickOutside(rootRef, () => {
   closeDropdown()
 })
 
-watch(() => modelValue.value, () => {
-  if (open.value) return
-  syncQueryWithSelection()
-}, { immediate: true })
-
-watch(() => props.options, () => {
-  if (modelValue.value && !selectedOption.value) {
-    modelValue.value = ''
-  }
-
-  if (!open.value) {
+watch(
+  () => modelValue.value,
+  () => {
+    if (open.value) return
     syncQueryWithSelection()
-  }
-}, { deep: true })
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.options,
+  () => {
+    if (modelValue.value && !selectedOption.value) {
+      modelValue.value = ''
+    }
+
+    if (!open.value) {
+      syncQueryWithSelection()
+    }
+  },
+  { deep: true },
+)
 
 watch(filteredOptions, (options) => {
   if (!open.value || options.length === 0) {
@@ -175,7 +188,9 @@ watch(filteredOptions, (options) => {
 
 <template>
   <div ref="rootRef" class="relative">
-    <Search class="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+    <Search
+      class="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+    />
     <Input
       v-model="query"
       :placeholder="placeholder"
@@ -207,12 +222,14 @@ watch(filteredOptions, (options) => {
           v-for="(option, index) in filteredOptions"
           :key="option.id"
           type="button"
-          :class="cn(
-            'w-full rounded-sm px-2 py-1.5 text-left text-sm cursor-pointer',
-            index === highlightedIndex
-              ? 'bg-accent text-accent-foreground'
-              : 'hover:bg-accent/70',
-          )"
+          :class="
+            cn(
+              'w-full rounded-sm px-2 py-1.5 text-left text-sm cursor-pointer',
+              index === highlightedIndex
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-accent/70',
+            )
+          "
           @mousedown.prevent="selectOption(option)"
           @mouseenter="highlightedIndex = index"
         >

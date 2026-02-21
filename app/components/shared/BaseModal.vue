@@ -45,10 +45,7 @@ function onOpenAutoFocus(event: Event) {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent
-      class="min-w-0 sm:max-w-md overflow-visible"
-      @open-auto-focus="onOpenAutoFocus"
-    >
+    <DialogContent class="min-w-0 sm:max-w-md overflow-visible" @open-auto-focus="onOpenAutoFocus">
       <DialogHeader>
         <DialogTitle v-if="title">
           {{ title }}
@@ -66,12 +63,7 @@ function onOpenAutoFocus(event: Event) {
         <slot />
 
         <DialogFooter v-if="!hideFooter">
-          <Button
-            type="button"
-            variant="outline"
-            class="cursor-pointer"
-            @click="open = false"
-          >
+          <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
             {{ cancelText || t('common.cancel') }}
           </Button>
           <Button
@@ -80,7 +72,10 @@ function onOpenAutoFocus(event: Event) {
             :variant="destructive ? 'destructive' : 'default'"
             :disabled="submitting || canSubmit === false"
           >
-            <span v-if="submitting" class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            <span
+              v-if="submitting"
+              class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            />
             {{ submitText || t('common.submit') }}
           </Button>
         </DialogFooter>

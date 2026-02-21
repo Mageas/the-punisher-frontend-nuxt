@@ -27,11 +27,9 @@ async function onSubmit() {
   try {
     await login(form.email, form.password)
     await navigateTo('/')
-  }
-  catch (err) {
+  } catch (err) {
     handleApiError(err)
-  }
-  finally {
+  } finally {
     isLoading.value = false
   }
 }

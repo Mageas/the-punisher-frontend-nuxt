@@ -44,9 +44,7 @@ function formatPoints(points: number): string {
           >
             {{ studentFirstName }} {{ studentLastName }}
           </NuxtLink>
-          <template v-else>
-            {{ studentFirstName }} {{ studentLastName }}
-          </template>
+          <template v-else> {{ studentFirstName }} {{ studentLastName }} </template>
         </template>
         <template v-else>
           {{ bonusTypeName }}

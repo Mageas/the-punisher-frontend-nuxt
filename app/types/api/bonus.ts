@@ -35,4 +35,4 @@ export interface BonusCreateData {
 /**
  * Data required to use/consume a bonus.
  */
-export interface BonusUseData {}
+export type BonusUseData = Record<string, never>

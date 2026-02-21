@@ -93,7 +93,10 @@ await reload()
       </template>
 
       <template #actions>
-        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+        <Button
+          class="w-full justify-center cursor-pointer xl:w-auto"
+          @click="showCreateModal = true"
+        >
           <Plus class="w-4 h-4" />
           {{ t('punishments.newPunishment') }}
         </Button>
@@ -102,14 +105,13 @@ await reload()
 
     <div class="relative mb-6">
       <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        v-model="searchQuery"
-        :placeholder="t('punishments.searchPlaceholder')"
-        class="pl-9"
-      />
+      <Input v-model="searchQuery" :placeholder="t('punishments.searchPlaceholder')" class="pl-9" />
     </div>
 
-    <div v-if="punishments.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
+    <div
+      v-if="punishments.length === 0 && !loading"
+      class="py-16 text-center text-muted-foreground"
+    >
       {{ t('punishments.noPunishments') }}
     </div>
 

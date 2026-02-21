@@ -6,7 +6,7 @@ interface BreadcrumbItem {
   to?: string
 }
 
-const props = defineProps<{
+defineProps<{
   items: BreadcrumbItem[]
 }>()
 </script>

@@ -10,17 +10,20 @@ const emit = defineEmits<{
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
-const props = withDefaults(defineProps<{
-  preselectedStudentId?: string | null
-  preselectedClassroomId?: string | null
-}>(), {
-  preselectedStudentId: null,
-  preselectedClassroomId: null,
-})
+const props = withDefaults(
+  defineProps<{
+    preselectedStudentId?: string | null
+    preselectedClassroomId?: string | null
+  }>(),
+  {
+    preselectedStudentId: null,
+    preselectedClassroomId: null,
+  },
+)
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
+const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
@@ -28,35 +31,51 @@ const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
 
-const schema = toTypedSchema(zod.object({
-  classroom_id: zod.string().optional(),
-  student_id: zod.string()
-    .min(1, t('apiErrors.details.validation_field_required'))
-    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
-  punishment_type_id: zod.string()
-    .min(1, t('apiErrors.details.validation_field_required'))
-    .uuid(t('apiErrors.details.validation_malformed_parameter', { value: 'UUID' })),
-  due_at: zod.any().refine(val => !!val, t('apiErrors.details.validation_field_required')),
-  due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
-}))
+const schema = toTypedSchema(
+  zod.object({
+    classroom_id: zod.string().optional(),
+    student_id: zod
+      .string()
+      .min(1, t('apiErrors.details.validation_field_required'))
+      .uuid(
+        t('apiErrors.details.validation_malformed_parameter', {
+          value: 'UUID',
+        }),
+      ),
+    punishment_type_id: zod
+      .string()
+      .min(1, t('apiErrors.details.validation_field_required'))
+      .uuid(
+        t('apiErrors.details.validation_malformed_parameter', {
+          value: 'UUID',
+        }),
+      ),
+    due_at: zod.any().refine((val) => !!val, t('apiErrors.details.validation_field_required')),
+    due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+  }),
+)
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
-  validationSchema: schema,
-  initialValues: {
-    classroom_id: props.preselectedClassroomId ?? '',
-    student_id: props.preselectedStudentId ?? '',
-    punishment_type_id: '',
-    due_at: undefined as DateValue | undefined,
-    due_at_time: '08:00',
-  },
-})
+const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } =
+  useForm({
+    validationSchema: schema,
+    initialValues: {
+      classroom_id: props.preselectedClassroomId ?? '',
+      student_id: props.preselectedStudentId ?? '',
+      punishment_type_id: '',
+      due_at: undefined as DateValue | undefined,
+      due_at_time: '08:00',
+    },
+  })
 
 // When classroom changes, re-fetch students and reset student selection
-watch(() => values.classroom_id, (newClassroomId) => {
-  if (hasPreselectedStudent.value) return
-  setFieldValue('student_id', '', false)
-  fetchStudents(newClassroomId || undefined)
-})
+watch(
+  () => values.classroom_id,
+  (newClassroomId) => {
+    if (hasPreselectedStudent.value) return
+    setFieldValue('student_id', '', false)
+    fetchStudents(newClassroomId || undefined)
+  },
+)
 
 // Load data when modal opens
 watch(open, async (isOpen) => {
@@ -72,7 +91,9 @@ watch(open, async (isOpen) => {
       },
     })
     await Promise.all([
-      hasPreselectedStudent.value || hasPreselectedClassroom.value ? Promise.resolve() : fetchClassrooms(),
+      hasPreselectedStudent.value || hasPreselectedClassroom.value
+        ? Promise.resolve()
+        : fetchClassrooms(),
       fetchStudents(values.classroom_id || undefined),
       fetchPunishmentTypes(),
     ])
@@ -96,8 +117,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     })
     open.value = false
     emit('created')
-  }
-  catch (err) {
+  } catch (err) {
     setFormErrors(setFieldError, err)
   }
 })
@@ -115,7 +135,11 @@ const onSubmit = handleSubmit(async (formValues) => {
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
-      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value, handleChange }" name="classroom_id">
+      <FormField
+        v-if="!hasPreselectedClassroom"
+        v-slot="{ value, handleChange }"
+        name="classroom_id"
+      >
         <FormItem>
           <FormLabel>{{ t('modals.punishment.class') }}</FormLabel>
           <FormControl>

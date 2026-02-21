@@ -38,4 +38,4 @@ export interface PunishmentCreateData {
 /**
  * Data required to resolve a punishment.
  */
-export interface PunishmentResolveData {}
+export type PunishmentResolveData = Record<string, never>

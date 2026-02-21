@@ -1,16 +1,6 @@
 <script setup lang="ts">
-import {
-  AlertCircle,
-  AlertTriangle,
-  Gavel,
-  Pencil,
-  Star,
-  Trash2,
-} from 'lucide-vue-next'
-import type {
-  Student,
-  StudentKpis,
-} from '~/types/api'
+import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
+import type { Student, StudentKpis } from '~/types/api'
 
 definePageMeta({
   path: '/students/:studentId',
@@ -92,8 +82,7 @@ async function fetchStudentProfile() {
     ])
     student.value = studentRes
     kpis.value = kpisRes
-  }
-  finally {
+  } finally {
     loadingProfile.value = false
   }
 }
@@ -147,14 +136,18 @@ watch(studentId, (nextStudentId, previousStudentId) => {
     <AppBreadcrumb
       :items="[
         { label: t('students.title'), to: '/students' },
-        { label: student ? `${student.first_name} ${student.last_name}` : '...' }
+        {
+          label: student ? `${student.first_name} ${student.last_name}` : '...',
+        },
       ]"
     />
 
     <template v-if="student && kpis">
       <div class="mb-8">
         <div class="mb-4 flex items-center gap-4">
-          <div class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-xl font-semibold shrink-0">
+          <div
+            class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-xl font-semibold shrink-0"
+          >
             {{ initials }}
           </div>
           <div class="min-w-0">
@@ -170,7 +163,11 @@ watch(studentId, (nextStudentId, previousStudentId) => {
               >
                 {{ classroom.name }}
               </Badge>
-              <Badge v-if="student.classrooms.length === 0" variant="outline" class="text-muted-foreground">
+              <Badge
+                v-if="student.classrooms.length === 0"
+                variant="outline"
+                class="text-muted-foreground"
+              >
                 {{ t('students.noClassroom') }}
               </Badge>
             </div>
@@ -190,11 +187,19 @@ watch(studentId, (nextStudentId, previousStudentId) => {
             <AlertTriangle class="w-4 h-4" />
             {{ t('studentProfile.actions.addPenalty') }}
           </Button>
-          <Button variant="outline" class="cursor-pointer" @click="showPunishmentCreateModal = true">
+          <Button
+            variant="outline"
+            class="cursor-pointer"
+            @click="showPunishmentCreateModal = true"
+          >
             <Gavel class="w-4 h-4" />
             {{ t('studentProfile.actions.addPunishment') }}
           </Button>
-          <Button variant="outline" class="cursor-pointer text-destructive hover:text-destructive" @click="showDeleteModal = true">
+          <Button
+            variant="outline"
+            class="cursor-pointer text-destructive hover:text-destructive"
+            @click="showDeleteModal = true"
+          >
             <Trash2 class="w-4 h-4" />
             {{ t('studentProfile.actions.delete') }}
           </Button>

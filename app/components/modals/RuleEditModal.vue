@@ -16,20 +16,27 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
+const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 
-const schema = toTypedSchema(zod.object({
-  name: zod.string()
-    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
-    .max(120, t('apiErrors.details.validation_max_length', { value: 120 })),
-  penalty_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
-  resulting_punishment_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
-  threshold: zod.number().min(1, t('apiErrors.details.validation_min_length', { value: 1 })),
-  mode: zod.enum(['at', 'every', 'after'] as const),
-  due_at_after_days: zod.number().min(0, t('apiErrors.details.validation_min_length', { value: 0 })),
-}))
+const schema = toTypedSchema(
+  zod.object({
+    name: zod
+      .string()
+      .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+      .max(120, t('apiErrors.details.validation_max_length', { value: 120 })),
+    penalty_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+    resulting_punishment_type_id: zod
+      .string()
+      .min(1, t('apiErrors.details.validation_field_required')),
+    threshold: zod.number().min(1, t('apiErrors.details.validation_min_length', { value: 1 })),
+    mode: zod.enum(['at', 'every', 'after'] as const),
+    due_at_after_days: zod
+      .number()
+      .min(0, t('apiErrors.details.validation_min_length', { value: 0 })),
+  }),
+)
 
 const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
@@ -56,10 +63,7 @@ watch(open, async (isOpen) => {
         due_at_after_days: props.rule.due_at_after_days,
       },
     })
-    await Promise.all([
-      fetchPenaltyTypes(),
-      fetchPunishmentTypes(),
-    ])
+    await Promise.all([fetchPenaltyTypes(), fetchPunishmentTypes()])
   }
 })
 
@@ -76,8 +80,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     })
     open.value = false
     emit('updated')
-  }
-  catch (err) {
+  } catch (err) {
     setFormErrors(setFieldError, err)
   }
 })
@@ -134,10 +137,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormItem>
           <FormLabel>{{ t('modals.rule.mode') }}</FormLabel>
           <FormControl>
-            <NativeSelect
-              :model-value="value"
-              @update:model-value="handleChange as any"
-            >
+            <NativeSelect :model-value="value" @update:model-value="handleChange as any">
               <option value="at">
                 {{ t('rules.modes.at') }}
               </option>

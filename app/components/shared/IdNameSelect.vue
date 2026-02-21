@@ -10,11 +10,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
 interface IdNameOption {
@@ -24,19 +20,24 @@ interface IdNameOption {
 
 const NONE_OPTION_VALUE = '__none_option__'
 
-const props = withDefaults(defineProps<{
-  options: readonly IdNameOption[]
-  placeholder: string
-  searchPlaceholder: string
-  emptyText: string
-  fullWidth?: boolean
-  noneOptionLabel?: string
-  noneValueLabel?: string
-  noneOptionValue?: string
-}>(), {
-  fullWidth: true,
-  noneOptionValue: NONE_OPTION_VALUE,
-})
+const props = withDefaults(
+  defineProps<{
+    options: readonly IdNameOption[]
+    placeholder: string
+    searchPlaceholder: string
+    emptyText: string
+    fullWidth?: boolean
+    noneOptionLabel?: string
+    noneValueLabel?: string
+    noneOptionValue?: string
+  }>(),
+  {
+    fullWidth: true,
+    noneOptionValue: NONE_OPTION_VALUE,
+    noneOptionLabel: undefined,
+    noneValueLabel: undefined,
+  },
+)
 
 const modelValue = defineModel<string>({ default: '' })
 
@@ -45,15 +46,12 @@ const open = ref(false)
 const selectOptions = computed(() => {
   if (!props.noneOptionLabel) return props.options
 
-  return [
-    { id: props.noneOptionValue, name: props.noneOptionLabel },
-    ...props.options,
-  ]
+  return [{ id: props.noneOptionValue, name: props.noneOptionLabel }, ...props.options]
 })
 
 const selectedLabel = computed(() => {
   if (!modelValue.value) return props.noneValueLabel ?? props.placeholder
-  const found = props.options.find(option => option.id === modelValue.value)
+  const found = props.options.find((option) => option.id === modelValue.value)
   return found?.name ?? props.placeholder
 })
 
@@ -75,17 +73,26 @@ function select(value: string) {
         variant="outline"
         role="combobox"
         :aria-expanded="open"
-        :class="cn(
-          'max-w-full justify-between overflow-hidden font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground',
-          props.fullWidth ? 'w-full' : 'w-[200px]',
-        )"
+        :class="
+          cn(
+            'max-w-full justify-between overflow-hidden font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground',
+            props.fullWidth ? 'w-full' : 'w-[200px]',
+          )
+        "
       >
-        <span class="min-w-0 flex-1 truncate text-left" :title="selectedLabel">{{ selectedLabel }}</span>
+        <span class="min-w-0 flex-1 truncate text-left" :title="selectedLabel">{{
+          selectedLabel
+        }}</span>
         <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </PopoverTrigger>
     <PopoverContent
-      :class="cn('max-w-[calc(100vw-2rem)] p-0', props.fullWidth ? 'w-[--reka-popover-trigger-width]' : 'w-[200px]')"
+      :class="
+        cn(
+          'max-w-[calc(100vw-2rem)] p-0',
+          props.fullWidth ? 'w-[--reka-popover-trigger-width]' : 'w-[200px]',
+        )
+      "
       align="start"
     >
       <Command>
@@ -101,10 +108,7 @@ function select(value: string) {
               @select="select(option.id)"
             >
               <CheckIcon
-                :class="cn(
-                  'mr-2 h-4 w-4',
-                  isSelected(option.id) ? 'opacity-100' : 'opacity-0',
-                )"
+                :class="cn('mr-2 h-4 w-4', isSelected(option.id) ? 'opacity-100' : 'opacity-0')"
               />
               <span class="min-w-0 flex-1 truncate" :title="option.name">{{ option.name }}</span>
             </CommandItem>

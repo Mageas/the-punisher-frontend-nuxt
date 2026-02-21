@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import { AlertCircle, ChevronRight, Plus, Search, Star } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
-import type { Student } from '~/types/api'
 
 const { t } = useI18n()
 const { getInitials, formatPoints } = useFormat()
-const {
-  students,
-  loading,
-  page,
-  itemPerPage,
-  totalCount,
-  fetchStudents,
-} = useStudents()
+const { students, loading, page, itemPerPage, totalCount, fetchStudents } = useStudents()
 
 const searchQuery = ref('')
 const searchDebounced = refDebounced(searchQuery, 300)
@@ -58,7 +50,10 @@ await reload()
       </template>
 
       <template #actions>
-        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+        <Button
+          class="w-full justify-center cursor-pointer xl:w-auto"
+          @click="showCreateModal = true"
+        >
           <Plus class="w-4 h-4" />
           {{ t('students.newStudent') }}
         </Button>
@@ -67,11 +62,7 @@ await reload()
 
     <div class="relative mb-6">
       <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        v-model="searchQuery"
-        :placeholder="t('students.searchPlaceholder')"
-        class="pl-9"
-      />
+      <Input v-model="searchQuery" :placeholder="t('students.searchPlaceholder')" class="pl-9" />
     </div>
 
     <div v-if="students.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
@@ -85,14 +76,14 @@ await reload()
         :to="`/students/${student.id}`"
         class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-secondary/40 sm:flex-nowrap sm:items-center"
       >
-        <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-medium shrink-0">
+        <div
+          class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-medium shrink-0"
+        >
           {{ getInitials(student.first_name, student.last_name) }}
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium">
-            {{ student.first_name }} {{ student.last_name }}
-          </p>
+          <p class="text-sm font-medium">{{ student.first_name }} {{ student.last_name }}</p>
           <div v-if="student.classrooms.length > 0" class="mt-1 flex flex-wrap gap-1.5">
             <Badge
               v-for="classroom in student.classrooms"

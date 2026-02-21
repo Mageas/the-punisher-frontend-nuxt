@@ -11,16 +11,20 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
+const { globalError, setFormErrors, clearErrors } = useApiErrors()
 
-const schema = toTypedSchema(zod.object({
-  first_name: zod.string()
-    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
-    .max(70, t('apiErrors.details.validation_max_length', { value: 70 })),
-  last_name: zod.string()
-    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
-    .max(70, t('apiErrors.details.validation_max_length', { value: 70 })),
-}))
+const schema = toTypedSchema(
+  zod.object({
+    first_name: zod
+      .string()
+      .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+      .max(70, t('apiErrors.details.validation_max_length', { value: 70 })),
+    last_name: zod
+      .string()
+      .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+      .max(70, t('apiErrors.details.validation_max_length', { value: 70 })),
+  }),
+)
 
 const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
@@ -46,8 +50,7 @@ const onSubmit = handleSubmit(async (values) => {
     })
     open.value = false
     emit('created')
-  }
-  catch (err) {
+  } catch (err) {
     setFormErrors(setFieldError, err)
   }
 })

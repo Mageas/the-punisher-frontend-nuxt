@@ -18,12 +18,9 @@ type FetchSource<TItem, TOptions> =
 /**
  * Shared parent composable for paginated resources.
  */
-export function usePaginatedCollection<
-  TItem,
-  TOptions extends QueryOptions = QueryOptions,
->(source: FetchSource<TItem, TOptions>) {
-  const { $api } = useNuxtApp()
-
+export function usePaginatedCollection<TItem, TOptions extends QueryOptions = QueryOptions>(
+  source: FetchSource<TItem, TOptions>,
+) {
   // -- Reactive State --
   const items = ref<TItem[]>([]) as Ref<TItem[]>
   const loading = ref(false)
@@ -39,14 +36,17 @@ export function usePaginatedCollection<
   const filterParams = (options?: QueryOptions) => {
     if (!options) return {}
     return Object.fromEntries(
-      Object.entries(options).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+      Object.entries(options).filter(([_, v]) => v !== undefined && v !== null && v !== ''),
     )
   }
 
   /**
    * Resolves the data source and performs the API call if needed.
    */
-  async function resolveData(options?: TOptions & { page?: number }): Promise<PaginatedResponse<TItem>> {
+  async function resolveData(
+    options?: TOptions & { page?: number },
+  ): Promise<PaginatedResponse<TItem>> {
+    const { $api } = useNuxtApp()
     if (typeof source === 'function') {
       const result = await source(options)
 
@@ -81,8 +81,7 @@ export function usePaginatedCollection<
       totalCount.value = res.total_count
       nextPage.value = res.next_page
       previousPage.value = res.previous_page
-    }
-    finally {
+    } finally {
       loading.value = false
     }
   }

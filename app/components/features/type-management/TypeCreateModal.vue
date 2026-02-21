@@ -16,13 +16,16 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { globalError, handleApiError, setFormErrors, clearErrors } = useApiErrors()
+const { globalError, setFormErrors, clearErrors } = useApiErrors()
 
-const schema = toTypedSchema(zod.object({
-  name: zod.string()
-    .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
-    .max(100, t('apiErrors.details.validation_max_length', { value: 100 })),
-}))
+const schema = toTypedSchema(
+  zod.object({
+    name: zod
+      .string()
+      .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
+      .max(100, t('apiErrors.details.validation_max_length', { value: 100 })),
+  }),
+)
 
 const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
@@ -44,8 +47,7 @@ const onSubmit = handleSubmit(async (values) => {
     await props.createFn(values.name)
     open.value = false
     emit('created')
-  }
-  catch (err) {
+  } catch (err) {
     setFormErrors(setFieldError, err)
   }
 })
@@ -65,11 +67,7 @@ const onSubmit = handleSubmit(async (values) => {
       <FormItem>
         <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
         <FormControl>
-          <Input
-            type="text"
-            :placeholder="props.placeholder"
-            v-bind="componentField"
-          />
+          <Input type="text" :placeholder="props.placeholder" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>

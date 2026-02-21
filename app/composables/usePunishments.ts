@@ -5,7 +5,6 @@ import { punishmentService } from '~/services/punishment.service'
  * Composable to fetch and manage punishments with pagination.
  */
 export function usePunishments() {
-  const { $api } = useNuxtApp()
   const paginated = usePaginatedCollection<
     Punishment,
     {
@@ -13,7 +12,7 @@ export function usePunishments() {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >((options) => punishmentService.getPunishments($api, options))
+  >((options) => punishmentService.getPunishments(options))
 
   async function fetchPunishments(options?: {
     page?: number
@@ -24,11 +23,11 @@ export function usePunishments() {
   }
 
   async function resolvePunishment(id: string) {
-    await punishmentService.resolvePunishment($api, id, {})
+    await punishmentService.resolvePunishment(id, {})
   }
 
   async function deletePunishment(id: string) {
-    await punishmentService.deletePunishment($api, id)
+    await punishmentService.deletePunishment(id)
   }
 
   return {

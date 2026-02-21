@@ -41,11 +41,7 @@ const cards = computed(() => [
 
 <template>
   <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-    <div
-      v-for="card in cards"
-      :key="card.key"
-      class="rounded-lg border border-border p-6"
-    >
+    <div v-for="card in cards" :key="card.key" class="rounded-lg border border-border p-6">
       <div class="mb-2 flex items-center justify-between">
         <p class="text-sm font-medium text-muted-foreground">
           {{ card.label }}

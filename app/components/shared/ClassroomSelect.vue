@@ -11,7 +11,7 @@ const modelValue = defineModel<string>({ default: '' })
 
 const { t } = useI18n()
 const options = computed(() =>
-  props.classrooms.map(classroom => ({
+  props.classrooms.map((classroom) => ({
     id: classroom.id,
     name: classroom.name,
   })),

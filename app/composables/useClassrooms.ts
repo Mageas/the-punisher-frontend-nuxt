@@ -5,31 +5,30 @@ import { classroomService } from '~/services/classroom.service'
  * Composable to fetch and manage classrooms with pagination.
  */
 export function useClassrooms() {
-  const { $api } = useNuxtApp()
-
   const paginated = usePaginatedCollection<
     Classroom,
     {
       page?: number
     }
-  >((options) => classroomService.getClassrooms($api, options))
+  >((options) => classroomService.getClassrooms(options))
 
-  async function fetchClassrooms(options?: {
-    page?: number
-  }) {
+  async function fetchClassrooms(options?: { page?: number }) {
     await paginated.fetchPage(options)
   }
 
   async function createClassroom(data: { name: string; school_year: string }) {
-    return await classroomService.createClassroom($api, data)
+    return await classroomService.createClassroom(data)
   }
 
-  async function updateClassroom(classroomId: string, data: { name?: string; school_year?: string }) {
-    return await classroomService.updateClassroom($api, classroomId, data)
+  async function updateClassroom(
+    classroomId: string,
+    data: { name?: string; school_year?: string },
+  ) {
+    return await classroomService.updateClassroom(classroomId, data)
   }
 
   async function deleteClassroom(classroomId: string) {
-    return await classroomService.deleteClassroom($api, classroomId)
+    return await classroomService.deleteClassroom(classroomId)
   }
 
   return {

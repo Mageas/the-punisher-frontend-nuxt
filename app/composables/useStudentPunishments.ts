@@ -7,6 +7,7 @@ import type { Punishment } from '~/types/api'
  */
 export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
   const { $api } = useNuxtApp()
+
   const paginated = usePaginatedCollection<
     Punishment,
     {

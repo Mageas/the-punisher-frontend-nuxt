@@ -2,17 +2,20 @@
 import { ArrowRight, Pencil, Trash2 } from 'lucide-vue-next'
 import type { RuleMode } from '~/types/api'
 
-const props = withDefaults(defineProps<{
-  penaltyTypeName: string
-  punishmentTypeName: string
-  threshold: number
-  dueAtAfterDays: number
-  mode: RuleMode
-  isActive: boolean
-  toggling?: boolean
-}>(), {
-  toggling: false,
-})
+const props = withDefaults(
+  defineProps<{
+    penaltyTypeName: string
+    punishmentTypeName: string
+    threshold: number
+    dueAtAfterDays: number
+    mode: RuleMode
+    isActive: boolean
+    toggling?: boolean
+  }>(),
+  {
+    toggling: false,
+  },
+)
 
 const emit = defineEmits<{
   toggleActive: [nextIsActive: boolean]

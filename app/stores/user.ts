@@ -2,8 +2,6 @@ import { defineStore } from 'pinia'
 import type { User } from '~/types/api'
 
 export const useUserStore = defineStore('user', () => {
-  const { $api } = useNuxtApp()
-
   const user = ref<User | null>(null)
   const loading = ref(false)
 
@@ -21,12 +19,11 @@ export const useUserStore = defineStore('user', () => {
     if (user.value) return
     loading.value = true
     try {
+      const { $api } = useNuxtApp()
       user.value = await $api<User>('/user/me')
-    }
-    catch {
+    } catch {
       user.value = null
-    }
-    finally {
+    } finally {
       loading.value = false
     }
   }

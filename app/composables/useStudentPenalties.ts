@@ -7,6 +7,7 @@ import type { Penalty } from '~/types/api'
  */
 export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
   const { $api } = useNuxtApp()
+
   const paginated = usePaginatedCollection<
     Penalty,
     {
@@ -15,10 +16,7 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
     }
   >(() => `/students/${toValue(studentId)}/penalties`)
 
-  async function fetchPenalties(options?: {
-    page?: number
-    search?: string
-  }) {
+  async function fetchPenalties(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
   }
 

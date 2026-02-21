@@ -5,7 +5,9 @@ import { typeService } from '~/services/type.service'
  * Composable to fetch ALL punishment types across all pages.
  */
 export function useAllPunishmentTypes() {
-  const allPaginated = useAllPaginatedCollection<PunishmentType>(($api, options) => typeService.getPunishmentTypes($api, options))
+  const allPaginated = useAllPaginatedCollection<PunishmentType>((options) =>
+    typeService.getPunishmentTypes(options),
+  )
 
   async function fetchPunishmentTypes() {
     await allPaginated.fetchAll()

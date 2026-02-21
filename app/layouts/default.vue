@@ -33,12 +33,12 @@ import {
 
 const { t } = useI18n()
 const route = useRoute()
-const { logout: authLogout } = useAuth()
+const { logout: authLogout, isAuthenticated } = useAuth()
 const userStore = useUserStore()
 
-onMounted(() => {
-  userStore.fetchUser()
-})
+if (isAuthenticated.value) {
+  await userStore.fetchUser()
+}
 
 async function logout() {
   userStore.clearUser()
@@ -59,9 +59,7 @@ interface NavGroup {
 const navGroups = computed<NavGroup[]>(() => [
   {
     label: t('sidebar.general'),
-    links: [
-      { to: '/', icon: LayoutDashboard, label: t('sidebar.dashboard') },
-    ],
+    links: [{ to: '/', icon: LayoutDashboard, label: t('sidebar.dashboard') }],
   },
   {
     label: t('sidebar.tracking'),
@@ -82,8 +80,16 @@ const navGroups = computed<NavGroup[]>(() => [
     label: t('sidebar.configuration'),
     links: [
       { to: '/rules', icon: Scale, label: t('sidebar.rules') },
-      { to: '/penalty-types', icon: AlertCircle, label: t('sidebar.penaltyTypes') },
-      { to: '/punishment-types', icon: FileWarning, label: t('sidebar.punishmentTypes') },
+      {
+        to: '/penalty-types',
+        icon: AlertCircle,
+        label: t('sidebar.penaltyTypes'),
+      },
+      {
+        to: '/punishment-types',
+        icon: FileWarning,
+        label: t('sidebar.punishmentTypes'),
+      },
       { to: '/bonus-types', icon: Trophy, label: t('sidebar.bonusTypes') },
     ],
   },
@@ -102,7 +108,9 @@ function isActive(to: string): boolean {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg">
-              <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <div
+                class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+              >
                 <Skull class="size-4" />
               </div>
               <div class="grid flex-1 text-left text-sm leading-tight">
@@ -133,18 +141,18 @@ function isActive(to: string): boolean {
         <SidebarMenu>
           <SidebarMenuItem>
             <div class="flex items-center gap-2 px-2 py-1.5">
-              <div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium">
+              <div
+                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium"
+              >
                 {{ userStore.initials }}
               </div>
               <div class="grid flex-1 text-left text-sm leading-tight min-w-0">
                 <span class="truncate font-semibold">{{ userStore.fullName }}</span>
-                <span class="truncate text-xs text-muted-foreground">{{ userStore.user?.email }}</span>
+                <span class="truncate text-xs text-muted-foreground">{{
+                  userStore.user?.email
+                }}</span>
               </div>
-              <SidebarMenuButton
-                size="sm"
-                class="size-8 shrink-0 cursor-pointer"
-                @click="logout"
-              >
+              <SidebarMenuButton size="sm" class="size-8 shrink-0 cursor-pointer" @click="logout">
                 <LogOut class="size-4" />
               </SidebarMenuButton>
             </div>

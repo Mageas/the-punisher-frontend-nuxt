@@ -3,16 +3,8 @@ import { Plus } from 'lucide-vue-next'
 import type { Rule, RulePayload } from '~/types/api'
 
 const { t } = useI18n()
-const {
-  rules,
-  loading,
-  page,
-  itemPerPage,
-  totalCount,
-  fetchRules,
-  updateRule,
-  deleteRule,
-} = useRules()
+const { rules, loading, page, itemPerPage, totalCount, fetchRules, updateRule, deleteRule } =
+  useRules()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -57,11 +49,9 @@ async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   try {
     await updateRule(rule.id, buildRulePayload(rule, { is_active: nextIsActive }))
     await reload(page.value)
-  }
-  catch (err) {
+  } catch (err) {
     handleApiError(err)
-  }
-  finally {
+  } finally {
     const { [rule.id]: _ignored, ...rest } = togglingById.value
     togglingById.value = rest
   }
@@ -102,7 +92,10 @@ await reload()
       </template>
 
       <template #actions>
-        <Button class="w-full justify-center cursor-pointer xl:w-auto" @click="showCreateModal = true">
+        <Button
+          class="w-full justify-center cursor-pointer xl:w-auto"
+          @click="showCreateModal = true"
+        >
           <Plus class="w-4 h-4" />
           {{ t('rules.newRule') }}
         </Button>
@@ -145,11 +138,7 @@ await reload()
     />
 
     <RuleCreateModal v-model:open="showCreateModal" @created="onCreated" />
-    <RuleEditModal
-      v-model:open="showEditModal"
-      :rule="ruleToEdit"
-      @updated="onUpdated"
-    />
+    <RuleEditModal v-model:open="showEditModal" :rule="ruleToEdit" @updated="onUpdated" />
     <RuleDeleteModal
       v-model:open="showDeleteModal"
       :rule-id="ruleToDeleteId"

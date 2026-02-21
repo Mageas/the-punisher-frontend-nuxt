@@ -30,12 +30,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         accessToken.value = data.access_token
         return true
-      }
-      catch {
+      } catch {
         accessToken.value = null
         return false
-      }
-      finally {
+      } finally {
         refreshPromise = null
       }
     })()
@@ -53,12 +51,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         if (Array.isArray(options.headers)) {
           options.headers.push(['Authorization', `Bearer ${accessToken.value}`])
-        }
-        else if (options.headers instanceof Headers) {
+        } else if (options.headers instanceof Headers) {
           options.headers.set('Authorization', `Bearer ${accessToken.value}`)
-        }
-        else {
-          (options.headers as Record<string, string>).Authorization = `Bearer ${accessToken.value}`
+        } else {
+          ;(options.headers as Record<string, string>).Authorization = `Bearer ${accessToken.value}`
         }
       }
     },
@@ -66,7 +62,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     async onResponseError({ response, options, request }) {
       // Only attempt refresh on 401 and not on auth endpoints themselves
       const resolvedRequest = await request
-      const url = typeof resolvedRequest === 'string' ? resolvedRequest : (resolvedRequest as any).url
+      const url =
+        typeof resolvedRequest === 'string'
+          ? resolvedRequest
+          : 'url' in resolvedRequest
+            ? (resolvedRequest as { url: string }).url
+            : ''
 
       if (response.status === 401 && !url.includes('/auth/')) {
         const refreshed = await refreshToken()
@@ -80,17 +81,21 @@ export default defineNuxtPlugin((nuxtApp) => {
               options.headers.forEach((value, key) => {
                 retryHeaders[key] = value
               })
-            }
-            else {
+            } else {
               Object.assign(retryHeaders, options.headers)
             }
           }
 
           retryHeaders.Authorization = `Bearer ${accessToken.value}`
 
-          // We must ensure the retry uses the full URL if we use the plain $fetch, 
+          // We must ensure the retry uses the full URL if we use the plain $fetch,
           // as the original request might be relative.
-          const retryUrl = typeof resolvedRequest === 'string' ? resolvedRequest : (resolvedRequest as any).url
+          const retryUrl =
+            typeof resolvedRequest === 'string'
+              ? resolvedRequest
+              : 'url' in resolvedRequest
+                ? (resolvedRequest as { url: string }).url
+                : ''
 
           throw await $fetch(retryUrl, {
             ...options,

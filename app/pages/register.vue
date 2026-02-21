@@ -44,11 +44,9 @@ async function onSubmit() {
     })
 
     await navigateTo('/login')
-  }
-  catch (err) {
+  } catch (err) {
     handleApiError(err)
-  }
-  finally {
+  } finally {
     isLoading.value = false
   }
 }

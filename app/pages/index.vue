@@ -59,11 +59,19 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
       </template>
 
       <template #actions>
-        <Button variant="outline" class="justify-center cursor-pointer" @click="showBonusModal = true">
+        <Button
+          variant="outline"
+          class="justify-center cursor-pointer"
+          @click="showBonusModal = true"
+        >
           <Star class="w-4 h-4" />
           {{ t('dashboard.newBonus') }}
         </Button>
-        <Button variant="outline" class="justify-center cursor-pointer" @click="showPenaltyModal = true">
+        <Button
+          variant="outline"
+          class="justify-center cursor-pointer"
+          @click="showPenaltyModal = true"
+        >
           <AlertTriangle class="w-4 h-4" />
           {{ t('dashboard.newPenalty') }}
         </Button>

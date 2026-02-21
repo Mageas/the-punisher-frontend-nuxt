@@ -10,7 +10,9 @@ const initials = computed(() => {
 </script>
 
 <template>
-  <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-medium shrink-0">
+  <div
+    class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-medium shrink-0"
+  >
     {{ initials }}
   </div>
 </template>

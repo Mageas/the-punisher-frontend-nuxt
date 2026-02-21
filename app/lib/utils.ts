@@ -1,6 +1,6 @@
-import type { ClassValue } from "clsx"
-import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import type { ClassValue } from 'clsx'
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,7 +37,10 @@ export function formatDateTime(dateStr: string | null | undefined): string {
  */
 export function formatTime(dateStr: string | null | undefined): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  return new Date(dateStr).toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 /**
