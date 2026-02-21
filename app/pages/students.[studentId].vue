@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
+import { studentService } from '~/services/student.service'
 
 definePageMeta({
   path: '/students/:studentId',
@@ -9,7 +10,6 @@ definePageMeta({
 const { t } = useI18n()
 const { getInitials } = useFormat()
 const route = useRoute()
-const { $api } = useNuxtApp()
 
 const studentId = computed(() => {
   const routeStudentId = route.params.studentId
@@ -77,8 +77,8 @@ async function fetchStudentProfile() {
   loadingProfile.value = true
   try {
     const [studentRes, kpisRes] = await Promise.all([
-      $api<Student>(`/students/${studentId.value}`),
-      $api<StudentKpis>(`/students/${studentId.value}/kpis`),
+      studentService.getStudentById(studentId.value),
+      studentService.getStudentKpis(studentId.value),
     ])
     student.value = studentRes
     kpis.value = kpisRes
@@ -106,28 +106,26 @@ async function useBonus(id: string) {
 }
 
 async function deleteStudent(id: string) {
-  await $api(`/students/${id}`, {
-    method: 'DELETE',
-  })
+  await studentService.deleteStudent(id)
 }
 
-function onActionConfirmed() {
-  loadAllData()
+async function onActionConfirmed() {
+  await loadAllData()
 }
 
 async function onDeleteConfirmed() {
   await navigateTo('/students')
 }
 
-function onCreated() {
-  loadAllData()
+async function onCreated() {
+  await loadAllData()
 }
 
 await loadAllData()
 
-watch(studentId, (nextStudentId, previousStudentId) => {
+watch(studentId, async (nextStudentId, previousStudentId) => {
   if (!nextStudentId || nextStudentId === previousStudentId) return
-  loadAllData()
+  await loadAllData()
 })
 </script>
 

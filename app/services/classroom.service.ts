@@ -14,7 +14,7 @@ export const classroomService = {
     return $api<ClassroomDetail>(`/classrooms/${classroomId}`)
   },
 
-  async createClassroom(data: { name: string; school_year: string }) {
+  async createClassroom(data: { name: string; year?: string | null }) {
     const { $api } = useNuxtApp()
     return $api<Classroom>('/classrooms', {
       method: 'POST',
@@ -22,7 +22,7 @@ export const classroomService = {
     })
   },
 
-  async updateClassroom(classroomId: string, data: { name?: string; school_year?: string }) {
+  async updateClassroom(classroomId: string, data: { name?: string; year?: string | null }) {
     const { $api } = useNuxtApp()
     return $api<Classroom>(`/classrooms/${classroomId}`, {
       method: 'PUT',

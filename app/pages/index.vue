@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
+import { dashboardService } from '~/services/dashboard.service'
+import { punishmentService } from '~/services/punishment.service'
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
+const { globalError, handleApiError, clearErrors } = useApiErrors()
 
 // Classroom filter
 const { classrooms, fetchClassrooms } = useAllClassrooms()
@@ -21,26 +23,39 @@ const showPunishmentModal = ref(false)
 // Fetch dashboard data
 async function fetchDashboard() {
   loading.value = true
-  const params: Record<string, string> = {}
-  if (selectedClassroomId.value) {
-    params.classroom_id = selectedClassroomId.value
+  clearErrors()
+
+  try {
+    dashboard.value = await dashboardService.getDashboard({
+      classroomId: selectedClassroomId.value || undefined,
+    })
+  } catch (err) {
+    dashboard.value = null
+    handleApiError(err)
+  } finally {
+    loading.value = false
   }
-  dashboard.value = await $api<DashboardResponse>('/dashboard', { params })
-  loading.value = false
 }
 
 async function resolvePunishment(id: string) {
-  await $api(`/punishments/${id}/resolve`, { method: 'POST' })
+  clearErrors()
+
+  try {
+    await punishmentService.resolvePunishment(id, {})
+  } catch (err) {
+    handleApiError(err)
+    throw err
+  }
 }
 
 // Refresh dashboard after modal creation
-function onModalCreated() {
-  fetchDashboard()
+async function onModalCreated() {
+  await fetchDashboard()
 }
 
 // Watch filter changes
-watch(selectedClassroomId, () => {
-  fetchDashboard()
+watch(selectedClassroomId, async () => {
+  await fetchDashboard()
 })
 
 // Initial load
@@ -49,6 +64,10 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
 
 <template>
   <div>
+    <Alert v-if="globalError" variant="destructive" class="mb-6">
+      <AlertDescription>{{ globalError }}</AlertDescription>
+    </Alert>
+
     <!-- Header & Filtre Global -->
     <PageHeaderBar align="start">
       <template #left>
@@ -97,7 +116,7 @@ await Promise.all([fetchClassrooms(), fetchDashboard()])
         <DashboardPendingPunishments
           :punishments="dashboard.pending_punishments"
           :resolve-fn="resolvePunishment"
-          @resolved="fetchDashboard"
+          @resolved="onModalCreated"
         />
       </div>
     </template>

@@ -4,6 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
+import { punishmentService } from '~/services/punishment.service'
 
 const emit = defineEmits<{
   created: []
@@ -22,7 +23,6 @@ const props = withDefaults(
 )
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
@@ -107,13 +107,10 @@ const onSubmit = handleSubmit(async (formValues) => {
     const [h, m] = formValues.due_at_time.split(':')
     date.setHours(Number(h), Number(m), 0, 0)
 
-    await $api('/punishments/', {
-      method: 'POST',
-      body: {
-        student_id: formValues.student_id,
-        punishment_type_id: formValues.punishment_type_id,
-        due_at: date.toISOString(),
-      },
+    await punishmentService.createPunishment({
+      student_id: formValues.student_id,
+      punishment_type_id: formValues.punishment_type_id,
+      due_at: date.toISOString(),
     })
     open.value = false
     emit('created')

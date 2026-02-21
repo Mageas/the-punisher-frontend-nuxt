@@ -37,16 +37,16 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
-function onDeleteConfirmed() {
-  reload(page.value)
+async function onDeleteConfirmed() {
+  await reload(page.value)
 }
 
-function onCreated() {
-  reload(1)
+async function onCreated() {
+  await reload(1)
 }
 
-watch(searchDebounced, () => {
-  reload(1)
+watch(searchDebounced, async () => {
+  await reload(1)
 })
 
 await reload()

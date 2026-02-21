@@ -16,14 +16,11 @@ export function useClassrooms() {
     await paginated.fetchPage(options)
   }
 
-  async function createClassroom(data: { name: string; school_year: string }) {
+  async function createClassroom(data: { name: string; year?: string | null }) {
     return await classroomService.createClassroom(data)
   }
 
-  async function updateClassroom(
-    classroomId: string,
-    data: { name?: string; school_year?: string },
-  ) {
+  async function updateClassroom(classroomId: string, data: { name?: string; year?: string | null }) {
     return await classroomService.updateClassroom(classroomId, data)
   }
 

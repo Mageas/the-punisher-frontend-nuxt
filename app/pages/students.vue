@@ -26,12 +26,12 @@ async function onPageChange(nextPage: number) {
   await reload(nextPage)
 }
 
-function onCreated() {
-  reload(1)
+async function onCreated() {
+  await reload(1)
 }
 
-watch(searchDebounced, () => {
-  reload(1)
+watch(searchDebounced, async () => {
+  await reload(1)
 })
 
 await reload()

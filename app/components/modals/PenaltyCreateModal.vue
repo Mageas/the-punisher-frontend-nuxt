@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { penaltyService } from '~/services/penalty.service'
 
 const emit = defineEmits<{
   created: []
@@ -20,7 +21,6 @@ const props = withDefaults(
 )
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
@@ -95,12 +95,9 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await $api('/penalties/', {
-      method: 'POST',
-      body: {
-        student_id: formValues.student_id,
-        penalty_type_id: formValues.penalty_type_id,
-      },
+    await penaltyService.createPenalty({
+      student_id: formValues.student_id,
+      penalty_type_id: formValues.penalty_type_id,
     })
     open.value = false
     emit('created')

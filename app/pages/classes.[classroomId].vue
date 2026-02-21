@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Classroom, Student } from '~/types/api'
+import { classroomService } from '~/services/classroom.service'
 
 definePageMeta({
   path: '/classes/:classroomId',
@@ -7,7 +8,6 @@ definePageMeta({
 
 const { t } = useI18n()
 const route = useRoute()
-const { $api } = useNuxtApp()
 
 const { students: classroomStudents, fetchStudents: fetchClassroomStudents } = useAllStudents()
 const { students: allStudents, fetchStudents: fetchAllStudents } = useAllStudents()
@@ -17,17 +17,17 @@ const {
   clearErrors: clearAddStudentErrors,
 } = useApiErrors()
 
-const classroomId = computed(() => {
+const classroomId = computed<string>(() => {
   const routeClassroomId = route.params.classroomId
-  return Array.isArray(routeClassroomId) ? routeClassroomId[0] : routeClassroomId
+  const resolvedClassroomId = Array.isArray(routeClassroomId) ? routeClassroomId[0] : routeClassroomId
+  if (!resolvedClassroomId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Missing classroom id',
+    })
+  }
+  return resolvedClassroomId
 })
-
-if (!classroomId.value) {
-  throw createError({
-    statusCode: 400,
-    statusMessage: 'Missing classroom id',
-  })
-}
 
 const classroom = ref<Classroom | null>(null)
 const loading = ref(false)
@@ -69,7 +69,7 @@ async function fetchClassroomProfile() {
   loading.value = true
   try {
     const [classroomRes] = await Promise.all([
-      $api<Classroom>(`/classrooms/${classroomId.value}`),
+      classroomService.getClassroomById(classroomId.value),
       fetchClassroomStudents(classroomId.value),
       fetchAllStudents(),
     ])
@@ -87,12 +87,7 @@ async function addStudentToClassroom() {
   clearAddStudentErrors()
 
   try {
-    await $api(`/classrooms/${classroomId.value}/students`, {
-      method: 'POST',
-      body: {
-        student_id: student.id,
-      },
-    })
+    await classroomService.addStudentToClassroom(classroomId.value, student.id)
     addStudentId.value = ''
     await fetchClassroomProfile()
   } catch (err) {
@@ -108,19 +103,15 @@ function openRemoveModal(student: Student) {
 }
 
 async function removeStudentFromClass(studentId: string) {
-  await $api(`/classrooms/${classroomId.value}/students/${studentId}`, {
-    method: 'DELETE',
-  })
+  await classroomService.removeStudentFromClassroom(classroomId.value, studentId)
 }
 
 async function deleteClassroom(id: string) {
-  await $api(`/classrooms/${id}`, {
-    method: 'DELETE',
-  })
+  await classroomService.deleteClassroom(id)
 }
 
-function onActionConfirmed() {
-  fetchClassroomProfile()
+async function onActionConfirmed() {
+  await fetchClassroomProfile()
 }
 
 async function onDeleteConfirmed() {
@@ -129,9 +120,9 @@ async function onDeleteConfirmed() {
 
 await fetchClassroomProfile()
 
-watch(classroomId, (nextClassroomId, previousClassroomId) => {
+watch(classroomId, async (nextClassroomId, previousClassroomId) => {
   if (!nextClassroomId || nextClassroomId === previousClassroomId) return
-  fetchClassroomProfile()
+  await fetchClassroomProfile()
 })
 </script>
 

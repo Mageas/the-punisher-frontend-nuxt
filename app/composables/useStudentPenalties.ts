@@ -1,27 +1,27 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Penalty } from '~/types/api'
+import { studentService } from '~/services/student.service'
+import { penaltyService } from '~/services/penalty.service'
 
 /**
  * Composable to fetch and manage a student's penalties with pagination.
  */
 export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
-  const { $api } = useNuxtApp()
-
   const paginated = usePaginatedCollection<
     Penalty,
     {
       page?: number
       search?: string
     }
-  >(() => `/students/${toValue(studentId)}/penalties`)
+  >((options) => studentService.getStudentPenalties(toValue(studentId), options))
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
   }
 
   async function deletePenalty(id: string) {
-    await $api(`/penalties/${id}`, { method: 'DELETE' })
+    await penaltyService.deletePenalty(id)
   }
 
   return {

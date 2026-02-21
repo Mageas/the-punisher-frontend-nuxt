@@ -1,6 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { StudentHistoryItem } from '~/types/api'
+import { studentService } from '~/services/student.service'
 
 /**
  * Composable to fetch and manage a student's history with pagination.
@@ -11,7 +12,7 @@ export function useStudentHistory(studentId: MaybeRefOrGetter<string>) {
     {
       page?: number
     }
-  >(() => `/students/${toValue(studentId)}/history`)
+  >((options) => studentService.getStudentHistory(toValue(studentId), options))
 
   async function fetchHistory(options?: { page?: number }) {
     await paginated.fetchPage(options)

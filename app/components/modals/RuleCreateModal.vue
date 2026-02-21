@@ -3,6 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { RuleMode } from '~/types/api'
+import { ruleService } from '~/services/rule.service'
 
 const emit = defineEmits<{
   created: []
@@ -11,7 +12,6 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
@@ -69,13 +69,10 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await $api('/rules/', {
-      method: 'POST',
-      body: {
-        ...formValues,
-        name: generatedRuleName.value.substring(0, 120), // Max 120 per DTO
-        is_active: true,
-      },
+    await ruleService.createRule({
+      ...formValues,
+      name: generatedRuleName.value.substring(0, 120), // Max 120 per DTO
+      is_active: true,
     })
     open.value = false
     emit('created')

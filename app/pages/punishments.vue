@@ -60,23 +60,23 @@ function openResolveModal(id: string) {
 }
 
 // After delete confirmed
-function onDeleteConfirmed() {
-  reload(page.value)
+async function onDeleteConfirmed() {
+  await reload(page.value)
 }
 
 // After resolve confirmed
-function onResolveConfirmed() {
-  reload(page.value)
+async function onResolveConfirmed() {
+  await reload(page.value)
 }
 
 // After creation
-function onCreated() {
-  reload(1)
+async function onCreated() {
+  await reload(1)
 }
 
 // Watch search changes
-watch(searchDebounced, () => {
-  reload(1)
+watch(searchDebounced, async () => {
+  await reload(1)
 })
 
 // Initial load

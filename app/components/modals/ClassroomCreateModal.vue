@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { classroomService } from '~/services/classroom.service'
 
 const emit = defineEmits<{
   created: []
@@ -10,7 +11,6 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 
 const schema = toTypedSchema(
@@ -45,12 +45,9 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (values) => {
   clearErrors()
   try {
-    await $api('/classrooms/', {
-      method: 'POST',
-      body: {
-        name: values.name,
-        year: values.year || null,
-      },
+    await classroomService.createClassroom({
+      name: values.name,
+      year: values.year || null,
     })
     open.value = false
     emit('created')

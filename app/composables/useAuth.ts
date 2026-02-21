@@ -1,33 +1,26 @@
-import type { AuthResponse, LoginRequest, RegisterRequest } from '~/types/api'
+import type { AuthResponse, RegisterRequest } from '~/types/api'
+import { authService } from '~/services/auth.service'
 
 /**
  * Composable for managing authentication state.
  *
- * - Persists the access_token in a cookie (accessible SSR + client).
+ * - Stores access_token in app memory state.
  * - Uses `credentials: 'include'` on $fetch so the backend's
  *   HttpOnly `refresh_token` cookie is sent/received automatically.
- * - Logout clears both access_token and refresh_token cookies.
+ * - Logout requests server-side refresh token revocation.
  */
 export function useAuth() {
-  const config = useRuntimeConfig()
-  const accessToken = useCookie('access_token', { path: '/' })
-  const refreshToken = useCookie('refresh_token', { path: '/v1/auth/refresh' })
+  const accessToken = useState<string | null>('auth.access-token', () => null)
 
   const isAuthenticated = computed(() => !!accessToken.value)
 
   /**
    * Log in with email/password.
-   * Saves the access_token cookie and lets the browser store the
+   * Saves the access_token in memory and lets the browser store the
    * HttpOnly refresh_token cookie set by the backend.
    */
   async function login(email: string, password: string) {
-    const data = await $fetch<AuthResponse>('/auth/login', {
-      baseURL: config.public.apiBaseUrl,
-      method: 'POST',
-      credentials: 'include',
-      body: { email, password } as LoginRequest,
-    })
-
+    const data = await authService.login(email, password)
     accessToken.value = data.access_token
   }
 
@@ -35,19 +28,20 @@ export function useAuth() {
    * Register a new teacher account.
    */
   async function register(body: RegisterRequest) {
-    await $fetch('/auth/register', {
-      baseURL: config.public.apiBaseUrl,
-      method: 'POST',
-      body,
-    })
+    await authService.register(body)
   }
 
   /**
-   * Clear both access_token and refresh_token cookies, then redirect to login.
+   * Revoke the refresh_token on the server, clear local auth state and redirect to login.
    */
   async function logout() {
+    try {
+      await authService.logout()
+    } catch {
+      // Best effort: local logout still proceeds even if server revocation fails.
+    }
+
     accessToken.value = null
-    refreshToken.value = null
     await navigateTo('/login')
   }
 
@@ -56,12 +50,7 @@ export function useAuth() {
    */
   async function refresh(): Promise<boolean> {
     try {
-      const data = await $fetch<{ access_token: string }>('/auth/refresh', {
-        baseURL: config.public.apiBaseUrl,
-        method: 'POST',
-        credentials: 'include',
-      })
-
+      const data = await authService.refresh()
       accessToken.value = data.access_token
       return true
     } catch {

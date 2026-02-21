@@ -1,13 +1,13 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Punishment } from '~/types/api'
+import { punishmentService } from '~/services/punishment.service'
+import { studentService } from '~/services/student.service'
 
 /**
  * Composable to fetch and manage a student's punishments with pagination.
  */
 export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
-  const { $api } = useNuxtApp()
-
   const paginated = usePaginatedCollection<
     Punishment,
     {
@@ -15,7 +15,7 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >(() => `/students/${toValue(studentId)}/punishments`)
+  >((options) => studentService.getStudentPunishments(toValue(studentId), options))
 
   async function fetchPunishments(options?: {
     page?: number
@@ -26,11 +26,11 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
   }
 
   async function resolvePunishment(id: string) {
-    await $api<Punishment>(`/punishments/${id}/resolve`, { method: 'POST' })
+    await punishmentService.resolvePunishment(id, {})
   }
 
   async function deletePunishment(id: string) {
-    await $api(`/punishments/${id}`, { method: 'DELETE' })
+    await punishmentService.deletePunishment(id)
   }
 
   return {

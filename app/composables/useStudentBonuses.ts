@@ -1,13 +1,13 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Bonus } from '~/types/api'
+import { bonusService } from '~/services/bonus.service'
+import { studentService } from '~/services/student.service'
 
 /**
  * Composable to fetch and manage a student's bonuses with pagination.
  */
 export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
-  const { $api } = useNuxtApp()
-
   const paginated = usePaginatedCollection<
     Bonus,
     {
@@ -15,7 +15,7 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
       state?: 'used' | 'unused'
       search?: string
     }
-  >(() => `/students/${toValue(studentId)}/bonuses`)
+  >((options) => studentService.getStudentBonuses(toValue(studentId), options))
 
   async function fetchBonuses(options?: {
     page?: number
@@ -26,11 +26,11 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   }
 
   async function useBonus(id: string) {
-    await $api<Bonus>(`/bonuses/${id}/use`, { method: 'POST' })
+    await bonusService.useBonus(id, {})
   }
 
   async function deleteBonus(id: string) {
-    await $api(`/bonuses/${id}`, { method: 'DELETE' })
+    await bonusService.deleteBonus(id)
   }
 
   return {

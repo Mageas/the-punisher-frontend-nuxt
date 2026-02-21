@@ -72,16 +72,16 @@ function openDeleteModal(itemId: string) {
   showDeleteModal.value = true
 }
 
-function onCreated() {
-  reload(1)
+async function onCreated() {
+  await reload(1)
 }
 
-function onUpdated() {
-  reload(page.value)
+async function onUpdated() {
+  await reload(page.value)
 }
 
-function onDeleteConfirmed() {
-  reload(page.value)
+async function onDeleteConfirmed() {
+  await reload(page.value)
 }
 
 await reload()

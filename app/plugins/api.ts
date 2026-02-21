@@ -9,7 +9,7 @@ import type { AuthResponse } from '~/types/api'
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
-  const accessToken = useCookie('access_token', { path: '/' })
+  const accessToken = useState<string | null>('auth.access-token', () => null)
 
   let refreshPromise: Promise<boolean> | null = null
 

@@ -3,6 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { Rule, RuleMode } from '~/types/api'
+import { ruleService } from '~/services/rule.service'
 
 const emit = defineEmits<{
   updated: []
@@ -15,7 +16,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
 const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
@@ -71,12 +71,9 @@ const onSubmit = handleSubmit(async (formValues) => {
   if (!props.rule?.id) return
   clearErrors()
   try {
-    await $api(`/rules/${props.rule.id}`, {
-      method: 'PUT',
-      body: {
-        ...formValues,
-        is_active: props.rule.is_active,
-      },
+    await ruleService.updateRule(props.rule.id, {
+      ...formValues,
+      is_active: props.rule.is_active,
     })
     open.value = false
     emit('updated')

@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { studentService } from '~/services/student.service'
 
 const emit = defineEmits<{
   updated: []
@@ -16,7 +17,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 
 const schema = toTypedSchema(
@@ -56,10 +56,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (!props.studentId) return
   clearErrors()
   try {
-    await $api(`/students/${props.studentId}`, {
-      method: 'PUT',
-      body: values,
-    })
+    await studentService.updateStudent(props.studentId, values)
     open.value = false
     emit('updated')
   } catch (err) {

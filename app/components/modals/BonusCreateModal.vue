@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { bonusService } from '~/services/bonus.service'
 
 const emit = defineEmits<{
   created: []
@@ -20,7 +21,6 @@ const props = withDefaults(
 )
 
 const { t } = useI18n()
-const { $api } = useNuxtApp()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { classrooms, fetchClassrooms } = useAllClassrooms()
 const { students, fetchStudents } = useAllStudents()
@@ -98,13 +98,10 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    await $api('/bonuses/', {
-      method: 'POST',
-      body: {
-        student_id: formValues.student_id,
-        bonus_type_id: formValues.bonus_type_id,
-        points: formValues.points,
-      },
+    await bonusService.createBonus({
+      student_id: formValues.student_id,
+      bonus_type_id: formValues.bonus_type_id,
+      points: formValues.points,
     })
     open.value = false
     emit('created')
