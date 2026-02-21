@@ -41,7 +41,34 @@ export default defineNuxtPlugin((nuxtApp) => {
     return refreshPromise
   }
 
-  const api = $fetch.create({
+  type ApiRequest = Parameters<typeof $fetch>[0]
+  type ApiOptions = Parameters<typeof $fetch>[1]
+
+  function isRequestToAuthRoute(request: ApiRequest): boolean {
+    if (typeof request === 'string') {
+      return request.includes('/auth/')
+    }
+
+    if (request instanceof Request) {
+      return request.url.includes('/auth/')
+    }
+
+    if (request && typeof request === 'object' && 'url' in request) {
+      const maybeUrl = (request as { url?: unknown }).url
+      return typeof maybeUrl === 'string' && maybeUrl.includes('/auth/')
+    }
+
+    return false
+  }
+
+  function isUnauthorizedError(error: unknown): boolean {
+    if (!error || typeof error !== 'object') return false
+
+    const withStatus = error as { status?: number; response?: { status?: number } }
+    return withStatus.status === 401 || withStatus.response?.status === 401
+  }
+
+  const baseApi = $fetch.create({
     baseURL: config.public.apiBaseUrl,
     credentials: 'include',
 
@@ -59,58 +86,26 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     },
 
-    async onResponseError({ response, options, request }) {
-      // Only attempt refresh on 401 and not on auth endpoints themselves
-      const resolvedRequest = await request
-      const url =
-        typeof resolvedRequest === 'string'
-          ? resolvedRequest
-          : 'url' in resolvedRequest
-            ? (resolvedRequest as { url: string }).url
-            : ''
+  })
 
-      if (response.status === 401 && !url.includes('/auth/')) {
+  const api = (async (request: ApiRequest, options?: ApiOptions) => {
+    try {
+      return await baseApi(request, options)
+    } catch (error) {
+      if (isUnauthorizedError(error) && !isRequestToAuthRoute(request)) {
         const refreshed = await refreshToken()
 
         if (refreshed) {
-          // Retry the original request with the new token
-          const retryHeaders: Record<string, string> = {}
-
-          if (options.headers) {
-            if (options.headers instanceof Headers) {
-              options.headers.forEach((value, key) => {
-                retryHeaders[key] = value
-              })
-            } else {
-              Object.assign(retryHeaders, options.headers)
-            }
-          }
-
-          retryHeaders.Authorization = `Bearer ${accessToken.value}`
-
-          // We must ensure the retry uses the full URL if we use the plain $fetch,
-          // as the original request might be relative.
-          const retryUrl =
-            typeof resolvedRequest === 'string'
-              ? resolvedRequest
-              : 'url' in resolvedRequest
-                ? (resolvedRequest as { url: string }).url
-                : ''
-
-          throw await $fetch(retryUrl, {
-            ...options,
-            baseURL: config.public.apiBaseUrl,
-            method: options.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
-            headers: retryHeaders,
-          })
+          return baseApi(request, options)
         }
 
-        // Refresh failed — redirect to login
         accessToken.value = null
         await nuxtApp.runWithContext(() => navigateTo('/login'))
       }
-    },
-  })
+
+      throw error
+    }
+  }) as typeof $fetch
 
   return {
     provide: {

@@ -4,29 +4,20 @@ test.describe('Login Page', () => {
   test('should show login form', async ({ page }) => {
     await page.goto('/login')
 
-    // Check for title (The Punisher)
-    await expect(page.locator('h1')).toContainText('The Punisher')
+    await expect(page.getByRole('heading', { level: 1, name: 'The Punisher' })).toBeVisible()
+    await expect(page.getByText('Connectez-vous à votre compte', { exact: true })).toBeVisible()
 
-    // Check for login subtitle
-    await expect(page.locator('p.text-muted-foreground')).toContainText(
-      'Connectez-vous à votre compte',
-    )
-
-    // Check for form fields
-    await expect(page.locator('label[for="email"]')).toBeVisible()
-    await expect(page.locator('label[for="password"]')).toBeVisible()
-    await expect(page.locator('button[type="submit"]')).toBeVisible()
+    await expect(page.getByLabel('Email')).toBeVisible()
+    await expect(page.getByLabel('Mot de passe')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible()
   })
 
-  test('should show error on invalid login', async ({ page }) => {
+  test('should keep password masked and navigate to register page', async ({ page }) => {
     await page.goto('/login')
 
-    await page.fill('#email', 'wrong@example.com')
-    await page.fill('#password', 'wrongpassword')
-    await page.click('button[type="submit"]')
+    await expect(page.getByLabel('Mot de passe')).toHaveAttribute('type', 'password')
 
-    // Since we don't have a real backend running or mocked in this basic test,
-    // it might fail or show an error depending on how the app handles fetch errors.
-    // In a real scenario, we would mock the API.
+    await page.getByRole('link', { name: 'Créer un compte' }).click()
+    await expect(page).toHaveURL(/\/register$/)
   })
 })
