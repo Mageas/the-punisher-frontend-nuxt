@@ -39,3 +39,20 @@ export function formatTime(dateStr: string | null | undefined): string {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
+
+/**
+ * Get initials from a person's first and last name.
+ */
+export function getInitials(firstName?: string | null, lastName?: string | null): string {
+  const firstInitial = firstName?.charAt(0) ?? ''
+  const lastInitial = lastName?.charAt(0) ?? ''
+  return `${firstInitial}${lastInitial}`.toUpperCase()
+}
+
+/**
+ * Format points with optional 'pt' or 'pts' suffix.
+ */
+export function formatPoints(points: number): string {
+  const suffix = points > 1 ? 'pts' : 'pt'
+  return `${points} ${suffix}`
+}

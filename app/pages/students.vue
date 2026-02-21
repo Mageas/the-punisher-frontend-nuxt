@@ -4,6 +4,7 @@ import { refDebounced } from '@vueuse/core'
 import type { Student } from '~/types/api'
 
 const { t } = useI18n()
+const { getInitials, formatPoints } = useFormat()
 const {
   students,
   loading,
@@ -20,17 +21,6 @@ const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
-
-function initials(student: Student): string {
-  const firstInitial = student.first_name?.charAt(0) ?? ''
-  const lastInitial = student.last_name?.charAt(0) ?? ''
-  return `${firstInitial}${lastInitial}`.toUpperCase()
-}
-
-function formatBonusPoints(points: number): string {
-  const suffix = points > 1 ? 'pts' : 'pt'
-  return `${points} ${suffix}`
-}
 
 async function reload(pageToLoad = page.value || 1) {
   await fetchStudents({
@@ -96,7 +86,7 @@ await reload()
         class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-secondary/40 sm:flex-nowrap sm:items-center"
       >
         <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-medium shrink-0">
-          {{ initials(student) }}
+          {{ getInitials(student.first_name, student.last_name) }}
         </div>
 
         <div class="min-w-0 flex-1">
@@ -121,7 +111,7 @@ await reload()
         <div class="ml-auto flex items-center gap-5 text-sm">
           <div class="flex items-center gap-1.5 text-amber-400">
             <Star class="w-3.5 h-3.5" />
-            <span class="font-medium">{{ formatBonusPoints(student.available_bonus_points) }}</span>
+            <span class="font-medium">{{ formatPoints(student.available_bonus_points) }}</span>
           </div>
 
           <div class="flex items-center gap-1.5 text-red-400">

@@ -3,6 +3,7 @@ import { AlertCircle, Plus, Star } from 'lucide-vue-next'
 import type { Classroom } from '~/types/api'
 
 const { t } = useI18n()
+const { getInitials, formatPoints } = useFormat()
 const {
   classrooms,
   loading,
@@ -16,17 +17,6 @@ const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
-
-function initials(student: Classroom['students_preview'][number]): string {
-  const firstInitial = student.first_name?.charAt(0) ?? ''
-  const lastInitial = student.last_name?.charAt(0) ?? ''
-  return `${firstInitial}${lastInitial}`.toUpperCase()
-}
-
-function formatBonusPoints(points: number): string {
-  const suffix = points > 1 ? 'pts' : 'pt'
-  return `${points} ${suffix}`
-}
 
 function extraStudentsCount(classroom: Classroom): number {
   return Math.max(0, classroom.student_count - previewStudents(classroom).length)
@@ -103,7 +93,7 @@ await reload()
               :key="student.id"
               class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-secondary text-[10px] font-medium"
             >
-              {{ initials(student) }}
+              {{ getInitials(student.first_name, student.last_name) }}
             </div>
 
             <div
@@ -118,7 +108,7 @@ await reload()
         <div class="mt-auto flex items-center gap-3 text-xs text-muted-foreground">
           <span class="inline-flex items-center gap-1">
             <Star class="h-3 w-3 text-amber-400" />
-            {{ formatBonusPoints(classroom.total_bonus_points) }}
+            {{ formatPoints(classroom.total_bonus_points) }}
           </span>
           <span class="inline-flex items-center gap-1">
             <AlertCircle class="h-3 w-3" />
@@ -127,6 +117,7 @@ await reload()
         </div>
       </NuxtLink>
     </div>
+
 
     <CustomPagination
       v-show="showPagination"

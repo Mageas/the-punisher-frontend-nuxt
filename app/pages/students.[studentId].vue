@@ -2,7 +2,6 @@
 import {
   AlertCircle,
   AlertTriangle,
-  ChevronLeft,
   Gavel,
   Pencil,
   Star,
@@ -18,6 +17,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const { getInitials } = useFormat()
 const route = useRoute()
 const { $api } = useNuxtApp()
 
@@ -81,12 +81,7 @@ const showBonusCreateModal = ref(false)
 const showPenaltyCreateModal = ref(false)
 const showPunishmentCreateModal = ref(false)
 
-const initials = computed(() => {
-  if (!student.value) return ''
-  const firstInitial = student.value.first_name?.charAt(0) ?? ''
-  const lastInitial = student.value.last_name?.charAt(0) ?? ''
-  return `${firstInitial}${lastInitial}`.toUpperCase()
-})
+const initials = computed(() => getInitials(student.value?.first_name, student.value?.last_name))
 
 async function fetchStudentProfile() {
   loadingProfile.value = true
@@ -149,12 +144,12 @@ watch(studentId, (nextStudentId, previousStudentId) => {
 
 <template>
   <div>
-    <div class="mb-6">
-      <NuxtLink to="/students" class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ChevronLeft class="w-4 h-4" />
-        {{ t('studentProfile.backToStudents') }}
-      </NuxtLink>
-    </div>
+    <AppBreadcrumb
+      :items="[
+        { label: t('students.title'), to: '/students' },
+        { label: student ? `${student.first_name} ${student.last_name}` : '...' }
+      ]"
+    />
 
     <template v-if="student && kpis">
       <div class="mb-8">

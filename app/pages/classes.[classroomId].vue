@@ -138,7 +138,12 @@ watch(classroomId, (nextClassroomId, previousClassroomId) => {
 
 <template>
   <div>
-    <ClassroomProfileBreadcrumb :classroom-name="classroom?.name ?? null" />
+    <AppBreadcrumb
+      :items="[
+        { label: t('classes.title'), to: '/classes' },
+        { label: classroom?.name ?? '...' }
+      ]"
+    />
 
     <template v-if="classroom">
       <ClassroomProfileHeader
