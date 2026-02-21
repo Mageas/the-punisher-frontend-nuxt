@@ -3,8 +3,16 @@ import { Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
 
 const { t } = useI18n()
-const { penalties, loading, page, itemPerPage, totalCount, fetchPenalties, deletePenalty } =
-  usePenalties()
+const {
+  penalties,
+  loading,
+  page,
+  itemPerPage,
+  totalCount,
+  fetchPenalties,
+  gotoPage,
+  deletePenalty,
+} = usePenalties()
 
 // Search
 const searchQuery = ref('')
@@ -29,7 +37,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 function openDeleteModal(id: string) {

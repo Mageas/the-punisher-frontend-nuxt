@@ -34,6 +34,7 @@ const {
   totalCount: punishmentsTotal,
   itemPerPage: punishmentsPerPage,
   fetchPunishments,
+  gotoPage: gotoPunishmentsPage,
   resolvePunishment: resolvePunishmentApi,
 } = useStudentPunishments(studentId)
 
@@ -44,6 +45,7 @@ const {
   totalCount: bonusesTotal,
   itemPerPage: bonusesPerPage,
   fetchBonuses,
+  gotoPage: gotoBonusesPage,
   useBonus: useBonusApi,
 } = useStudentBonuses(studentId)
 
@@ -54,6 +56,7 @@ const {
   totalCount: penaltiesTotal,
   itemPerPage: penaltiesPerPage,
   fetchPenalties,
+  gotoPage: gotoPenaltiesPage,
 } = useStudentPenalties(studentId)
 
 const {
@@ -63,6 +66,7 @@ const {
   totalCount: historyTotal,
   itemPerPage: historyPerPage,
   fetchHistory,
+  gotoPage: gotoHistoryPage,
 } = useStudentHistory(studentId)
 
 const showEditModal = ref(false)
@@ -257,7 +261,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           :total="punishmentsTotal"
           :items-per-page="punishmentsPerPage"
           :loading="loadingPunishments"
-          @update:page="fetchPunishments({ state: 'pending', page: $event })"
+          @update:page="gotoPunishmentsPage($event)"
         />
       </div>
 
@@ -273,7 +277,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           :total="bonusesTotal"
           :items-per-page="bonusesPerPage"
           :loading="loadingBonuses"
-          @update:page="fetchBonuses({ state: 'unused', page: $event })"
+          @update:page="gotoBonusesPage($event)"
         />
       </div>
 
@@ -285,7 +289,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           :total="penaltiesTotal"
           :items-per-page="penaltiesPerPage"
           :loading="loadingPenalties"
-          @update:page="fetchPenalties({ page: $event })"
+          @update:page="gotoPenaltiesPage($event)"
         />
       </div>
 
@@ -297,7 +301,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           :total="historyTotal"
           :items-per-page="historyPerPage"
           :loading="loadingHistory"
-          @update:page="fetchHistory({ page: $event })"
+          @update:page="gotoHistoryPage($event)"
         />
       </div>
     </template>

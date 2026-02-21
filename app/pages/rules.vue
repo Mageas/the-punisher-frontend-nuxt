@@ -3,8 +3,17 @@ import { Plus } from 'lucide-vue-next'
 import type { Rule, RulePayload } from '~/types/api'
 
 const { t } = useI18n()
-const { rules, loading, page, itemPerPage, totalCount, fetchRules, updateRule, deleteRule } =
-  useRules()
+const {
+  rules,
+  loading,
+  page,
+  itemPerPage,
+  totalCount,
+  fetchRules,
+  gotoPage,
+  updateRule,
+  deleteRule,
+} = useRules()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -37,7 +46,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 async function onToggleActive(rule: Rule, nextIsActive: boolean) {

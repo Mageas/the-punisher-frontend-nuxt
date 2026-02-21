@@ -4,7 +4,7 @@ import type { Classroom } from '~/types/api'
 import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms } = useClassrooms()
+const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms, gotoPage } = useClassrooms()
 
 const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
@@ -25,7 +25,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 async function onCreated() {

@@ -10,7 +10,7 @@ export function useClassrooms() {
     {
       page?: number
     }
-  >((options) => classroomService.getClassrooms(options))
+  >((options) => classroomService.getClassrooms(options), { queryKey: 'page' })
 
   async function fetchClassrooms(options?: { page?: number }) {
     await paginated.fetchPage(options)
@@ -37,6 +37,7 @@ export function useClassrooms() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchClassrooms,
+    gotoPage: paginated.gotoPage,
     createClassroom,
     updateClassroom,
     deleteClassroom,

@@ -11,8 +11,26 @@ import { authService } from '~/services/auth.service'
  */
 export function useAuth() {
   const accessToken = useState<string | null>('auth.access-token', () => null)
+  const accessTokenCookie = useCookie<string | null>('access_token', {
+    path: '/',
+    sameSite: 'lax',
+  })
+
+  if (!accessToken.value && accessTokenCookie.value) {
+    accessToken.value = accessTokenCookie.value
+  }
 
   const isAuthenticated = computed(() => !!accessToken.value)
+
+  function setAccessToken(token: string) {
+    accessToken.value = token
+    accessTokenCookie.value = token
+  }
+
+  function clearAccessToken() {
+    accessToken.value = null
+    accessTokenCookie.value = null
+  }
 
   /**
    * Log in with email/password.
@@ -21,7 +39,7 @@ export function useAuth() {
    */
   async function login(email: string, password: string) {
     const data = await authService.login(email, password)
-    accessToken.value = data.access_token
+    setAccessToken(data.access_token)
   }
 
   /**
@@ -41,7 +59,7 @@ export function useAuth() {
       // Best effort: local logout still proceeds even if server revocation fails.
     }
 
-    accessToken.value = null
+    clearAccessToken()
     await navigateTo('/login')
   }
 
@@ -51,10 +69,10 @@ export function useAuth() {
   async function refresh(): Promise<boolean> {
     try {
       const data = await authService.refresh()
-      accessToken.value = data.access_token
+      setAccessToken(data.access_token)
       return true
     } catch {
-      accessToken.value = null
+      clearAccessToken()
       return false
     }
   }

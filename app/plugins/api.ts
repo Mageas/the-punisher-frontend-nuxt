@@ -10,14 +10,36 @@ import type { AuthResponse } from '~/types/api'
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const accessToken = useState<string | null>('auth.access-token', () => null)
+  const accessTokenCookie = useCookie<string | null>('access_token', {
+    path: '/',
+    sameSite: 'lax',
+  })
+
+  if (!accessToken.value && accessTokenCookie.value) {
+    accessToken.value = accessTokenCookie.value
+  }
 
   let refreshPromise: Promise<boolean> | null = null
+
+  function setAccessToken(token: string) {
+    accessToken.value = token
+    accessTokenCookie.value = token
+  }
+
+  function clearAccessToken() {
+    accessToken.value = null
+    accessTokenCookie.value = null
+  }
 
   /**
    * Attempt to refresh the access_token using the HttpOnly refresh_token cookie.
    * Deduplicates concurrent refresh calls.
    */
   async function refreshToken(): Promise<boolean> {
+    if (import.meta.server) {
+      return false
+    }
+
     if (refreshPromise) return refreshPromise
 
     refreshPromise = (async () => {
@@ -28,10 +50,10 @@ export default defineNuxtPlugin((nuxtApp) => {
           credentials: 'include',
         })
 
-        accessToken.value = data.access_token
+        setAccessToken(data.access_token)
         return true
       } catch {
-        accessToken.value = null
+        clearAccessToken()
         return false
       } finally {
         refreshPromise = null
@@ -74,6 +96,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     onRequest({ options }) {
       if (accessToken.value) {
+        if (accessTokenCookie.value !== accessToken.value) {
+          accessTokenCookie.value = accessToken.value
+        }
+
         options.headers = options.headers || {}
 
         if (Array.isArray(options.headers)) {
@@ -93,13 +119,18 @@ export default defineNuxtPlugin((nuxtApp) => {
       return await baseApi(request, options)
     } catch (error) {
       if (isUnauthorizedError(error) && !isRequestToAuthRoute(request)) {
+        if (import.meta.server) {
+          clearAccessToken()
+          throw error
+        }
+
         const refreshed = await refreshToken()
 
         if (refreshed) {
           return baseApi(request, options)
         }
 
-        accessToken.value = null
+        clearAccessToken()
         await nuxtApp.runWithContext(() => navigateTo('/login'))
       }
 

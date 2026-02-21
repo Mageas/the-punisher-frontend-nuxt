@@ -4,7 +4,7 @@ import { refDebounced } from '@vueuse/core'
 import { getInitials, formatPoints } from '~/lib/utils'
 
 const { t } = useI18n()
-const { students, loading, page, itemPerPage, totalCount, fetchStudents } = useStudents()
+const { students, loading, page, itemPerPage, totalCount, fetchStudents, gotoPage } = useStudents()
 
 const searchQuery = ref('')
 const searchDebounced = refDebounced(searchQuery, 300)
@@ -23,7 +23,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 async function onCreated() {

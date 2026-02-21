@@ -14,7 +14,9 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
       page?: number
       search?: string
     }
-  >((options) => studentService.getStudentPenalties(toValue(studentId), options))
+  >((options) => studentService.getStudentPenalties(toValue(studentId), options), {
+    queryKey: 'penalties_page',
+  })
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
@@ -33,6 +35,7 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPenalties,
+    gotoPage: paginated.gotoPage,
     deletePenalty,
   }
 }

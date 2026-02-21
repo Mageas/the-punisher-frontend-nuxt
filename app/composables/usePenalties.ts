@@ -11,7 +11,7 @@ export function usePenalties() {
       page?: number
       search?: string
     }
-  >((options) => penaltyService.getPenalties(options))
+  >((options) => penaltyService.getPenalties(options), { queryKey: 'page' })
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
@@ -30,6 +30,7 @@ export function usePenalties() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPenalties,
+    gotoPage: paginated.gotoPage,
     deletePenalty,
   }
 }

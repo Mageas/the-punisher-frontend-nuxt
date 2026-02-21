@@ -10,7 +10,7 @@ export function useRules() {
     {
       page?: number
     }
-  >((options) => ruleService.getRules(options))
+  >((options) => ruleService.getRules(options), { queryKey: 'page' })
 
   async function fetchRules(options?: { page?: number }) {
     await paginated.fetchPage(options)
@@ -37,6 +37,7 @@ export function useRules() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchRules,
+    gotoPage: paginated.gotoPage,
     createRule,
     updateRule,
     deleteRule,

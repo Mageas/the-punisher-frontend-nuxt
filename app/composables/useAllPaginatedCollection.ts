@@ -11,6 +11,7 @@ type Fetcher<TItem, TArgs extends unknown[]> = (
 export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
   fetcher: Fetcher<TItem, TArgs>,
 ) {
+  const nuxtApp = useNuxtApp()
   const items = ref<TItem[]>([])
   const loading = ref(false)
 
@@ -24,7 +25,7 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
       const MAX_PAGES = 10
 
       while (hasMore && page <= MAX_PAGES) {
-        const res = await fetcher({ page }, ...args)
+        const res = await nuxtApp.runWithContext(() => fetcher({ page }, ...args))
 
         all.push(...res.data)
         hasMore = res.next_page !== null

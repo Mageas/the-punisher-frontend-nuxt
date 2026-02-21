@@ -10,6 +10,7 @@ const {
   itemPerPage,
   totalCount,
   fetchPunishments,
+  gotoPage,
   resolvePunishment,
   deletePunishment,
 } = usePunishments()
@@ -39,7 +40,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 // Resolve a punishment inline

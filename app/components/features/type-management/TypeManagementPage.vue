@@ -33,6 +33,7 @@ const {
   itemPerPage,
   totalCount,
   fetchTypes,
+  gotoPage,
   createType,
   updateType,
   deleteType,
@@ -59,7 +60,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 function openEditModal(item: ManagedType) {

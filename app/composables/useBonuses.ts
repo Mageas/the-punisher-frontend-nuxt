@@ -12,7 +12,7 @@ export function useBonuses() {
       state?: 'used' | 'unused'
       search?: string
     }
-  >((options) => bonusService.getBonuses(options))
+  >((options) => bonusService.getBonuses(options), { queryKey: 'page' })
 
   async function fetchBonuses(options?: {
     page?: number
@@ -39,6 +39,7 @@ export function useBonuses() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchBonuses,
+    gotoPage: paginated.gotoPage,
     useBonus,
     deleteBonus,
   }

@@ -15,7 +15,9 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >((options) => studentService.getStudentPunishments(toValue(studentId), options))
+  >((options) => studentService.getStudentPunishments(toValue(studentId), options), {
+    queryKey: 'punishments_page',
+  })
 
   async function fetchPunishments(options?: {
     page?: number
@@ -42,6 +44,7 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchPunishments,
+    gotoPage: paginated.gotoPage,
     resolvePunishment,
     deletePunishment,
   }

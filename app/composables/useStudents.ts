@@ -11,7 +11,7 @@ export function useStudents() {
       page?: number
       search?: string
     }
-  >((options) => studentService.getStudents(options))
+  >((options) => studentService.getStudents(options), { queryKey: 'page' })
 
   async function fetchStudents(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
@@ -41,6 +41,7 @@ export function useStudents() {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchStudents,
+    gotoPage: paginated.gotoPage,
     createStudent,
     updateStudent,
     deleteStudent,

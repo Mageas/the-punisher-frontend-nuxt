@@ -3,8 +3,17 @@ import { Gift, Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
 
 const { t } = useI18n()
-const { bonuses, loading, page, itemPerPage, totalCount, fetchBonuses, useBonus, deleteBonus } =
-  useBonuses()
+const {
+  bonuses,
+  loading,
+  page,
+  itemPerPage,
+  totalCount,
+  fetchBonuses,
+  gotoPage,
+  useBonus,
+  deleteBonus,
+} = useBonuses()
 
 // Search
 const searchQuery = ref('')
@@ -31,7 +40,7 @@ async function reload(pageToLoad = page.value || 1) {
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await reload(nextPage)
+  await gotoPage(nextPage)
 }
 
 async function handleUse(id: string) {

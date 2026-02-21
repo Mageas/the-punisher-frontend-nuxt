@@ -15,7 +15,9 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
       state?: 'used' | 'unused'
       search?: string
     }
-  >((options) => studentService.getStudentBonuses(toValue(studentId), options))
+  >((options) => studentService.getStudentBonuses(toValue(studentId), options), {
+    queryKey: 'bonuses_page',
+  })
 
   async function fetchBonuses(options?: {
     page?: number
@@ -42,6 +44,7 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
     nextPage: paginated.nextPage,
     previousPage: paginated.previousPage,
     fetchBonuses,
+    gotoPage: paginated.gotoPage,
     useBonus,
     deleteBonus,
   }
