@@ -1,5 +1,4 @@
 import type { Rule, RulePayload } from '~/types/api'
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage rules with pagination.

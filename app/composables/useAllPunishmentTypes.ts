@@ -1,5 +1,4 @@
 import type { PunishmentType } from '~/types/api'
-import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL punishment types across all pages.

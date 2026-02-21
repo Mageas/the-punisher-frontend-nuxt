@@ -1,3 +1,5 @@
+import type { AuthResponse, LoginRequest, RegisterRequest } from '~/types/api'
+
 /**
  * Composable for managing authentication state.
  *
@@ -19,11 +21,11 @@ export function useAuth() {
    * HttpOnly refresh_token cookie set by the backend.
    */
   async function login(email: string, password: string) {
-    const data = await $fetch<{ access_token: string }>('/auth/login', {
+    const data = await $fetch<AuthResponse>('/auth/login', {
       baseURL: config.public.apiBaseUrl,
       method: 'POST',
       credentials: 'include',
-      body: { email, password },
+      body: { email, password } as LoginRequest,
     })
 
     accessToken.value = data.access_token
@@ -32,7 +34,7 @@ export function useAuth() {
   /**
    * Register a new teacher account.
    */
-  async function register(body: { email: string, password: string, first_name: string, last_name: string }) {
+  async function register(body: RegisterRequest) {
     await $fetch('/auth/register', {
       baseURL: config.public.apiBaseUrl,
       method: 'POST',

@@ -1,5 +1,4 @@
 import type { Student } from '~/types/api'
-import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL students across all pages.

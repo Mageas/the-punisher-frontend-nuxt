@@ -1,4 +1,3 @@
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 interface NamedTypeResource {
   id: string

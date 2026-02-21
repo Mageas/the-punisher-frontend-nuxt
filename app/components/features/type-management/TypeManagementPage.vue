@@ -2,7 +2,6 @@
 import type { Component } from 'vue'
 import { Plus } from 'lucide-vue-next'
 import type { BonusType, PenaltyType, PunishmentType } from '~/types/api'
-import { useTypeCollection } from '~/composables/useTypeCollection'
 
 type ManagedType = BonusType | PenaltyType | PunishmentType
 

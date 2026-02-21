@@ -1,3 +1,5 @@
+import type { AuthResponse } from '~/types/api'
+
 /**
  * Nuxt plugin that provides a global `$api` fetch instance.
  *
@@ -20,7 +22,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     refreshPromise = (async () => {
       try {
-        const data = await $fetch<{ access_token: string }>('/auth/refresh', {
+        const data = await $fetch<AuthResponse>('/auth/refresh', {
           baseURL: config.public.apiBaseUrl,
           method: 'POST',
           credentials: 'include',

@@ -1,5 +1,4 @@
 import type { Student } from '~/types/api'
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage students with pagination.

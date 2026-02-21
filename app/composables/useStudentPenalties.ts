@@ -1,7 +1,6 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { Penalty } from '~/types/api'
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage a student's penalties with pagination.

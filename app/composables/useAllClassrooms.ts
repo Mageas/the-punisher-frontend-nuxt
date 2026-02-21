@@ -1,5 +1,4 @@
 import type { Classroom } from '~/types/api'
-import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL classrooms across all pages.

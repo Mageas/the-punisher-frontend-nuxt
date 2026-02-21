@@ -1,5 +1,4 @@
 import type { Penalty } from '~/types/api'
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage penalties with pagination.

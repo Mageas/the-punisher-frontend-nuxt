@@ -1,5 +1,4 @@
 import type { Bonus } from '~/types/api'
-import { usePaginatedCollection } from '~/composables/usePaginatedCollection'
 
 /**
  * Composable to fetch and manage bonuses with pagination.

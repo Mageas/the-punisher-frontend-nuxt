@@ -1,5 +1,4 @@
 import type { BonusType } from '~/types/api'
-import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL bonus types across all pages.

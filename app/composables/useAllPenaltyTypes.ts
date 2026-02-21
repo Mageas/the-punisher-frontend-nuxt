@@ -1,5 +1,4 @@
 import type { PenaltyType } from '~/types/api'
-import { useAllPaginatedCollection } from '~/composables/useAllPaginatedCollection'
 
 /**
  * Composable to fetch ALL penalty types across all pages.
