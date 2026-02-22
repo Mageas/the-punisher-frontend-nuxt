@@ -7,8 +7,17 @@ import type { AuthResponse } from '~/types/api'
  * - On 401 responses, attempts a silent token refresh then retries the request once.
  * - If refresh fails, clears auth state and redirects to /login.
  */
+let hasLoggedStartup = false
+
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
+  const apiBaseUrl = import.meta.server ? config.apiBaseUrlServer : config.public.apiBaseUrl
+
+  if (import.meta.server && !hasLoggedStartup) {
+    console.log(`[SSR Startup] API base URL: ${apiBaseUrl}`)
+    hasLoggedStartup = true
+  }
+
   const accessToken = useState<string | null>('auth.access-token', () => null)
   const accessTokenCookie = useCookie<string | null>('access_token', {
     path: '/',
@@ -45,7 +54,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     refreshPromise = (async () => {
       try {
         const data = await $fetch<AuthResponse>('/auth/refresh', {
-          baseURL: config.public.apiBaseUrl,
+          baseURL: apiBaseUrl,
           method: 'POST',
           credentials: 'include',
         })
@@ -91,7 +100,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   const baseApi = $fetch.create({
-    baseURL: config.public.apiBaseUrl,
+    baseURL: apiBaseUrl,
     credentials: 'include',
 
     onRequest({ options }) {

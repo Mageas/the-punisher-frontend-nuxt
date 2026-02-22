@@ -3,6 +3,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
   runtimeConfig: {
+    apiBaseUrlServer:
+      process.env.NUXT_API_BASE_URL_SERVER ||
+      process.env.NUXT_PUBLIC_API_BASE_URL ||
+      'http://localhost:8080/v1',
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/v1',
     },
