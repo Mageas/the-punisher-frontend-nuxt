@@ -28,6 +28,7 @@ vi.mock('#app/composables/router', () => ({
 const mockAuthService = {
   login: vi.fn(),
   register: vi.fn(),
+  getRegisterStatus: vi.fn(),
   logout: vi.fn(),
   refresh: vi.fn(),
 }
@@ -98,5 +99,15 @@ describe('useAuth', () => {
     expect(result).toBe(false)
     expect(accessToken.value).toBe(null)
     expect(isAuthenticated.value).toBe(false)
+  })
+
+  it('reads registration availability status', async () => {
+    mockAuthService.getRegisterStatus.mockResolvedValue({ register_allowed: false })
+    const { isRegisterAllowed } = useAuth()
+
+    const result = await isRegisterAllowed()
+
+    expect(mockAuthService.getRegisterStatus).toHaveBeenCalled()
+    expect(result).toBe(false)
   })
 })

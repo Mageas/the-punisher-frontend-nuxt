@@ -1,4 +1,4 @@
-import type { AuthResponse, LoginRequest, RegisterRequest } from '~/types/api'
+import type { AuthResponse, LoginRequest, RegisterRequest, RegisterStatusResponse } from '~/types/api'
 
 export function useAuthService() {
   const { $api } = useNuxtApp()
@@ -24,6 +24,15 @@ export function useAuthService() {
   }
 
   /**
+   * Read registration availability flag.
+   */
+  async function getRegisterStatus() {
+    return $api<RegisterStatusResponse>('/auth/register/status', {
+      method: 'GET',
+    })
+  }
+
+  /**
    * Revoke the refresh_token on the server.
    */
   async function logout() {
@@ -44,6 +53,7 @@ export function useAuthService() {
   return {
     login,
     register,
+    getRegisterStatus,
     logout,
     refresh,
   }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Skull } from 'lucide-vue-next'
+import { LockKeyhole, Skull } from 'lucide-vue-next'
 
 definePageMeta({
   layout: false,
@@ -7,11 +7,20 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { register, isAuthenticated } = useAuth()
+const { register, isAuthenticated, isRegisterAllowed } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
 if (isAuthenticated.value) {
   await navigateTo('/')
+}
+
+const registerAllowed = ref(true)
+
+try {
+  registerAllowed.value = await isRegisterAllowed()
+} catch {
+  // Keep form available if status endpoint is temporarily unreachable.
+  registerAllowed.value = true
 }
 
 const form = reactive({
@@ -25,6 +34,10 @@ const isLoading = ref(false)
 const passwordMismatch = ref(false)
 
 async function onSubmit() {
+  if (!registerAllowed.value) {
+    return
+  }
+
   clearErrors()
   passwordMismatch.value = false
 
@@ -50,6 +63,10 @@ async function onSubmit() {
     isLoading.value = false
   }
 }
+
+const registerSubtitle = computed(() =>
+  registerAllowed.value ? t('auth.registerSubtitle') : t('auth.registerClosedSubtitle'),
+)
 </script>
 
 <template>
@@ -64,12 +81,12 @@ async function onSubmit() {
           {{ t('app.title') }}
         </h1>
         <p class="text-sm text-muted-foreground mt-1">
-          {{ t('auth.registerSubtitle') }}
+          {{ registerSubtitle }}
         </p>
       </div>
 
       <!-- Card -->
-      <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+      <div v-if="registerAllowed" class="rounded-lg border border-border bg-card p-6 shadow-sm">
         <!-- Global error -->
         <Alert v-if="globalError" variant="destructive" class="mb-4">
           <AlertDescription>{{ globalError }}</AlertDescription>
@@ -159,6 +176,21 @@ async function onSubmit() {
             {{ t('auth.registerSubmit') }}
           </Button>
         </form>
+      </div>
+      <div v-else class="rounded-lg border border-border bg-card p-6 shadow-sm">
+        <div class="flex flex-col items-center text-center space-y-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-destructive/10">
+            <LockKeyhole class="w-6 h-6 text-destructive" />
+          </div>
+          <div class="space-y-1">
+            <p class="text-sm font-medium">
+              {{ t('auth.registerClosed') }}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              {{ t('auth.registerClosedHelp') }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Link -->

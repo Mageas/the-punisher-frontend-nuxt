@@ -337,6 +337,7 @@
     "loginSubmit": "Se connecter",
     "register": "Inscription",
     "registerSubtitle": "Créez votre compte professeur",
+    "registerClosedSubtitle": "Inscriptions temporairement fermées",
     "registerSubmit": "Créer mon compte",
     "noAccount": "Pas encore de compte ?",
     "createAccount": "Créer un compte",
@@ -351,7 +352,9 @@
     "password": "Mot de passe",
     "passwordPlaceholder": "••••••••",
     "passwordConfirm": "Confirmer le mot de passe",
-    "passwordMismatch": "Les mots de passe ne correspondent pas."
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "registerClosed": "Les inscriptions sont fermées.",
+    "registerClosedHelp": "La création de compte est désactivée pour le moment."
   },
   "apiErrors": {
     "messages": {

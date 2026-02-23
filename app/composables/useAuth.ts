@@ -50,6 +50,14 @@ export function useAuth() {
   }
 
   /**
+   * Return whether public registrations are currently allowed.
+   */
+  async function isRegisterAllowed() {
+    const data = await authService.getRegisterStatus()
+    return data.register_allowed
+  }
+
+  /**
    * Revoke the refresh_token on the server, clear local auth state and redirect to login.
    */
   async function logout() {
@@ -82,6 +90,7 @@ export function useAuth() {
     isAuthenticated,
     login,
     register,
+    isRegisterAllowed,
     logout,
     refresh,
   }
