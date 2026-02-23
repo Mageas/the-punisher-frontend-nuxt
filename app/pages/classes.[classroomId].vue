@@ -22,6 +22,7 @@ const classroomId = computed<string>(() => {
   const routeClassroomId = route.params.classroomId
   return (Array.isArray(routeClassroomId) ? routeClassroomId[0] : routeClassroomId) as string
 })
+const { kpis: classroomKpis, fetchKpis: fetchClassroomKpis } = useClassroomKpis(classroomId)
 
 const classroom = ref<Classroom | null>(null)
 const loading = ref(false)
@@ -64,6 +65,7 @@ async function fetchClassroomProfile() {
   try {
     const [classroomRes] = await Promise.all([
       classroomService.getClassroomById(classroomId.value),
+      fetchClassroomKpis(),
       fetchClassroomStudents(classroomId.value),
       fetchAllStudents(),
     ])
@@ -129,14 +131,14 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
       ]"
     />
 
-    <template v-if="classroom">
+    <template v-if="classroom && classroomKpis">
       <ClassroomProfileHeader
         :classroom="classroom"
         @edit="showEditModal = true"
         @delete="showDeleteModal = true"
       />
 
-      <ClassroomProfileKpiCards :classroom="classroom" />
+      <ClassroomProfileKpiCards :kpis="classroomKpis" />
 
       <ClassroomProfileStudentsSection
         v-model="addStudentId"

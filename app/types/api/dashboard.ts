@@ -4,8 +4,11 @@
 export interface DashboardKpis {
   student_count: number
   available_bonus_points: number
+  total_bonus_points: number
   unused_bonus_count: number
   penalty_count: number
+  total_punishment_count: number
+  overdue_punishment_count: number
   pending_punishment_count: number
 }
 

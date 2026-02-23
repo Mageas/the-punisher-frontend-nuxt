@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DashboardResponse } from '~/types/api'
+import type { Classroom, DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
 
 const { t } = useI18n()
@@ -10,7 +10,8 @@ const dashboardService = useDashboardService()
 const punishmentService = usePunishmentService()
 
 // Classroom filter
-const { classrooms, fetchClassrooms } = useAllClassrooms()
+const { classrooms: allClassrooms, fetchClassrooms } = useAllClassrooms()
+const classrooms = ref<Classroom[]>([])
 const selectedClassroomId = ref<string>('')
 
 // Dashboard data
@@ -22,7 +23,13 @@ const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
 
-// Fetch dashboard data
+function snapshotClassrooms(list: readonly Classroom[]): Classroom[] {
+  return list.map((classroom) => ({
+    ...classroom,
+    students_preview: classroom.students_preview.map((student) => ({ ...student })),
+  }))
+}
+
 async function fetchDashboard() {
   loading.value = true
 
@@ -49,20 +56,33 @@ watch(selectedClassroomId, async () => {
   await fetchDashboard()
 })
 
-async function loadInitialData() {
-  await Promise.all([fetchClassrooms(), fetchDashboard()])
-}
-
-await useAsyncData(
+const { data: initialData } = await useAsyncData(
   () => `dashboard:initial:${route.fullPath}`,
   async () => {
-    await loadInitialData()
-    return true
+    await fetchClassrooms()
+
+    const [dashboardData, classroomsData] = await Promise.all([
+      dashboardService.getDashboard({
+        classroomId: selectedClassroomId.value || undefined,
+      }),
+      Promise.resolve(snapshotClassrooms(allClassrooms.value)),
+    ])
+
+    return {
+      classrooms: classroomsData,
+      dashboard: dashboardData,
+    }
   },
   {
     server: true,
   },
 )
+
+if (initialData.value) {
+  classrooms.value = initialData.value.classrooms
+  dashboard.value = initialData.value.dashboard
+  loading.value = false
+}
 </script>
 
 <template>
