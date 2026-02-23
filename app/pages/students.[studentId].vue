@@ -71,6 +71,10 @@ const showPunishmentCreateModal = ref(false)
 
 const initials = computed(() => getInitials(student.value?.first_name, student.value?.last_name))
 
+function formatRatio(current: number, total: number): string {
+  return `${current} / ${total}`
+}
+
 async function fetchStudentProfile() {
   loadingProfile.value = true
   try {
@@ -203,42 +207,52 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       </div>
 
       <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-lg border border-border p-6">
+        <div class="rounded-lg border border-border p-4 sm:p-6">
           <div class="mb-2 flex items-center justify-between">
-            <p class="text-sm font-medium text-muted-foreground">
+            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
               {{ t('studentProfile.kpis.availableBonusPoints') }}
             </p>
             <Star class="w-4 h-4 text-amber-400" />
           </div>
-          <p class="text-3xl font-bold text-amber-400">
-            {{ kpis.available_bonus_points }}
+          <p
+            class="text-xl sm:text-3xl font-bold text-amber-400 tabular-nums whitespace-nowrap leading-none"
+          >
+            {{ formatRatio(kpis.available_bonus_points, kpis.total_bonus_points) }}
           </p>
-          <p class="mt-1 text-xs text-muted-foreground">
+          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
             {{ t('studentProfile.kpis.activeBonusCount', kpis.active_bonus_count) }}
           </p>
         </div>
 
-        <div class="rounded-lg border border-border p-6">
+        <div class="rounded-lg border border-border p-4 sm:p-6">
           <div class="mb-2 flex items-center justify-between">
-            <p class="text-sm font-medium text-muted-foreground">
+            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
               {{ t('studentProfile.kpis.totalPenaltyCount') }}
             </p>
             <AlertCircle class="w-4 h-4 text-muted-foreground" />
           </div>
-          <p class="text-3xl font-bold">
-            {{ kpis.total_penalty_count }}
+          <p class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none">
+            {{ formatRatio(kpis.penalty_count, kpis.total_penalty_count) }}
+          </p>
+          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+            {{ t('common.currentPeriod') }}
           </p>
         </div>
 
-        <div class="rounded-lg border border-border p-6">
+        <div class="rounded-lg border border-border p-4 sm:p-6">
           <div class="mb-2 flex items-center justify-between">
-            <p class="text-sm font-medium text-muted-foreground">
+            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
               {{ t('studentProfile.kpis.pendingPunishmentCount') }}
             </p>
             <Gavel class="w-4 h-4 text-red-400" />
           </div>
-          <p class="text-3xl font-bold text-red-400">
-            {{ kpis.pending_punishment_count }}
+          <p
+            class="text-xl sm:text-3xl font-bold text-red-400 tabular-nums whitespace-nowrap leading-none"
+          >
+            {{ formatRatio(kpis.pending_punishment_count, kpis.total_punishment_count) }}
+          </p>
+          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
+            {{ t('common.overduePunishments', kpis.overdue_punishment_count) }}
           </p>
         </div>
       </div>

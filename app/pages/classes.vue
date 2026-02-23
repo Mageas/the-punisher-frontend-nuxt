@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { AlertCircle, Plus, Star } from 'lucide-vue-next'
-import type { Classroom } from '~/types/api'
-import { getInitials, formatPoints } from '~/lib/utils'
+import type { Classroom, DashboardKpis } from '~/types/api'
+import { getInitials } from '~/lib/utils'
 
 const { t } = useI18n()
+const classroomService = useClassroomService()
 const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms, gotoPage } =
   useClassrooms()
 
 const showCreateModal = ref(false)
+const loadingClassroomKpis = ref(false)
+const classroomKpisById = ref<Record<string, DashboardKpis>>({})
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
@@ -20,13 +23,50 @@ function previewStudents(classroom: Classroom): Classroom['students_preview'] {
   return classroom.students_preview.slice(0, 3)
 }
 
+function formatRatio(current: number, total: number): string {
+  return `${current} / ${total}`
+}
+
+async function fetchVisibleClassroomKpis() {
+  const classroomIds = classrooms.value.map((classroom) => classroom.id)
+
+  if (classroomIds.length === 0) {
+    classroomKpisById.value = {}
+    return
+  }
+
+  loadingClassroomKpis.value = true
+  try {
+    const results = await Promise.allSettled(
+      classroomIds.map(async (classroomId) => ({
+        classroomId,
+        kpis: await classroomService.getClassroomKpis(classroomId),
+      })),
+    )
+
+    const nextKpisById: Record<string, DashboardKpis> = {}
+
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        nextKpisById[result.value.classroomId] = result.value.kpis
+      }
+    })
+
+    classroomKpisById.value = nextKpisById
+  } finally {
+    loadingClassroomKpis.value = false
+  }
+}
+
 async function reload(pageToLoad = page.value || 1) {
   await fetchClassrooms({ page: pageToLoad })
+  await fetchVisibleClassroomKpis()
 }
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
+  await fetchVisibleClassroomKpis()
 }
 
 async function onCreated() {
@@ -103,14 +143,27 @@ await reload()
         </div>
 
         <div class="mt-auto flex items-center gap-3 text-xs text-muted-foreground">
-          <span class="inline-flex items-center gap-1">
-            <Star class="h-3 w-3 text-amber-400" />
-            {{ formatPoints(classroom.total_bonus_points) }}
-          </span>
-          <span class="inline-flex items-center gap-1">
-            <AlertCircle class="h-3 w-3" />
-            {{ t('classes.penaltyCount', classroom.total_penalty_count) }}
-          </span>
+          <template v-if="classroomKpisById[classroom.id]">
+            <span
+              class="inline-flex items-center gap-1 tabular-nums whitespace-nowrap text-[11px] sm:text-xs"
+            >
+              <Star class="h-3 w-3 text-amber-400" />
+              {{
+                formatRatio(
+                  classroomKpisById[classroom.id]?.available_bonus_points ?? 0,
+                  classroomKpisById[classroom.id]?.total_bonus_points ?? 0,
+                )
+              }}
+            </span>
+            <span
+              class="inline-flex items-center gap-1 tabular-nums whitespace-nowrap text-[11px] sm:text-xs"
+            >
+              <AlertCircle class="h-3 w-3" />
+              {{ t('classes.penaltyCount', classroomKpisById[classroom.id]?.penalty_count ?? 0) }}
+            </span>
+          </template>
+          <span v-else-if="loadingClassroomKpis">{{ t('common.loading') }}</span>
+          <span v-else>--</span>
         </div>
       </NuxtLink>
     </div>

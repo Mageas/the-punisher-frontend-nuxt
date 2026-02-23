@@ -8,6 +8,10 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
+function formatRatio(current: number, total: number): string {
+  return `${current} / ${total}`
+}
+
 const cards = computed(() => [
   {
     label: t('dashboard.kpiStudents'),
@@ -19,7 +23,7 @@ const cards = computed(() => [
   },
   {
     label: t('dashboard.kpiBonusPoints'),
-    value: props.kpis.available_bonus_points,
+    value: formatRatio(props.kpis.available_bonus_points, props.kpis.total_bonus_points),
     icon: Star,
     iconClass: 'text-amber-400',
     valueClass: 'text-amber-400',
@@ -35,28 +39,31 @@ const cards = computed(() => [
   },
   {
     label: t('dashboard.kpiPendingPunishments'),
-    value: props.kpis.pending_punishment_count,
+    value: formatRatio(props.kpis.pending_punishment_count, props.kpis.total_punishment_count),
     icon: Gavel,
     iconClass: 'text-muted-foreground',
     valueClass: 'text-red-400',
-    subtitle: t('common.toResolve'),
+    subtitle: t('common.overduePunishments', props.kpis.overdue_punishment_count),
   },
 ])
 </script>
 
 <template>
   <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
-    <div v-for="card in cards" :key="card.label" class="border border-border rounded-lg p-6">
+    <div v-for="card in cards" :key="card.label" class="border border-border rounded-lg p-4 sm:p-6">
       <div class="flex items-center justify-between mb-2">
-        <p class="text-sm font-medium text-muted-foreground">
+        <p class="text-xs sm:text-sm font-medium text-muted-foreground">
           {{ card.label }}
         </p>
         <component :is="card.icon" class="w-4 h-4" :class="card.iconClass" />
       </div>
-      <p class="text-3xl font-bold" :class="card.valueClass">
+      <p
+        class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none"
+        :class="card.valueClass"
+      >
         {{ card.value }}
       </p>
-      <p class="text-xs text-muted-foreground mt-1">{{ card.subtitle }}</p>
+      <p class="text-[11px] sm:text-xs text-muted-foreground mt-1">{{ card.subtitle }}</p>
     </div>
   </div>
 </template>

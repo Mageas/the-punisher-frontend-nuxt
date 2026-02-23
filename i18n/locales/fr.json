@@ -30,7 +30,8 @@
     "toResolve": "à résoudre",
     "pt": "+{points} pt | +{points} pts",
     "nToResolve": "{count} à résoudre",
-    "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés"
+    "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés",
+    "overduePunishments": "{count} punition en retard | {count} punitions en retard"
   },
   "ui": {
     "close": "Fermer",
@@ -172,7 +173,8 @@
     "kpis": {
       "studentCount": "Élèves",
       "availableBonusPoints": "Points bonus dispo.",
-      "totalPenaltyCount": "Pénalités totales",
+      "penaltyCount": "Pénalités",
+      "pendingPunishmentCount": "Punitions en attente",
       "classTotal": "Total de la classe"
     },
     "students": {

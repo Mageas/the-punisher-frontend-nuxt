@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   ClassroomDetail,
   Student,
+  DashboardKpis,
 } from '~/types/api'
 
 export function useClassroomService() {
@@ -21,6 +22,10 @@ export function useClassroomService() {
 
   async function getClassroomById(classroomId: string) {
     return $api<ClassroomDetail>(`/classrooms/${classroomId}`)
+  }
+
+  async function getClassroomKpis(classroomId: string) {
+    return $api<DashboardKpis>(`/classrooms/${classroomId}/kpis`)
   }
 
   async function createClassroom(data: { name: string; year?: string | null }) {
@@ -72,6 +77,7 @@ export function useClassroomService() {
   return {
     getClassrooms,
     getClassroomById,
+    getClassroomKpis,
     createClassroom,
     updateClassroom,
     deleteClassroom,
