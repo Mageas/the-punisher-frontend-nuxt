@@ -91,6 +91,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     :submitting="isSubmitting"
     :can-submit="meta.valid"
     :submit-text="t('modals.rule.save')"
+    prevent-auto-focus
     @submit="onSubmit"
   >
     <FormField v-slot="{ componentField }" name="name">
