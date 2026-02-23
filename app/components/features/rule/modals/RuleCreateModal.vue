@@ -90,6 +90,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     :submitting="isSubmitting"
     :can-submit="meta.valid"
     :submit-text="t('modals.rule.create')"
+    prevent-auto-focus
     @submit="onSubmit"
   >
     <FormField v-slot="{ value, handleChange }" name="penalty_type_id">
