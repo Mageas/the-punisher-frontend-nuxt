@@ -14,6 +14,13 @@ export interface AuthResponse {
 }
 
 /**
+ * Response for public registration availability.
+ */
+export interface RegisterStatusResponse {
+  register_allowed: boolean
+}
+
+/**
  * Request payload for registration.
  */
 export interface RegisterRequest {
