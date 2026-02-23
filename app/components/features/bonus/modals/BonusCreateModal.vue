@@ -67,6 +67,7 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldVa
 watch(
   () => values.classroom_id,
   (newClassroomId) => {
+    if (!open.value) return
     if (hasPreselectedStudent.value) return
     setFieldValue('student_id', '', false)
     fetchStudents(newClassroomId || undefined)
