@@ -1,4 +1,5 @@
 import type {
+  ApiRequestOptions,
   Punishment,
   PaginatedResponse,
   PunishmentCreateData,
@@ -8,12 +9,15 @@ import type {
 export function usePunishmentService() {
   const { $api } = useNuxtApp()
 
-  async function getPunishments(options?: { page?: number; search?: string; state?: string }) {
+  async function getPunishments(
+    options?: { page?: number; search?: string; state?: string },
+    requestOptions?: ApiRequestOptions,
+  ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
     if (options?.state) params.state = options.state
-    return $api<PaginatedResponse<Punishment>>('/punishments', { params })
+    return $api<PaginatedResponse<Punishment>>('/punishments', { params, ...requestOptions })
   }
 
   async function createPunishment(data: PunishmentCreateData) {

@@ -5,6 +5,8 @@
   "common": {
     "cancel": "Annuler",
     "submit": "Valider",
+    "loading": "Chargement...",
+    "retry": "Réessayer",
     "allStudents": "Tous les élèves",
     "selectClassOptional": "Sélectionner une classe (optionnel)",
     "searchClass": "Rechercher une classe...",
@@ -32,6 +34,8 @@
   },
   "ui": {
     "close": "Fermer",
+    "breadcrumb": "Fil d'Ariane",
+    "clearInput": "Effacer la saisie",
     "sidebar": {
       "title": "Barre latérale",
       "mobileDescription": "Affiche la barre latérale mobile.",

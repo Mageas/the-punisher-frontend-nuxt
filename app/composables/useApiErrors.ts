@@ -76,25 +76,9 @@ export function useApiErrors() {
   /**
    * Processes an API error (from $fetch catch) and populates
    * `fieldErrors` and/or `globalError`.
-   *
-   * If the error is fatal (500+, or marked as fatal), it will be re-thrown
-   * to trigger the global Nuxt error page.
    */
   function handleApiError(err: unknown): void {
     clearErrors()
-
-    // If it's a fatal error (already created via createError or statusCode >= 500)
-    // we let it bubble up to trigger the Nuxt error page.
-    if (err && typeof err === 'object') {
-      const e = err as { fatal?: boolean; statusCode?: number }
-      if (
-        e.fatal === true ||
-        (e.statusCode !== undefined && e.statusCode >= 500) ||
-        e.statusCode === undefined
-      ) {
-        throw err
-      }
-    }
 
     const apiError = extractApiError(err)
     if (!apiError) {

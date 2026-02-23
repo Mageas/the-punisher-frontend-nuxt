@@ -11,6 +11,11 @@ export interface AllPaginatedCollectionOptions {
    * Defaults to 10.
    */
   maxPages?: number
+  /**
+   * When enabled, re-throw fetch errors after updating local error state.
+   * Useful for pages where partial SSR data is not acceptable.
+   */
+  throwOnError?: boolean
 }
 
 /**
@@ -26,6 +31,7 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
   const error = ref<ApiError | null>(null)
 
   const maxPages = options.maxPages ?? 10
+  const throwOnError = options.throwOnError ?? false
   let lastCallId = 0
 
   async function fetchAll(...args: TArgs) {
@@ -61,12 +67,6 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
           for (const res of otherPages) {
             all.push(...res.data)
           }
-
-          if (totalPages === maxPages && totalCount > maxPages * perPage) {
-            console.warn(
-              `[useAllPaginatedCollection] Reached maxPages (${maxPages}). Data may be incomplete.`,
-            )
-          }
         } else {
           // Fallback to sequential if perPage is missing or 0
           let page = 2
@@ -85,14 +85,17 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
     } catch (err: unknown) {
       if (callId !== lastCallId) return
 
-      let errorData: ApiError = { error: 'Unknown error', error_code: 500 }
+      let errorData: ApiError = { error: 'internal_error', error_code: 500 }
 
       if (err && typeof err === 'object' && 'data' in err) {
         errorData = (err as { data: ApiError }).data
       }
 
       error.value = errorData
-      console.error('[useAllPaginatedCollection] Fetch failed:', err)
+
+      if (throwOnError) {
+        throw err
+      }
     } finally {
       if (callId === lastCallId) {
         loading.value = false

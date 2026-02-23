@@ -71,11 +71,12 @@ describe('useApiErrors', () => {
     expect(globalError.value).toBe('apiErrors.messages.internal_error')
   })
 
-  it('re-throws fatal errors (500)', () => {
-    const { handleApiError } = useApiErrors()
-    const fatalError = { statusCode: 500 }
+  it('sets internal_error for non-api errors', () => {
+    const { globalError, handleApiError } = useApiErrors()
 
-    expect(() => handleApiError(fatalError)).toThrow()
+    handleApiError({ statusCode: 500 })
+
+    expect(globalError.value).toBe('apiErrors.messages.internal_error')
   })
 
   it('clears errors', () => {

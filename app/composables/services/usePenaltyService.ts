@@ -1,13 +1,16 @@
-import type { Penalty, PaginatedResponse, PenaltyCreateData } from '~/types/api'
+import type { ApiRequestOptions, Penalty, PaginatedResponse, PenaltyCreateData } from '~/types/api'
 
 export function usePenaltyService() {
   const { $api } = useNuxtApp()
 
-  async function getPenalties(options?: { page?: number; search?: string }) {
+  async function getPenalties(
+    options?: { page?: number; search?: string },
+    requestOptions?: ApiRequestOptions,
+  ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
-    return $api<PaginatedResponse<Penalty>>('/penalties', { params })
+    return $api<PaginatedResponse<Penalty>>('/penalties', { params, ...requestOptions })
   }
 
   async function createPenalty(data: PenaltyCreateData) {

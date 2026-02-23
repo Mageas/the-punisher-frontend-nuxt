@@ -2,11 +2,15 @@
 import type { NuxtError } from '#app'
 import { AlertTriangle, Home, RotateCcw } from 'lucide-vue-next'
 
-defineProps<{
+const { t } = useI18n()
+const props = defineProps<{
   error: NuxtError
 }>()
 
-const { t } = useI18n()
+const statusCode = computed(() => {
+  const fallbackStatus = (props.error as NuxtError & { status?: number }).status
+  return props.error.statusCode ?? fallbackStatus ?? 500
+})
 
 const handleError = () => clearError({ redirect: '/' })
 </script>
@@ -16,12 +20,12 @@ const handleError = () => clearError({ redirect: '/' })
     <div
       class="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-destructive/10 text-destructive"
     >
-      <AlertTriangle v-if="error.status === 500" class="h-12 w-12" />
-      <span v-else class="text-4xl font-bold">{{ error.status }}</span>
+      <AlertTriangle v-if="statusCode >= 500" class="h-12 w-12" />
+      <span v-else class="text-4xl font-bold">{{ statusCode }}</span>
     </div>
 
     <h1 class="mb-8 text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
-      {{ error.status === 404 ? t('errors.pageNotFound') : t('errors.serverError') }}
+      {{ statusCode === 404 ? t('errors.pageNotFound') : t('errors.serverError') }}
     </h1>
 
     <div class="flex flex-col gap-4 sm:flex-row">

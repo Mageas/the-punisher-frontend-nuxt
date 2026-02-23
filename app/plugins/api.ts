@@ -1,4 +1,5 @@
-import type { AuthResponse } from '~/types/api'
+import type { ApiRequestOptions, AuthResponse } from '~/types/api'
+import { getApiErrorStatus, isFatalApiError } from '~/lib/api-error'
 
 /**
  * Nuxt plugin that provides a global `$api` fetch instance.
@@ -7,16 +8,9 @@ import type { AuthResponse } from '~/types/api'
  * - On 401 responses, attempts a silent token refresh then retries the request once.
  * - If refresh fails, clears auth state and redirects to /login.
  */
-let hasLoggedStartup = false
-
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const apiBaseUrl = import.meta.server ? config.apiBaseUrlServer : config.public.apiBaseUrl
-
-  if (import.meta.server && !hasLoggedStartup) {
-    console.log(`[SSR Startup] API base URL: ${apiBaseUrl}`)
-    hasLoggedStartup = true
-  }
 
   const accessToken = useState<string | null>('auth.access-token', () => null)
   const accessTokenCookie = useCookie<string | null>('access_token', {
@@ -74,6 +68,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   type ApiRequest = Parameters<typeof $fetch>[0]
   type ApiOptions = Parameters<typeof $fetch>[1]
+  type ApiCallOptions = ApiOptions & ApiRequestOptions
 
   function isRequestToAuthRoute(request: ApiRequest): boolean {
     if (typeof request === 'string') {
@@ -122,7 +117,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
   })
 
-  const api = (async (request: ApiRequest, options?: ApiOptions & { fatal?: boolean }) => {
+  const api = (async (request: ApiRequest, options?: ApiCallOptions) => {
     try {
       return await baseApi(request, options)
     } catch (error: unknown) {
@@ -143,22 +138,20 @@ export default defineNuxtPlugin((nuxtApp) => {
         await nuxtApp.runWithContext(() => navigateTo('/login'))
       }
 
-      // 2. Handle Fatal Errors (500+, Network Failure)
-      // If the error is 500 or higher, or has no statusCode (connection refused),
-      // we throw a fatal error that Nuxt captures to show the error page.
-      // We skip this if options.fatal is explicitly false.
-      if (error && typeof error === 'object') {
-        const e = error as { statusCode?: number; status?: number; statusMessage?: string }
-        const statusCode = e.statusCode || e.status || 500
-        const isFatalError = statusCode >= 500 || e.statusCode === undefined
+      // 2. Force Nuxt error page for API outages (network/CORS/5xx)
+      if (isFatalApiError(error)) {
+        const status = getApiErrorStatus(error)
+        const fatalError = createError({
+          statusCode: status && status >= 500 ? status : 500,
+          statusMessage: 'Server Error',
+          fatal: true,
+        })
 
-        if (isFatalError && options?.fatal !== false) {
-          throw createError({
-            statusCode: statusCode,
-            statusMessage: e.statusMessage || 'Internal Server Error',
-            fatal: true,
-          })
+        if (import.meta.client) {
+          nuxtApp.runWithContext(() => showError(fatalError))
         }
+
+        throw fatalError
       }
 
       throw error

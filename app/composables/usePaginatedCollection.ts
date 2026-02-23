@@ -43,6 +43,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
   // -- Reactive State --
   const items = ref<TItem[]>([]) as Ref<TItem[]>
   const loading = ref(false)
+  const error = ref<unknown | null>(null)
   const page = ref(1)
   const filters = reactive({ ...defaultFilters }) as TFilters
   const itemPerPage = ref(0)
@@ -110,6 +111,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
    */
   async function fetchPage(overrideOptions?: Partial<TFilters> & { page?: number }) {
     loading.value = true
+    error.value = null
     try {
       const fetchParams = {
         ...filters,
@@ -125,6 +127,9 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
       totalCount.value = res.total_count
       nextPage.value = res.next_page
       previousPage.value = res.previous_page
+    } catch (err: unknown) {
+      error.value = err
+      throw err
     } finally {
       loading.value = false
     }
@@ -203,7 +208,12 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
       if (pageChanged || filtersChanged) {
         page.value = newState.page
         applyFilterState(newState.filters)
-        await fetchPage()
+        try {
+          await fetchPage()
+        } catch (fetchError: unknown) {
+          // Error state is already tracked in `error` inside fetchPage.
+          void fetchError
+        }
       }
     },
     { deep: true },
@@ -212,6 +222,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
   return {
     items: items as Readonly<Ref<TItem[]>>,
     loading: readonly(loading),
+    error: readonly(error),
     page: readonly(page),
     filters: readonly(filters),
     itemPerPage: readonly(itemPerPage),

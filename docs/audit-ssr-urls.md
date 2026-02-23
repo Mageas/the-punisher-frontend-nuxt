@@ -1,18 +1,32 @@
 # Audit SSR / Chargement Direct des URLs (Nuxt 4)
 
-Date de l'audit: 2026-02-22
+Date de l'audit initial: 2026-02-22
+Date de revue implementation (post-P0): 2026-02-22
 
 ## Objectif
 
 Auditer l'implementation SSR (Nuxt/Nitro) et le chargement direct des URLs en mode build (runtime Nitro), expliquer le bug `500` observe au refresh dur (`Ctrl+Shift+R`), et fournir une roadmap de correction alignée avec les pratiques industrie.
 
+## Etat post-P0 (revue implementation)
+
+Synthese:
+
+- Le lot P0 est implemente: separation SSR/CSR dans `runtimeConfig`, selection d'URL par `import.meta.server`, `.env.example` mis a jour, startup log SSR actif.
+- Les points P1 restent majoritairement valides.
+- Le point P1.2 est **partiellement** traite: une option `fatal?: boolean` existe dans `$api`, mais elle n'est pas encore appliquee systematiquement par les services/pages.
+- Les points P2/P3 restent valides (proxy same-origin, architecture auth cible, observabilite, tests smoke SSR build).
+
+Validation rapide executee en local (2026-02-22, mode `nuxt dev`):
+
+- `GET /penaltie` sans cookie -> `302 /login`
+- `GET /penaltie` avec cookie `access_token` non expire -> `404`
+
 ## Resume Executif
 
-- Le bug principal est reproduit en mode build SSR.
-- La cause racine n'est pas un probleme de routing Nuxt, mais un probleme de resolution d'URL backend cote serveur SSR combine a une gestion d'erreurs trop agressive dans le plugin `$api`.
-- En Docker, `NUXT_PUBLIC_API_BASE_URL=http://localhost:8080/v1` est non fiable pour le SSR: depuis le conteneur frontend, `localhost` pointe vers le conteneur frontend lui-meme, pas vers votre backend.
-- Quand un `access_token` valide est present, le middleware auth laisse passer la requete vers la page, la page execute ses appels API en SSR, l'appel reseau echoue, et `app/plugins/api.ts` remonte un `fatal 500` global.
-- Les routes inconnues (`/penaltie`) ne sont pas la cause du 500. Elles retournent bien `404` dans certaines conditions, mais le middleware auth global rend le comportement incoherent (redirect `/login` quand non authentifie).
+- Le bug historique (`500` au hard refresh en build SSR) venait principalement de la connectivite API SSR en environnement Docker, pas du routing Nuxt.
+- Le lot P0 est en place dans le code, ce qui corrige la separation des URLs client/serveur et la documentation de configuration.
+- Les risques restants sont surtout de robustesse SSR: politique d'erreur globale `$api` encore agressive, routes inconnues redirigees vers `/login` quand non authentifie, absence de standardisation `useAsyncData`.
+- Les routes inconnues (`/penaltie`) ne sont pas la cause racine du `500`, mais leur semantique HTTP reste incoherente selon l'etat d'authentification.
 
 ## Reproduction (confirmee localement)
 
@@ -35,16 +49,17 @@ Le `fatal 500` remonte depuis le plugin API compile (`server.mjs:6409`) et corre
 
 ## Cause Racine (Root Cause)
 
-### 1) URL backend non SSR-safe en conteneur
+### 1) URL backend non SSR-safe en conteneur (historique, corrige par P0)
 
 Fichiers:
-- `docker-compose.yml:11`
+- `docker-compose.yml:13`
 - `nuxt.config.ts:5`
-- `.env.example:2`
+- `.env.example:7`
 
 Constat:
-- La meme variable `NUXT_PUBLIC_API_BASE_URL` est utilisee pour le navigateur ET pour le rendu SSR.
-- En runtime Docker, `http://localhost:8080/v1` n'est pas l'API (sauf si l'API tourne dans le meme conteneur, ce qui n'est pas le cas ici).
+- Avant P0, la meme variable `NUXT_PUBLIC_API_BASE_URL` etait utilisee pour navigateur + SSR.
+- Depuis P0, la separation existe (`NUXT_API_BASE_URL_SERVER` / `NUXT_PUBLIC_API_BASE_URL`).
+- Risque residuel: en Docker, garder `http://localhost:8080/v1` comme valeur SSR par defaut reste non fiable si non surchargee.
 
 Impact:
 - En SSR build, les pages proteges executent des appels API cote serveur vers une cible inaccessible.
@@ -53,9 +68,9 @@ Impact:
 ### 2) Plugin `$api` global transforme les erreurs reseau en fatal 500
 
 Fichier:
-- `app/plugins/api.ts:116`
-- `app/plugins/api.ts:141`
-- `app/plugins/api.ts:147`
+- `app/plugins/api.ts:125`
+- `app/plugins/api.ts:153`
+- `app/plugins/api.ts:155`
 
 Constat:
 - Toute erreur reseau / erreur sans `statusCode` est interpretee comme fatale:
@@ -68,16 +83,16 @@ Impact:
 
 ## Findings detailles (audit)
 
-## Critique 1: Configuration d'API non separee entre client et serveur
+## Critique 1 (resolu P0): Configuration d'API non separee entre client et serveur
 
 Fichiers:
 - `nuxt.config.ts:5`
-- `docker-compose.yml:11`
-- `.env.example:2`
+- `docker-compose.yml:13`
+- `.env.example:7`
 
 Probleme:
-- Une seule URL API "publique" est partagee par le client et le SSR.
-- En SSR, il faut une URL resolvable depuis l'environnement serveur (conteneur, VM, cluster), qui est souvent differente de l'URL vue par le navigateur.
+- Le decouplage SSR/CSR est implemente (`apiBaseUrlServer` / `public.apiBaseUrl`).
+- Le point d'attention restant est operationnel (valeur par defaut Docker), pas structurel.
 
 Standard industrie:
 - Separer les URLs:
@@ -88,11 +103,13 @@ Standard industrie:
 ## Critique 2: Politique d'erreur globale trop agressive dans le plugin API
 
 Fichier:
-- `app/plugins/api.ts:116`
+- `app/plugins/api.ts:125`
+- `app/plugins/api.ts:153`
 
 Probleme:
 - Le plugin decide de la fatalite sans contexte metier (page critique vs widget optionnel vs mutation).
 - Une simple erreur reseau sur un endpoint non critique provoque un crash SSR global.
+- Une option `fatal?: boolean` existe deja mais n'est pas encore appliquee de maniere systematique par les appelants.
 
 Standard industrie:
 - La criticite doit etre decidee au niveau de la page/composable (ou via options explicites), pas uniquement dans le client HTTP global.
@@ -234,54 +251,50 @@ Pourquoi ce n'est pas visible en dev:
 
 ## Roadmap de correction (priorisee)
 
-## P0 - Correction immediate (1-2 jours)
+## P0 - Correction immediate (termine)
 
 Objectif: eliminer le `500` lie a la connectivite SSR en build.
 
-1. Separer config API serveur / client
-- Ajouter dans `nuxt.config.ts`:
-  - `runtimeConfig.apiBaseUrlServer` (prive)
-  - `runtimeConfig.public.apiBaseUrl` (client)
-- Modifier `app/plugins/api.ts` pour choisir l'URL selon `import.meta.server`.
+Statut:
 
-2. Corriger la config Docker
-- Si backend dans le meme `docker-compose`:
-  - utiliser le nom du service backend (`http://backend:8080/v1`)
-- Si backend sur la machine hote:
-  - documenter `host.docker.internal` (ou `extra_hosts` Linux) au lieu de `localhost`
+- [x] Separation config API serveur/client (`nuxt.config.ts`)
+- [x] Selection d'URL selon `import.meta.server` (`app/plugins/api.ts`)
+- [x] Documentation env SSR/CSR (`.env.example`)
+- [x] Startup check SSR (`[SSR Startup] API base URL: ...`)
 
-3. Documenter l'env de prod
-- Mettre a jour `.env.example` avec variables SSR/CSR distinctes et exemples Docker.
+Point d'attention residuel:
 
-4. Ajouter un startup check (log non bloquant)
-- Logguer la cible API resolvee cote serveur au demarrage (sans secrets).
+- `docker-compose.yml` garde une valeur SSR par defaut a `http://localhost:8080/v1`.
+- En environnement conteneurise, cette valeur doit etre surchargee (`backend` service name, `host.docker.internal`, ou URL upstream reseau).
 
 ## P1 - Robustesse SSR / URL Loading (2-5 jours)
 
 Objectif: rendre le chargement direct des URLs fiable et observable.
 
-1. Refactor des pages critiques vers `useAsyncData`
-- Priorite:
-  - `app/pages/index.vue`
-  - `app/pages/penalties.vue`
-  - `app/pages/punishments.vue`
-  - `app/pages/bonuses.vue`
-- Definir pour chaque page:
-  - donnees critiques (fatal si KO)
-  - donnees secondaires (fallback UI)
+Statut: majoritairement ouvert.
 
-2. Revoir la politique d'erreur du plugin `$api`
+1. Priorite principale: simplifier la strategie d'erreur 404/400 cote client
+- Contexte: le commit `266bb2b9745da27980a6532cafa48a8e21b2fae6` visait une page d'erreur dediee avec mapping des statuts.
+- Le mapping `400 -> page erreur` avait ete ajoute cote client, notamment pour couvrir les URL malformees.
+- Changement cible API (pas encore effectif): une URL malformee devra retourner `404` au lieu de `400`.
+- Decision roadmap: reduire la logique de mapping cote frontend pour eviter de "jongler" avec les codes HTTP.
+- Pourquoi: implementation actuelle jugee trop complexe, peu lisible, et susceptible de masquer de vraies erreurs applicatives.
+
+1. Revoir la politique d'erreur du plugin `$api`
 - Le plugin ne doit pas imposer `fatal` par defaut pour tous les cas.
 - Introduire une option claire par appel:
   - `errorMode: 'fatal' | 'recoverable'`
   - ou `fatal: boolean` mais appliquee de maniere explicite par les services/pages
 - Conserver les informations d'erreur pour les logs serveur (URL, methode, status, cause reseau)
+- Etat actuel:
+  - `fatal?: boolean` est deja disponible dans `app/plugins/api.ts`.
+  - Les services/pages ne l'utilisent pas encore de facon explicite/normalisee.
 
-3. Corriger la semantique 404 des URLs inconnues
+1. Corriger la semantique 404 des URLs inconnues
 - Dans `auth.global.ts`, bypass auth si route non matchee (ex: `to.matched.length === 0`)
 - Laisser Nuxt retourner `404` pour `/penaltie`
 
-4. Standardiser les comportements par type de page
+1. Standardiser les comportements par type de page
 - Pages liste/profil: UX de fallback (alert + retry)
 - Pages critiques d'auth/session: redirect controle
 - Routes invalides: `404`
@@ -289,6 +302,8 @@ Objectif: rendre le chargement direct des URLs fiable et observable.
 ## P2 - Mise a niveau "standards industrie" (1 sprint)
 
 Objectif: architecture SSR stable, securisee, maintenable.
+
+Statut: ouvert.
 
 1. Introduire un proxy same-origin (`/api`)
 - Browser et SSR appellent `/api/...`
@@ -319,6 +334,8 @@ Objectif: architecture SSR stable, securisee, maintenable.
 
 ## P3 - Qualite / Regression Safety (continu)
 
+Statut: ouvert.
+
 1. Tests de smoke SSR build en CI
 - Cas non authentifie:
   - `GET /` -> 302 `/login`
@@ -339,12 +356,13 @@ Objectif: architecture SSR stable, securisee, maintenable.
 
 ## Recommandations concretes (ordre d'implementation)
 
-1. Corriger la connectivite SSR Docker (cause racine actuelle)
-2. Separer les URLs API server/client
-3. Ajuster la politique d'erreur `$api` (fatal vs recoverable)
-4. Corriger la semantique 404 dans le middleware auth
-5. Migrer les pages critiques vers `useAsyncData`
-6. Ajouter tests SSR build + docs d'exploitation
+1. Prioriser la simplification de la gestion d'erreurs frontend (commit `266bb2b9745da27980a6532cafa48a8e21b2fae6`) en preparant la transition API `400 -> 404` pour URL malformee
+2. Finaliser la politique d'erreur `$api` (fatal vs recoverable) et propager l'option dans les services/pages
+3. Corriger la semantique 404 dans le middleware auth (`to.matched.length === 0`)
+4. Migrer les pages critiques vers `useAsyncData` avec strategie explicite par page
+5. Ajouter des tests smoke SSR build en CI (routes directes, auth/no-auth, backend KO/OK)
+6. Formaliser la doc d'exploitation Docker/SSR (matrice d'env + checklist diagnostic)
+7. Planifier le lot P2 (proxy `/api`, durcissement auth, observabilite)
 
 ## Criteres d'acceptation (Definition of Done SSR)
 
@@ -356,6 +374,6 @@ Objectif: architecture SSR stable, securisee, maintenable.
 
 ## Notes finales
 
-- Le bug observe est principalement un ecart d'environnement (dev vs build Docker SSR), revele par une bonne execution SSR des pages.
-- Le routing Nuxt est globalement correct; le point bloquant est la strategie de connectivite API et la politique de gestion d'erreur en SSR.
-- Une correction P0 + P1 stabilisera rapidement le chargement direct des URLs en build.
+- Le bug observe etait principalement un ecart d'environnement (dev vs build Docker SSR), revele par une bonne execution SSR des pages.
+- Le routing Nuxt est globalement correct; les points bloquants restants sont surtout la politique d'erreur SSR et la semantique 404 via middleware auth.
+- P0 est en place; la stabilisation complete passe maintenant par l'execution du lot P1 (puis P2/P3).

@@ -2,12 +2,10 @@
 import type { Classroom, Student } from '~/types/api'
 
 const { t } = useI18n()
-const { validateUuid, catchResourceNotFound } = useResourceError()
 const classroomService = useClassroomService()
 
 definePageMeta({
   path: '/classes/:classroomId',
-  validate: validateUuid('classroomId'),
 })
 
 const route = useRoute()
@@ -70,8 +68,6 @@ async function fetchClassroomProfile() {
       fetchAllStudents(),
     ])
     classroom.value = classroomRes
-  } catch (err) {
-    catchResourceNotFound(err, t('apiErrors.messages.classroom_not_found'))
   } finally {
     loading.value = false
   }
@@ -127,7 +123,10 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
 <template>
   <div>
     <AppBreadcrumb
-      :items="[{ label: t('classes.title'), to: '/classes' }, { label: classroom?.name ?? '...' }]"
+      :items="[
+        { label: t('classes.title'), to: '/classes' },
+        { label: classroom?.name ?? t('common.loading') },
+      ]"
     />
 
     <template v-if="classroom">

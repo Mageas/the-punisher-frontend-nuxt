@@ -3,7 +3,7 @@ import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
 
 const { t } = useI18n()
-const { globalError, handleApiError, clearErrors } = useApiErrors()
+const route = useRoute()
 
 // Services
 const dashboardService = useDashboardService()
@@ -25,29 +25,18 @@ const showPunishmentModal = ref(false)
 // Fetch dashboard data
 async function fetchDashboard() {
   loading.value = true
-  clearErrors()
 
   try {
     dashboard.value = await dashboardService.getDashboard({
       classroomId: selectedClassroomId.value || undefined,
     })
-  } catch (err) {
-    dashboard.value = null
-    handleApiError(err)
   } finally {
     loading.value = false
   }
 }
 
 async function resolvePunishment(id: string) {
-  clearErrors()
-
-  try {
-    await punishmentService.resolvePunishment(id, {})
-  } catch (err) {
-    handleApiError(err)
-    throw err
-  }
+  await punishmentService.resolvePunishment(id, {})
 }
 
 // Refresh dashboard after modal creation
@@ -60,16 +49,24 @@ watch(selectedClassroomId, async () => {
   await fetchDashboard()
 })
 
-// Initial load
-await Promise.all([fetchClassrooms(), fetchDashboard()])
+async function loadInitialData() {
+  await Promise.all([fetchClassrooms(), fetchDashboard()])
+}
+
+await useAsyncData(
+  () => `dashboard:initial:${route.fullPath}`,
+  async () => {
+    await loadInitialData()
+    return true
+  },
+  {
+    server: true,
+  },
+)
 </script>
 
 <template>
   <div>
-    <Alert v-if="globalError" variant="destructive" class="mb-6">
-      <AlertDescription>{{ globalError }}</AlertDescription>
-    </Alert>
-
     <!-- Header & Filtre Global -->
     <PageHeaderBar align="start">
       <template #left>

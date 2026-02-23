@@ -1,4 +1,10 @@
-import type { Bonus, PaginatedResponse, BonusCreateData, BonusUseData } from '~/types/api'
+import type {
+  ApiRequestOptions,
+  Bonus,
+  PaginatedResponse,
+  BonusCreateData,
+  BonusUseData,
+} from '~/types/api'
 
 export function useBonusService() {
   const { $api } = useNuxtApp()
@@ -6,12 +12,15 @@ export function useBonusService() {
   /**
    * Fetch all bonuses with pagination.
    */
-  async function getBonuses(options?: { page?: number; search?: string; state?: string }) {
+  async function getBonuses(
+    options?: { page?: number; search?: string; state?: string },
+    requestOptions?: ApiRequestOptions,
+  ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
     if (options?.state) params.state = options.state
-    return $api<PaginatedResponse<Bonus>>('/bonuses', { params })
+    return $api<PaginatedResponse<Bonus>>('/bonuses', { params, ...requestOptions })
   }
 
   /**

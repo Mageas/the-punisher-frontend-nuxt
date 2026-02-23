@@ -5,6 +5,8 @@ import type { $Fetch as NitroFetch } from 'nitropack'
  */
 export type $Fetch = NitroFetch
 
+export type ApiRequestOptions = Record<string, never>
+
 /**
  * Standard API error response from the backend.
  */

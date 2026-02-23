@@ -3,6 +3,7 @@ import { Gift, Plus, Search, Trash2 } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
 
 const { t } = useI18n()
+const route = useRoute()
 const {
   bonuses,
   loading,
@@ -76,10 +77,16 @@ watch(searchDebounced, async (newSearch) => {
   await applyFilters({ search: newSearch })
 })
 
-// Initial fetch if not already loading (e.g. from watcher)
-if (bonuses.value.length === 0 && !loading.value) {
-  await reload()
-}
+await useAsyncData(
+  () => `bonuses:initial:${route.fullPath}`,
+  async () => {
+    await reload()
+    return true
+  },
+  {
+    server: true,
+  },
+)
 </script>
 
 <template>

@@ -3,6 +3,7 @@ import { onClickOutside } from '@vueuse/core'
 import { Search, X } from 'lucide-vue-next'
 import { computed, nextTick, ref, watch } from 'vue'
 import { cn } from '@/lib/utils'
+const { t } = useI18n()
 
 interface IdNameOption {
   id: string
@@ -206,7 +207,7 @@ watch(filteredOptions, (options) => {
       v-if="showClearButton"
       type="button"
       class="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-      aria-label="Effacer la saisie"
+      :aria-label="t('ui.clearInput')"
       @mousedown.prevent
       @click="clearInput"
     >

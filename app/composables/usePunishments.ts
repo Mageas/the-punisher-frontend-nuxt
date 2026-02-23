@@ -34,6 +34,7 @@ export function usePunishments() {
   return {
     punishments: paginated.items,
     loading: paginated.loading,
+    error: paginated.error,
     page: paginated.page,
     filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,

@@ -20,6 +20,11 @@ function isTokenExpired(token: string): boolean {
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
+  // Keep Nuxt's 404 semantics for unknown routes.
+  if (Array.isArray(to.matched) && to.matched.length === 0) {
+    return
+  }
+
   const accessToken = useState<string | null>('auth.access-token', () => null)
   const accessTokenCookie = useCookie<string | null>('access_token', {
     path: '/',

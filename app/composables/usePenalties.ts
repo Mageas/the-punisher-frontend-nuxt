@@ -25,6 +25,7 @@ export function usePenalties() {
   return {
     penalties: paginated.items,
     loading: paginated.loading,
+    error: paginated.error,
     page: paginated.page,
     filters: paginated.filters,
     itemPerPage: paginated.itemPerPage,
