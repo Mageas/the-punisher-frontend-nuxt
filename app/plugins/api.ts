@@ -13,6 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const apiBaseUrl = import.meta.server ? config.apiBaseUrlServer : config.public.apiBaseUrl
 
   const accessToken = useState<string | null>('auth.access-token', () => null)
+  const isLoggingOut = useState<boolean>('auth.is-logging-out', () => false)
   const accessTokenCookie = useCookie<string | null>('access_token', {
     path: '/',
     sameSite: 'lax',
@@ -123,6 +124,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     } catch (error: unknown) {
       // 1. Handle 401 Unauthorized (Silent Token Refresh)
       if (isUnauthorizedError(error) && !isRequestToAuthRoute(request)) {
+        if (isLoggingOut.value) {
+          clearAccessToken()
+          throw error
+        }
+
         if (import.meta.server) {
           clearAccessToken()
           throw error
