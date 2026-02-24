@@ -99,7 +99,7 @@ await reload()
 
       <template #actions>
         <Button
-          class="w-full justify-center cursor-pointer xl:w-auto"
+          class="w-full justify-center cursor-pointer md:w-auto"
           @click="showCreateModal = true"
         >
           <Plus class="h-4 w-4" />

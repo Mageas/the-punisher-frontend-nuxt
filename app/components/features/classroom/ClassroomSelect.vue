@@ -19,7 +19,7 @@ const options = computed(() =>
 </script>
 
 <template>
-  <div :class="props.fullWidth ? 'w-full' : 'w-[200px]'">
+  <div :class="props.fullWidth ? 'w-full' : 'basis-full md:basis-auto md:w-[200px]'">
     <IdNameSearchInput
       v-model="modelValue"
       :options="options"

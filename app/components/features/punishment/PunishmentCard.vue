@@ -38,61 +38,111 @@ const subtitle = computed(() => {
 
 <template>
   <div
-    class="flex flex-wrap items-center rounded-lg border border-border sm:flex-nowrap"
-    :class="[{ 'opacity-60': resolvedAt }, compact ? 'gap-3 p-3' : 'gap-4 p-4']"
+    class="rounded-lg border border-border"
+    :class="[{ 'opacity-60': resolvedAt }, compact ? 'p-3' : 'p-4']"
   >
-    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
-      <Gavel class="h-4 w-4 text-red-400" />
-    </div>
-
-    <!-- Content -->
-    <div class="min-w-0 flex-1">
-      <div class="flex items-center gap-2">
-        <p class="text-sm font-medium">
-          <NuxtLink
-            v-if="hasStudentName && props.studentId"
-            :to="`/students/${props.studentId}`"
-            class="transition-colors hover:text-primary hover:underline underline-offset-4"
-          >
-            {{ props.studentFirstName }} {{ props.studentLastName }}
-          </NuxtLink>
-          <span v-else-if="hasStudentName">
-            {{ props.studentFirstName }} {{ props.studentLastName }}
-          </span>
-          <span v-else>{{ punishmentTypeName }}</span>
-        </p>
-        <Badge
-          v-if="isAutomated"
-          variant="outline"
-          class="text-xs text-blue-400 border-blue-400/30"
-        >
-          {{ t('common.auto') }}
-        </Badge>
+    <!-- Mobile: vertical layout -->
+    <div class="flex items-start gap-3 sm:hidden">
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
+        <Gavel class="h-4 w-4 text-red-400" />
       </div>
-      <p class="mt-0.5 text-xs text-muted-foreground">
-        {{ subtitle }}
-      </p>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2">
+          <p class="text-sm font-medium">
+            <NuxtLink
+              v-if="hasStudentName && props.studentId"
+              :to="`/students/${props.studentId}`"
+              class="transition-colors hover:text-primary hover:underline underline-offset-4"
+            >
+              {{ props.studentFirstName }} {{ props.studentLastName }}
+            </NuxtLink>
+            <span v-else-if="hasStudentName">
+              {{ props.studentFirstName }} {{ props.studentLastName }}
+            </span>
+            <span v-else>{{ punishmentTypeName }}</span>
+          </p>
+          <Badge
+            v-if="isAutomated"
+            variant="outline"
+            class="text-xs text-blue-400 border-blue-400/30"
+          >
+            {{ t('common.auto') }}
+          </Badge>
+        </div>
+        <p class="mt-0.5 text-xs text-muted-foreground">
+          {{ subtitle }}
+        </p>
+        <div class="mt-2 flex items-center justify-between">
+          <div>
+            <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
+              {{ t('punishments.pending') }}
+            </Badge>
+            <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
+              {{ t('punishments.resolved') }}
+            </Badge>
+            <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
+              {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
+            </p>
+            <p v-else-if="resolvedAt" class="mt-1 text-xs text-muted-foreground">
+              {{ t('punishments.resolvedAt', { date: formatDate(resolvedAt) }) }}
+            </p>
+          </div>
+          <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
+            <slot name="actions" />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Status -->
-    <div class="text-left sm:text-right">
-      <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
-        {{ t('punishments.pending') }}
-      </Badge>
-      <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
-        {{ t('punishments.resolved') }}
-      </Badge>
-      <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
-        {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
-      </p>
-      <p v-else-if="resolvedAt" class="mt-1 text-xs text-muted-foreground">
-        {{ t('punishments.resolvedAt', { date: formatDate(resolvedAt) }) }}
-      </p>
-    </div>
-
-    <!-- Actions slot -->
-    <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
-      <slot name="actions" />
+    <!-- Desktop: horizontal layout -->
+    <div class="hidden items-center gap-4 sm:flex">
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
+        <Gavel class="h-4 w-4 text-red-400" />
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2">
+          <p class="text-sm font-medium">
+            <NuxtLink
+              v-if="hasStudentName && props.studentId"
+              :to="`/students/${props.studentId}`"
+              class="transition-colors hover:text-primary hover:underline underline-offset-4"
+            >
+              {{ props.studentFirstName }} {{ props.studentLastName }}
+            </NuxtLink>
+            <span v-else-if="hasStudentName">
+              {{ props.studentFirstName }} {{ props.studentLastName }}
+            </span>
+            <span v-else>{{ punishmentTypeName }}</span>
+          </p>
+          <Badge
+            v-if="isAutomated"
+            variant="outline"
+            class="text-xs text-blue-400 border-blue-400/30"
+          >
+            {{ t('common.auto') }}
+          </Badge>
+        </div>
+        <p class="mt-0.5 text-xs text-muted-foreground">
+          {{ subtitle }}
+        </p>
+      </div>
+      <div class="text-right">
+        <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
+          {{ t('punishments.pending') }}
+        </Badge>
+        <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
+          {{ t('punishments.resolved') }}
+        </Badge>
+        <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
+          {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
+        </p>
+        <p v-else-if="resolvedAt" class="mt-1 text-xs text-muted-foreground">
+          {{ t('punishments.resolvedAt', { date: formatDate(resolvedAt) }) }}
+        </p>
+      </div>
+      <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
+        <slot name="actions" />
+      </div>
     </div>
   </div>
 </template>

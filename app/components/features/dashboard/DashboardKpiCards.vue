@@ -49,7 +49,7 @@ const cards = computed(() => [
 </script>
 
 <template>
-  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
     <div v-for="card in cards" :key="card.label" class="border border-border rounded-lg p-4 sm:p-6">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs sm:text-sm font-medium text-muted-foreground">
