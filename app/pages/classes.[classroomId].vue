@@ -147,6 +147,7 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
         :assignable-student-options="assignableStudentOptions"
         :can-add-student="canAddStudent"
         :add-student-error="addStudentError"
+        keep-focus-on-student-select
         @submit-add="addStudentToClassroom"
         @remove-student="openRemoveModal"
       />

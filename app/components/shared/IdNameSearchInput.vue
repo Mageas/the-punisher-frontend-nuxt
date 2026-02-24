@@ -16,9 +16,11 @@ const props = withDefaults(
     placeholder: string
     emptyText: string
     disabled?: boolean
+    keepFocusOnSelect?: boolean
   }>(),
   {
     disabled: false,
+    keepFocusOnSelect: false,
   },
 )
 
@@ -84,6 +86,14 @@ function selectOption(option: IdNameOption) {
   query.value = option.name
   open.value = false
   highlightedIndex.value = -1
+
+  if (props.keepFocusOnSelect) {
+    nextTick(() => {
+      focusInput()
+    })
+    return
+  }
+
   blurInput()
 }
 

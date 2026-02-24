@@ -3,13 +3,20 @@ import { AlertCircle, Plus, Star, X } from 'lucide-vue-next'
 import type { Student } from '~/types/api'
 import { getInitials, formatPoints } from '~/lib/utils'
 
-defineProps<{
-  students: readonly Student[]
-  studentCount: number
-  assignableStudentOptions: readonly { id: string; name: string }[]
-  canAddStudent: boolean
-  addStudentError?: string | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    students: readonly Student[]
+    studentCount: number
+    assignableStudentOptions: readonly { id: string; name: string }[]
+    canAddStudent: boolean
+    addStudentError?: string | null
+    keepFocusOnStudentSelect?: boolean
+  }>(),
+  {
+    addStudentError: null,
+    keepFocusOnStudentSelect: false,
+  },
+)
 
 const emit = defineEmits<{
   submitAdd: []
@@ -63,6 +70,7 @@ function onRemoveStudent(student: Student) {
           :options="assignableStudentOptions"
           :placeholder="t('classProfile.students.searchPlaceholder')"
           :empty-text="t('students.noStudents')"
+          :keep-focus-on-select="props.keepFocusOnStudentSelect"
         />
       </div>
 
