@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Classroom, DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -93,30 +94,37 @@ if (initialData.value) {
         <h1 class="text-2xl font-bold tracking-tight whitespace-nowrap">
           {{ t('dashboard.title') }}
         </h1>
-        <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
+        <ClassroomSelect
+          v-model="selectedClassroomId"
+          :classrooms="classrooms"
+          class="hidden lg:inline-flex"
+        />
       </template>
 
       <template #actions>
-        <Button
-          variant="outline"
-          class="justify-center cursor-pointer"
-          @click="showBonusModal = true"
-        >
-          <Star class="w-4 h-4" />
-          {{ t('dashboard.newBonus') }}
-        </Button>
-        <Button
-          variant="outline"
-          class="justify-center cursor-pointer"
-          @click="showPenaltyModal = true"
-        >
-          <AlertTriangle class="w-4 h-4" />
-          {{ t('dashboard.newPenalty') }}
-        </Button>
-        <Button class="justify-center cursor-pointer" @click="showPunishmentModal = true">
-          <Gavel class="w-4 h-4" />
-          {{ t('dashboard.newPunishment') }}
-        </Button>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center w-full lg:w-auto">
+          <div class="flex-1 min-w-0 lg:hidden">
+            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
+          </div>
+          <div class="shrink-0">
+            <PageActionsMenu :create-label="t('common.add')">
+              <template #create>
+                <DropdownMenuItem class="cursor-pointer" @click="showBonusModal = true">
+                  <Star class="w-4 h-4 text-amber-400" />
+                  {{ t('dashboard.newBonus') }}
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="showPenaltyModal = true">
+                  <AlertTriangle class="w-4 h-4 text-amber-400" />
+                  {{ t('dashboard.newPenalty') }}
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="showPunishmentModal = true">
+                  <Gavel class="w-4 h-4 text-red-400" />
+                  {{ t('dashboard.newPunishment') }}
+                </DropdownMenuItem>
+              </template>
+            </PageActionsMenu>
+          </div>
+        </div>
       </template>
     </PageHeaderBar>
 

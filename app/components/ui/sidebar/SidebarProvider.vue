@@ -50,6 +50,14 @@ useEventListener("keydown", (event: KeyboardEvent) => {
   }
 })
 
+// Auto-close mobile sidebar on route change
+const route = useRoute()
+watch(() => route.fullPath, () => {
+  if (isMobile.value && openMobile.value) {
+    openMobile.value = false
+  }
+})
+
 // We add a state so that we can do data-state="expanded" or "collapsed".
 // This makes it easier to style the sidebar with Tailwind classes.
 const state = computed(() => open.value ? "expanded" : "collapsed")

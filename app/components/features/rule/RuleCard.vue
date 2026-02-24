@@ -34,7 +34,7 @@ const onUpdateModelValue = (value: boolean) => {
 
 <template>
   <div
-    class="flex flex-wrap items-center gap-4 rounded-lg border border-border p-4 sm:flex-nowrap"
+    class="flex flex-wrap items-start gap-3 rounded-lg border border-border p-4 sm:flex-nowrap sm:items-center sm:gap-4"
     :class="{ 'opacity-60': !props.isActive }"
   >
     <Switch

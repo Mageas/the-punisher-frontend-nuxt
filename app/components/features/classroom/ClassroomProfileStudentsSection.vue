@@ -56,7 +56,7 @@ function onRemoveStudent(student: Student) {
       <AlertDescription>{{ addStudentError }}</AlertDescription>
     </Alert>
 
-    <form class="flex gap-2" @submit.prevent="onSubmit">
+    <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="onSubmit">
       <div class="flex-1">
         <IdNameSearchInput
           v-model="modelValue"

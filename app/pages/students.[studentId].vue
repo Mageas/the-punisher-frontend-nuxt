@@ -2,6 +2,7 @@
 import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
 import { getInitials } from '~/lib/utils'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
 const { t } = useI18n()
 const studentService = useStudentService()
@@ -144,65 +145,67 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
 
     <template v-if="student && kpis">
       <div class="mb-8">
-        <div class="mb-4 flex items-center gap-4">
-          <div
-            class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-xl font-semibold shrink-0"
-          >
-            {{ initials }}
-          </div>
-          <div class="min-w-0">
-            <h1 class="text-2xl font-bold tracking-tight">
-              {{ student.first_name }} {{ student.last_name }}
-            </h1>
-            <div class="mt-1 flex flex-wrap gap-1.5">
-              <Badge
-                v-for="classroom in student.classrooms"
-                :key="classroom.id"
-                variant="outline"
-                class="text-muted-foreground"
-              >
-                {{ classroom.name }}
-              </Badge>
-              <Badge
-                v-if="student.classrooms.length === 0"
-                variant="outline"
-                class="text-muted-foreground"
-              >
-                {{ t('students.noClassroom') }}
-              </Badge>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-xl font-semibold shrink-0"
+            >
+              {{ initials }}
+            </div>
+            <div class="min-w-0">
+              <h1 class="text-2xl font-bold tracking-tight">
+                {{ student.first_name }} {{ student.last_name }}
+              </h1>
+              <div class="mt-1 flex flex-wrap gap-1.5">
+                <Badge
+                  v-for="classroom in student.classrooms"
+                  :key="classroom.id"
+                  variant="outline"
+                  class="text-muted-foreground"
+                >
+                  {{ classroom.name }}
+                </Badge>
+                <Badge
+                  v-if="student.classrooms.length === 0"
+                  variant="outline"
+                  class="text-muted-foreground"
+                >
+                  {{ t('students.noClassroom') }}
+                </Badge>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="flex flex-wrap gap-2">
-          <Button variant="outline" class="cursor-pointer" @click="showEditModal = true">
-            <Pencil class="w-4 h-4" />
-            {{ t('studentProfile.actions.edit') }}
-          </Button>
-          <Button variant="outline" class="cursor-pointer" @click="showBonusCreateModal = true">
-            <Star class="w-4 h-4" />
-            {{ t('studentProfile.actions.addBonus') }}
-          </Button>
-          <Button variant="outline" class="cursor-pointer" @click="showPenaltyCreateModal = true">
-            <AlertTriangle class="w-4 h-4" />
-            {{ t('studentProfile.actions.addPenalty') }}
-          </Button>
-          <Button
-            variant="outline"
-            class="cursor-pointer"
-            @click="showPunishmentCreateModal = true"
-          >
-            <Gavel class="w-4 h-4" />
-            {{ t('studentProfile.actions.addPunishment') }}
-          </Button>
-          <Button
-            variant="outline"
-            class="cursor-pointer text-destructive hover:text-destructive"
-            @click="showDeleteModal = true"
-          >
-            <Trash2 class="w-4 h-4" />
-            {{ t('studentProfile.actions.delete') }}
-          </Button>
+          <PageActionsMenu :create-label="t('common.add')" align="end">
+            <template #create>
+              <DropdownMenuItem class="cursor-pointer" @click="showBonusCreateModal = true">
+                <Star class="w-4 h-4 text-amber-400" />
+                {{ t('studentProfile.actions.addBonus') }}
+              </DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="showPenaltyCreateModal = true">
+                <AlertTriangle class="w-4 h-4 text-amber-400" />
+                {{ t('studentProfile.actions.addPenalty') }}
+              </DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="showPunishmentCreateModal = true">
+                <Gavel class="w-4 h-4 text-red-400" />
+                {{ t('studentProfile.actions.addPunishment') }}
+              </DropdownMenuItem>
+            </template>
+            <template #manage>
+              <DropdownMenuItem class="cursor-pointer" @click="showEditModal = true">
+                <Pencil class="w-4 h-4" />
+                {{ t('studentProfile.actions.edit') }}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                class="cursor-pointer"
+                @click="showDeleteModal = true"
+              >
+                <Trash2 class="w-4 h-4" />
+                {{ t('studentProfile.actions.delete') }}
+              </DropdownMenuItem>
+            </template>
+          </PageActionsMenu>
         </div>
       </div>
 
