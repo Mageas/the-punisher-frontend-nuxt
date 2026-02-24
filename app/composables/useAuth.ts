@@ -11,6 +11,7 @@ import type { RegisterRequest } from '~/types/api'
 export function useAuth() {
   const authService = useAuthService()
   const accessToken = useState<string | null>('auth.access-token', () => null)
+  const isLoggingOut = useState<boolean>('auth.is-logging-out', () => false)
   const accessTokenCookie = useCookie<string | null>('access_token', {
     path: '/',
     sameSite: 'lax',
@@ -61,14 +62,20 @@ export function useAuth() {
    * Revoke the refresh_token on the server, clear local auth state and redirect to login.
    */
   async function logout() {
-    try {
-      await authService.logout()
-    } catch {
-      // Best effort: local logout still proceeds even if server revocation fails.
-    }
+    isLoggingOut.value = true
 
-    clearAccessToken()
-    await navigateTo('/login')
+    try {
+      try {
+        await authService.logout()
+      } catch {
+        // Best effort: local logout still proceeds even if server revocation fails.
+      }
+
+      clearAccessToken()
+      await navigateTo('/login')
+    } finally {
+      isLoggingOut.value = false
+    }
   }
 
   /**
