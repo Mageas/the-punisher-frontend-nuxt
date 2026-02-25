@@ -61,7 +61,8 @@
     "penaltyTypes": "Types de pénalités",
     "punishmentTypes": "Types de punitions",
     "bonusTypes": "Types de bonus",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "logoutAll": "Déconnecter tous les appareils"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -332,6 +333,13 @@
       "bonusMessage": "Êtes-vous sûr de vouloir consommer ce bonus ?",
       "cancel": "Annuler",
       "confirm": "Consommer"
+    },
+    "logoutAll": {
+      "title": "Confirmer la déconnexion globale",
+      "message": "Êtes-vous sûr de vouloir vous déconnecter de tous les appareils ?",
+      "warning": "Cette action révoque toutes vos sessions actives.",
+      "cancel": "Annuler",
+      "confirm": "Tout déconnecter"
     }
   },
   "auth": {

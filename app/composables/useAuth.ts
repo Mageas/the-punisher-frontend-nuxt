@@ -6,7 +6,7 @@ import type { RegisterRequest } from '~/types/api'
  * - Stores access_token in app memory state.
  * - Uses `credentials: 'include'` on $fetch so the backend's
  *   HttpOnly `refresh_token` cookie is sent/received automatically.
- * - Logout requests server-side refresh token revocation.
+ * - Logout supports current-session and all-sessions refresh token revocation.
  */
 export function useAuth() {
   const authService = useAuthService()
@@ -79,6 +79,26 @@ export function useAuth() {
   }
 
   /**
+   * Revoke all refresh_tokens on the server, clear local auth state and redirect to login.
+   */
+  async function logoutAll() {
+    isLoggingOut.value = true
+
+    try {
+      try {
+        await authService.logoutAll()
+      } catch {
+        // Best effort: local logout still proceeds even if server revocation fails.
+      }
+
+      clearAccessToken()
+      await navigateTo('/login')
+    } finally {
+      isLoggingOut.value = false
+    }
+  }
+
+  /**
    * Attempt to refresh the access_token using the HttpOnly refresh_token cookie.
    */
   async function refresh(): Promise<boolean> {
@@ -99,6 +119,7 @@ export function useAuth() {
     register,
     isRegisterAllowed,
     logout,
+    logoutAll,
     refresh,
   }
 }

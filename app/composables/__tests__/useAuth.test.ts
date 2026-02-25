@@ -30,6 +30,7 @@ const mockAuthService = {
   register: vi.fn(),
   getRegisterStatus: vi.fn(),
   logout: vi.fn(),
+  logoutAll: vi.fn(),
   refresh: vi.fn(),
 }
 
@@ -80,6 +81,19 @@ describe('useAuth', () => {
     expect(isAuthenticated.value).toBe(false)
     expect(mockCookies.get('access_token')?.value).toBe(null)
   })
+
+  it('logs out all devices and clears token', async () => {
+    mockCookies.set('access_token', ref('old-token'))
+    const { logoutAll, isAuthenticated, accessToken } = useAuth()
+
+    await logoutAll()
+
+    expect(mockAuthService.logoutAll).toHaveBeenCalled()
+    expect(accessToken.value).toBe(null)
+    expect(isAuthenticated.value).toBe(false)
+    expect(mockCookies.get('access_token')?.value).toBe(null)
+  })
+
   it('refreshes token successfully', async () => {
     mockAuthService.refresh.mockResolvedValue({ access_token: 'refreshed-token' })
     const { refresh, accessToken } = useAuth()
