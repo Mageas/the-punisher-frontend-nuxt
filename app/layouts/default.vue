@@ -13,6 +13,13 @@ import {
   Trophy,
   Users,
 } from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useUserStore } from '~/stores/user'
 import {
   Sidebar,
@@ -33,8 +40,9 @@ import {
 
 const { t } = useI18n()
 const route = useRoute()
-const { logout: authLogout, isAuthenticated } = useAuth()
+const { logout: authLogout, logoutAll: authLogoutAll, isAuthenticated } = useAuth()
 const userStore = useUserStore()
+const showLogoutAllConfirm = ref(false)
 
 if (isAuthenticated.value) {
   await userStore.fetchUser()
@@ -43,6 +51,11 @@ if (isAuthenticated.value) {
 async function logout() {
   userStore.clearUser()
   await authLogout()
+}
+
+async function logoutAllDevices(_: string) {
+  userStore.clearUser()
+  await authLogoutAll()
 }
 
 interface NavLink {
@@ -152,9 +165,26 @@ function isActive(to: string): boolean {
                   userStore.user?.email
                 }}</span>
               </div>
-              <SidebarMenuButton size="sm" class="size-8 shrink-0 cursor-pointer" @click="logout">
-                <LogOut class="size-4" />
-              </SidebarMenuButton>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <SidebarMenuButton size="sm" class="size-8 shrink-0 cursor-pointer">
+                    <LogOut class="size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-56">
+                  <DropdownMenuItem class="cursor-pointer" @click="logout">
+                    {{ t('sidebar.logout') }}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    class="cursor-pointer"
+                    @click="showLogoutAllConfirm = true"
+                  >
+                    {{ t('sidebar.logoutAll') }}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -169,5 +199,16 @@ function isActive(to: string): boolean {
         <slot />
       </div>
     </SidebarInset>
+    <ConfirmActionModal
+      v-model:open="showLogoutAllConfirm"
+      item-id="logout-all-devices"
+      :action-fn="logoutAllDevices"
+      :title="t('modals.logoutAll.title')"
+      :message="t('modals.logoutAll.message')"
+      :warning-message="t('modals.logoutAll.warning')"
+      :cancel-label="t('modals.logoutAll.cancel')"
+      :confirm-label="t('modals.logoutAll.confirm')"
+      confirm-variant="destructive"
+    />
   </SidebarProvider>
 </template>

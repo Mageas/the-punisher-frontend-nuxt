@@ -47,6 +47,15 @@ export function useAuthService() {
   }
 
   /**
+   * Revoke all refresh tokens for the current user on the server.
+   */
+  async function logoutAll() {
+    return $api<unknown>('/auth/refresh-tokens', {
+      method: 'DELETE',
+    })
+  }
+
+  /**
    * Attempt to refresh the access_token using the HttpOnly refresh_token cookie.
    */
   async function refresh() {
@@ -60,6 +69,7 @@ export function useAuthService() {
     register,
     getRegisterStatus,
     logout,
+    logoutAll,
     refresh,
   }
 }
