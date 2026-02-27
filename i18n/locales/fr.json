@@ -244,6 +244,7 @@
       "confirmMessage": "Êtes-vous sûr de vouloir supprimer tous les élèves ? Cette action est irréversible.",
       "confirmWarning": "Tous les élèves, ainsi que leurs bonus, pénalités et punitions seront définitivement supprimés.",
       "confirmButton": "Supprimer tous les élèves",
+      "success": "Tous les élèves ont été supprimés.",
       "unavailable": "Cette fonctionnalité n'est pas encore disponible."
     },
     "deleteAllClassrooms": {
@@ -254,6 +255,7 @@
       "confirmMessage": "Êtes-vous sûr de vouloir supprimer toutes les classes ? Cette action est irréversible.",
       "confirmWarning": "Toutes les classes seront supprimées. Les élèves seront retirés de leurs classes mais ne seront pas supprimés.",
       "confirmButton": "Supprimer toutes les classes",
+      "success": "Toutes les classes ont été supprimées.",
       "unavailable": "Cette fonctionnalité n'est pas encore disponible."
     },
     "importStudents": {
