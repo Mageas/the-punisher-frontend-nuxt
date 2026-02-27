@@ -3,6 +3,8 @@ import { Monitor, School, ShieldAlert, Users } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const { logoutAll } = useAuth()
+const { deleteAllStudents: deleteAllStudentsRequest } = useStudents()
+const { deleteAllClassrooms: deleteAllClassroomsRequest } = useClassrooms()
 const userStore = useUserStore()
 
 const showLogoutAllConfirm = ref(false)
@@ -15,13 +17,11 @@ async function logoutAllDevices(_: string) {
 }
 
 async function deleteAllStudents(_: string) {
-  // API not yet available — placeholder for future implementation
-  throw new Error(t('dangerZone.deleteAllStudents.unavailable'))
+  await deleteAllStudentsRequest()
 }
 
 async function deleteAllClassrooms(_: string) {
-  // API not yet available — placeholder for future implementation
-  throw new Error(t('dangerZone.deleteAllClassrooms.unavailable'))
+  await deleteAllClassroomsRequest()
 }
 </script>
 
@@ -47,8 +47,6 @@ async function deleteAllClassrooms(_: string) {
         :title="t('dangerZone.deleteAllStudents.title')"
         :description="t('dangerZone.deleteAllStudents.description')"
         :button-label="t('dangerZone.deleteAllStudents.button')"
-        disabled
-        :disabled-message="t('dangerZone.deleteAllStudents.unavailable')"
         @action="showDeleteStudentsConfirm = true"
       />
 
@@ -57,8 +55,6 @@ async function deleteAllClassrooms(_: string) {
         :title="t('dangerZone.deleteAllClassrooms.title')"
         :description="t('dangerZone.deleteAllClassrooms.description')"
         :button-label="t('dangerZone.deleteAllClassrooms.button')"
-        disabled
-        :disabled-message="t('dangerZone.deleteAllClassrooms.unavailable')"
         @action="showDeleteClassroomsConfirm = true"
       />
 

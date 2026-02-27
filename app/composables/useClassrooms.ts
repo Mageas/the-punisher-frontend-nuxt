@@ -30,6 +30,10 @@ export function useClassrooms() {
     return await classroomService.deleteClassroom(classroomId)
   }
 
+  async function deleteAllClassrooms() {
+    return await classroomService.deleteAllClassrooms()
+  }
+
   return {
     classrooms: paginated.items,
     loading: paginated.loading,
@@ -45,5 +49,6 @@ export function useClassrooms() {
     createClassroom,
     updateClassroom,
     deleteClassroom,
+    deleteAllClassrooms,
   }
 }
