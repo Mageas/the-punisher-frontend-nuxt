@@ -67,6 +67,12 @@ async function deleteAllClassrooms(_: string) {
       />
     </div>
 
+    <Separator class="my-6" />
+
+    <div class="space-y-3">
+      <StudentImportCard />
+    </div>
+
     <ConfirmActionModal
       v-model:open="showLogoutAllConfirm"
       item-id="logout-all-devices"

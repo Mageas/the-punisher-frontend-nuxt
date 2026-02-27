@@ -20,10 +20,13 @@ export interface ApiError {
  * A single field-level validation error detail.
  * The `error` field can be a simple key like "validation_field_required"
  * or a key with a value like "validation_min_length:8".
+ * Some endpoints can attach extra context like the failing row/value.
  */
 export interface ApiErrorDetail {
   field: string
   error: string
+  row?: number
+  value?: string
 }
 
 /**

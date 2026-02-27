@@ -125,6 +125,7 @@ En tant que **Professeur**, je veux :
 
 En tant que **Professeur**, je veux :
   * **CRUD Élève :** Créer, modifier les infos (Nom/Prénom) ou supprimer un élève.
+  * **Import en lot :** Importer des élèves et créer/associer automatiquement leurs classes via un fichier CSV/XLSX lors de l'initialisation.
   * **Consulter l'Historique (Timeline) :** Voir la liste chronologique de tous les événements (Pénalités reçues, Bonus obtenus, Punitions déclenchées).
   * **Gérer les Punitions :**
     * Voir la liste des punitions actives.
@@ -201,7 +202,8 @@ Voici le périmètre strict de la première version :
 * **Gestion des Élèves :**
   * Créer un élève (Nom, Prénom).
   * Assigner un élève à une classe (via liste déroulante ou formulaire multi-select).
-  * *Note :* Pas d'import CSV pour le MVP, saisie manuelle uniquement.
+  * *MVP :* saisie manuelle uniquement.
+  * *Hors MVP / administration avancée :* un import CSV/XLSX permet de créer les élèves, créer les classes manquantes et lier les deux depuis la zone de danger.
 
 #### 4. Dashboard & Opérations (Le "Live")
 
@@ -291,6 +293,11 @@ Voici le périmètre strict de la première version :
     * [ ] Page `/eleves` : Lister tous les élèves (Table avec recherche).
     * [ ] Modal de création : Nom, Prénom, Sélection de la classe (Select).
     * [ ] Suppression d'un élève.
+  * [ ] **ADMIN-02B : Import élèves / classes**
+    * [ ] Route `/management/danger`.
+    * [ ] Import `multipart/form-data` via CSV/XLSX.
+    * [ ] Résumé des créations / existants / liens.
+    * [ ] Affichage des erreurs de lignes retournées par l'API.
   * [ ] **ADMIN-03 : Profil Élève (Vue détaillée)**
     * [ ] Page `/eleves/:id`.
     * [ ] Afficher les informations de base (Nom, Classe).

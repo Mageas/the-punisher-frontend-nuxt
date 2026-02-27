@@ -322,6 +322,64 @@ Body :
 Réponse :
 - `201` -> `ReturnStudentDto`
 
+### POST `/students/import`
+
+Request :
+- `Content-Type: multipart/form-data`
+- champ fichier obligatoire : `file`
+- formats supportés : `.xlsx`, `.csv`
+- en-têtes attendus : `Eleves`, `Classes`
+
+Règles :
+- validation complète avant écriture (aucun import partiel)
+- réutilisation d’un élève existant via `(first_name, last_name)` exact
+- création des classes manquantes (unicité applicative par `name`)
+- séparateurs de classes acceptés : `,` et `;`
+- limite : `1000` lignes de données
+
+Réponse :
+- `200` -> `StudentImportResponseDto`
+- `400 import_file_missing`
+- `400 import_file_invalid`
+- `400 import_template_invalid`
+- `400 import_validation_failed` (avec `error_details` contenant `row`, `field`, `error`, `value`)
+
+Exemple de succès :
+
+```json
+{
+  "summary": {
+    "rows_total": 3,
+    "rows_processed": 3,
+    "classrooms_created": 2,
+    "classrooms_existing": 1,
+    "students_created": 1,
+    "students_existing": 2,
+    "links_created": 3,
+    "links_existing": 2,
+    "rows_failed": 0
+  },
+  "errors": []
+}
+```
+
+Exemple d'erreur de validation :
+
+```json
+{
+  "error": "import_validation_failed",
+  "error_code": 400,
+  "error_details": [
+    {
+      "row": 4,
+      "field": "Classes",
+      "error": "validation_field_required",
+      "value": ""
+    }
+  ]
+}
+```
+
 ### GET `/students/`
 
 Query params :
@@ -747,6 +805,12 @@ Conflicts :
 - `bonus_already_used`
 - `punishment_already_resolved`
 
+Imports :
+- `import_file_missing`
+- `import_file_invalid`
+- `import_template_invalid`
+- `import_validation_failed`
+
 ## 16. Définitions des DTOs
 
 ### ReturnUserDto
@@ -802,6 +866,59 @@ Conflicts :
   "active_bonus_count": 2,
   "total_penalty_count": 5,
   "pending_punishment_count": 1
+}
+```
+
+### StudentImportResponseDto
+
+```json
+{
+  "summary": {
+    "rows_total": 3,
+    "rows_processed": 3,
+    "classrooms_created": 2,
+    "classrooms_existing": 1,
+    "students_created": 1,
+    "students_existing": 2,
+    "links_created": 3,
+    "links_existing": 2,
+    "rows_failed": 0
+  },
+  "errors": [
+    {
+      "row": 4,
+      "field": "Classes",
+      "error": "validation_field_required",
+      "value": ""
+    }
+  ]
+}
+```
+
+### StudentImportSummaryDto
+
+```json
+{
+  "rows_total": 3,
+  "rows_processed": 3,
+  "classrooms_created": 2,
+  "classrooms_existing": 1,
+  "students_created": 1,
+  "students_existing": 2,
+  "links_created": 3,
+  "links_existing": 2,
+  "rows_failed": 0
+}
+```
+
+### StudentImportRowErrorDto
+
+```json
+{
+  "row": 4,
+  "field": "Classes",
+  "error": "validation_field_required",
+  "value": ""
 }
 ```
 

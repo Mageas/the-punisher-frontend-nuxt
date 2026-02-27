@@ -42,6 +42,13 @@
   * **📄 Types de bonus**
     * *Icone :* `Trophy`
 
+### E. Menu utilisateur
+
+*Les actions liées au compte et aux opérations sensibles.*
+  * **📄 Zone de danger**
+    * *Icone :* `ShieldAlert`
+    * *Rôle :* Regroupe les opérations globales et sensibles du tenant, dont l'import initial des élèves/classes.
+
 ---
 
 ## 2. Pages & Layouts
@@ -101,6 +108,20 @@
     * Compteur Bonus : Indicateur visuel + Chiffre.
     * Compteur Pénalités : Indicateur visuel + Chiffre.
     * Icone `ChevronRight` pour accéder au profil.
+
+---
+
+### ⚠️ Zone de danger
+
+*Vue dédiée aux opérations globales du tenant.*
+  * **Accès :** depuis le menu utilisateur.
+  * **Actions destructives :**
+  * Cartes de suppression globale des élèves et des classes.
+  * Carte de déconnexion de tous les appareils.
+  * **Import initial :**
+  * Carte dédiée à l'import des élèves et classes depuis un fichier CSV/XLSX.
+  * Affichage d'un résumé d'import (créations, existants, liens, lignes en erreur).
+  * Tableau scrollable des erreurs de lignes quand la validation échoue.
 
 ---
 

@@ -1,3 +1,5 @@
+import type { ApiError } from '~/types/api'
+
 interface ApiFetchErrorLike {
   status?: unknown
   statusCode?: unknown
@@ -33,6 +35,23 @@ export function getApiErrorStatus(error: unknown): number | undefined {
   }
 
   return undefined
+}
+
+export function extractApiError(error: unknown): ApiError | null {
+  if (!error || typeof error !== 'object') return null
+
+  if ('data' in error) {
+    const data = (error as { data: unknown }).data
+    if (data && typeof data === 'object' && 'error' in data) {
+      return data as ApiError
+    }
+  }
+
+  if ('error' in error && 'error_code' in error) {
+    return error as ApiError
+  }
+
+  return null
 }
 
 export function isNetworkApiError(error: unknown): boolean {

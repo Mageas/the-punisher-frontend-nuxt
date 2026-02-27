@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getApiErrorStatus, isFatalApiError, isNetworkApiError } from '../api-error'
+import {
+  extractApiError,
+  getApiErrorStatus,
+  isFatalApiError,
+  isNetworkApiError,
+} from '../api-error'
 
 describe('api-error.ts', () => {
   describe('getApiErrorStatus', () => {
@@ -17,6 +22,29 @@ describe('api-error.ts', () => {
 
     it('returns undefined when no HTTP status is available', () => {
       expect(getApiErrorStatus(new TypeError('Failed to fetch'))).toBeUndefined()
+    })
+  })
+
+  describe('extractApiError', () => {
+    it('extracts the api error from a fetch-like error payload', () => {
+      expect(
+        extractApiError({
+          statusCode: 400,
+          data: {
+            error: 'import_validation_failed',
+            error_code: 400,
+            error_details: [{ row: 2, field: 'Classes', error: 'validation_field_required' }],
+          },
+        }),
+      ).toEqual({
+        error: 'import_validation_failed',
+        error_code: 400,
+        error_details: [{ row: 2, field: 'Classes', error: 'validation_field_required' }],
+      })
+    })
+
+    it('returns null when the error does not match the api shape', () => {
+      expect(extractApiError(new Error('boom'))).toBeNull()
     })
   })
 

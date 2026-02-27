@@ -7,6 +7,7 @@ import type {
   Penalty,
   Punishment,
   StudentHistoryItem,
+  StudentImportResponse,
 } from '~/types/api'
 
 export function useStudentService() {
@@ -134,6 +135,19 @@ export function useStudentService() {
     })
   }
 
+  /**
+   * Import students from a CSV or XLSX file.
+   */
+  async function importStudents(file: File): Promise<StudentImportResponse> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    return $api<StudentImportResponse>('/students/import', {
+      method: 'POST',
+      body: formData,
+    })
+  }
+
   return {
     getStudents,
     getStudentById,
@@ -146,5 +160,6 @@ export function useStudentService() {
     updateStudent,
     deleteStudent,
     deleteAllStudents,
+    importStudents,
   }
 }

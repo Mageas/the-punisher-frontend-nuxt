@@ -1,4 +1,5 @@
-import type { ApiError, ApiErrorDetail } from '~/types/api'
+import type { ApiErrorDetail } from '~/types/api'
+import { extractApiError } from '~/lib/api-error'
 
 /**
  * Parsed field errors: maps field names to their translated error messages.
@@ -136,26 +137,4 @@ export function useApiErrors() {
     clearErrors,
     clearFieldError,
   }
-}
-
-/**
- * Extracts an ApiError from various error shapes ($fetch FetchError, raw object, etc.)
- */
-function extractApiError(err: unknown): ApiError | null {
-  if (!err || typeof err !== 'object') return null
-
-  // $fetch wraps errors in FetchError with a `data` property
-  if ('data' in err) {
-    const data = (err as { data: unknown }).data
-    if (data && typeof data === 'object' && 'error' in data) {
-      return data as ApiError
-    }
-  }
-
-  // Direct ApiError shape
-  if ('error' in err && 'error_code' in err) {
-    return err as ApiError
-  }
-
-  return null
 }
