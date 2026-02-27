@@ -9,6 +9,7 @@ import {
   LogOut,
   School,
   Scale,
+  ShieldAlert,
   Skull,
   Star,
   Trophy,
@@ -41,9 +42,8 @@ import {
 
 const { t } = useI18n()
 const route = useRoute()
-const { logout: authLogout, logoutAll: authLogoutAll, isAuthenticated } = useAuth()
+const { logout: authLogout, isAuthenticated } = useAuth()
 const userStore = useUserStore()
-const showLogoutAllConfirm = ref(false)
 
 if (isAuthenticated.value) {
   await userStore.fetchUser()
@@ -52,11 +52,6 @@ if (isAuthenticated.value) {
 async function logout() {
   userStore.clearUser()
   await authLogout()
-}
-
-async function logoutAllDevices(_: string) {
-  userStore.clearUser()
-  await authLogoutAll()
 }
 
 interface NavLink {
@@ -193,17 +188,16 @@ function isActive(to: string): boolean {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem as-child class="cursor-pointer gap-2">
+                  <NuxtLink to="/management/danger">
+                    <ShieldAlert class="size-4" />
+                    {{ t('sidebar.danger') }}
+                  </NuxtLink>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem class="cursor-pointer gap-2" @click="logout">
                   <LogOut class="size-4" />
                   {{ t('sidebar.logout') }}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  class="cursor-pointer"
-                  @click="showLogoutAllConfirm = true"
-                >
-                  {{ t('sidebar.logoutAll') }}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -220,16 +214,5 @@ function isActive(to: string): boolean {
         <slot />
       </div>
     </SidebarInset>
-    <ConfirmActionModal
-      v-model:open="showLogoutAllConfirm"
-      item-id="logout-all-devices"
-      :action-fn="logoutAllDevices"
-      :title="t('modals.logoutAll.title')"
-      :message="t('modals.logoutAll.message')"
-      :warning-message="t('modals.logoutAll.warning')"
-      :cancel-label="t('modals.logoutAll.cancel')"
-      :confirm-label="t('modals.logoutAll.confirm')"
-      confirm-variant="destructive"
-    />
   </SidebarProvider>
 </template>
