@@ -51,6 +51,12 @@ export function useClassroomService() {
     })
   }
 
+  async function deleteAllClassrooms(): Promise<void> {
+    await $api('/classrooms', {
+      method: 'DELETE',
+    })
+  }
+
   async function addStudentToClassroom(classroomId: string, studentId: string): Promise<void> {
     await $api(`/classrooms/${classroomId}/students`, {
       method: 'POST',
@@ -81,6 +87,7 @@ export function useClassroomService() {
     createClassroom,
     updateClassroom,
     deleteClassroom,
+    deleteAllClassrooms,
     addStudentToClassroom,
     removeStudentFromClassroom,
     getClassroomStudents,

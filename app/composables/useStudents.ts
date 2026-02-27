@@ -33,6 +33,10 @@ export function useStudents() {
     return await studentService.deleteStudent(studentId)
   }
 
+  async function deleteAllStudents() {
+    return await studentService.deleteAllStudents()
+  }
+
   return {
     students: paginated.items,
     loading: paginated.loading,
@@ -48,5 +52,6 @@ export function useStudents() {
     createStudent,
     updateStudent,
     deleteStudent,
+    deleteAllStudents,
   }
 }

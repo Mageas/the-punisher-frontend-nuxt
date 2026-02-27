@@ -125,6 +125,15 @@ export function useStudentService() {
     })
   }
 
+  /**
+   * Delete all students.
+   */
+  async function deleteAllStudents(): Promise<void> {
+    await $api('/students', {
+      method: 'DELETE',
+    })
+  }
+
   return {
     getStudents,
     getStudentById,
@@ -136,5 +145,6 @@ export function useStudentService() {
     createStudent,
     updateStudent,
     deleteStudent,
+    deleteAllStudents,
   }
 }
