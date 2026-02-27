@@ -78,3 +78,36 @@ export type StudentHistoryItem =
   | StudentHistoryBonusItem
   | StudentHistoryPenaltyItem
   | StudentHistoryPunishmentItem
+
+/**
+ * Summary returned by a successful student import.
+ */
+export interface StudentImportSummary {
+  rows_total: number
+  rows_processed: number
+  classrooms_created: number
+  classrooms_existing: number
+  students_created: number
+  students_existing: number
+  links_created: number
+  links_existing: number
+  rows_failed: number
+}
+
+/**
+ * Successful import response.
+ */
+export interface StudentImportResponse {
+  summary: StudentImportSummary
+  errors: StudentImportRowError[]
+}
+
+/**
+ * A row-level error from import validation.
+ */
+export interface StudentImportRowError {
+  row: number
+  field: string
+  error: string
+  value?: string
+}
