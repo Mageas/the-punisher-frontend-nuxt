@@ -2,6 +2,7 @@
 import {
   AlertCircle,
   AlertTriangle,
+  ChevronsUpDown,
   FileWarning,
   Gavel,
   LayoutDashboard,
@@ -153,39 +154,59 @@ function isActive(to: string): boolean {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div class="flex items-center gap-2 px-2 py-1.5">
-              <div
-                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium"
-              >
-                {{ userStore.initials }}
-              </div>
-              <div class="grid flex-1 text-left text-sm leading-tight min-w-0">
-                <span class="truncate font-semibold">{{ userStore.fullName }}</span>
-                <span class="truncate text-xs text-muted-foreground">{{
-                  userStore.user?.email
-                }}</span>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <SidebarMenuButton size="sm" class="size-8 shrink-0 cursor-pointer">
-                    <LogOut class="size-4" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="w-56">
-                  <DropdownMenuItem class="cursor-pointer" @click="logout">
-                    {{ t('sidebar.logout') }}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    class="cursor-pointer"
-                    @click="showLogoutAllConfirm = true"
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <SidebarMenuButton
+                  size="lg"
+                  class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium"
                   >
-                    {{ t('sidebar.logoutAll') }}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                    {{ userStore.initials }}
+                  </div>
+                  <div class="grid flex-1 text-left text-sm leading-tight min-w-0">
+                    <span class="truncate font-semibold">{{ userStore.fullName }}</span>
+                    <span class="truncate text-xs text-muted-foreground">{{
+                      userStore.user?.email
+                    }}</span>
+                  </div>
+                  <ChevronsUpDown class="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="right"
+                align="end"
+                class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              >
+                <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <div
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-xs font-medium"
+                  >
+                    {{ userStore.initials }}
+                  </div>
+                  <div class="grid flex-1 text-left text-sm leading-tight min-w-0">
+                    <span class="truncate font-semibold">{{ userStore.fullName }}</span>
+                    <span class="truncate text-xs text-muted-foreground">{{
+                      userStore.user?.email
+                    }}</span>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem class="cursor-pointer gap-2" @click="logout">
+                  <LogOut class="size-4" />
+                  {{ t('sidebar.logout') }}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  class="cursor-pointer"
+                  @click="showLogoutAllConfirm = true"
+                >
+                  {{ t('sidebar.logoutAll') }}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
