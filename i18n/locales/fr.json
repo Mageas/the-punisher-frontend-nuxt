@@ -62,7 +62,8 @@
     "punishmentTypes": "Types de punitions",
     "bonusTypes": "Types de bonus",
     "logout": "Se déconnecter",
-    "logoutAll": "Déconnecter tous les appareils"
+    "logoutAll": "Déconnecter tous les appareils",
+    "danger": "Zone de danger"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -220,6 +221,40 @@
       "punishmentAuto": "Punition déclenchée : {name}",
       "bonus": "Bonus : {name}",
       "penalty": "Pénalité : {name}"
+    }
+  },
+  "dangerZone": {
+    "title": "Zone de danger",
+    "description": "Actions irréversibles affectant l'ensemble de votre tenant. Procédez avec précaution.",
+    "logoutAll": {
+      "title": "Déconnecter tous les appareils",
+      "description": "Révoque toutes les sessions actives. Tous les appareils connectés seront déconnectés, y compris celui-ci.",
+      "button": "Tout déconnecter",
+      "confirmTitle": "Confirmer la déconnexion globale",
+      "confirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de tous les appareils ?",
+      "confirmWarning": "Cette action révoque toutes vos sessions actives. Vous serez redirigé vers la page de connexion.",
+      "confirmButton": "Tout déconnecter",
+      "success": "Tous les appareils ont été déconnectés."
+    },
+    "deleteAllStudents": {
+      "title": "Supprimer tous les élèves",
+      "description": "Supprime définitivement tous les élèves du tenant ainsi que leurs bonus, pénalités et punitions associés.",
+      "button": "Supprimer tous les élèves",
+      "confirmTitle": "Confirmer la suppression des élèves",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer tous les élèves ? Cette action est irréversible.",
+      "confirmWarning": "Tous les élèves, ainsi que leurs bonus, pénalités et punitions seront définitivement supprimés.",
+      "confirmButton": "Supprimer tous les élèves",
+      "unavailable": "Cette fonctionnalité n'est pas encore disponible."
+    },
+    "deleteAllClassrooms": {
+      "title": "Supprimer toutes les classes",
+      "description": "Supprime définitivement toutes les classes du tenant. Les élèves ne seront pas supprimés mais retirés de leurs classes.",
+      "button": "Supprimer toutes les classes",
+      "confirmTitle": "Confirmer la suppression des classes",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer toutes les classes ? Cette action est irréversible.",
+      "confirmWarning": "Toutes les classes seront supprimées. Les élèves seront retirés de leurs classes mais ne seront pas supprimés.",
+      "confirmButton": "Supprimer toutes les classes",
+      "unavailable": "Cette fonctionnalité n'est pas encore disponible."
     }
   },
   "modals": {
