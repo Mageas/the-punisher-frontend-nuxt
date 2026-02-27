@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Monitor, School, ShieldAlert, Users } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const { logoutAll } = useAuth()
@@ -18,10 +19,12 @@ async function logoutAllDevices(_: string) {
 
 async function deleteAllStudents(_: string) {
   await deleteAllStudentsRequest()
+  toast.success(t('dangerZone.deleteAllStudents.success'))
 }
 
 async function deleteAllClassrooms(_: string) {
   await deleteAllClassroomsRequest()
+  toast.success(t('dangerZone.deleteAllClassrooms.success'))
 }
 </script>
 
