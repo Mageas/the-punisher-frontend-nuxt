@@ -19,10 +19,11 @@ export interface TypeServiceFunctions<TType> {
  */
 export function useTypeCollection<TType extends NamedTypeResource>(
   services: TypeServiceFunctions<TType>,
+  stateKey = 'paginated:types',
 ) {
   const paginated = usePaginatedCollection<TType, { page?: number }>(
     (options) => services.getTypes(options),
-    { pageKey: 'page' },
+    { pageKey: 'page', stateKey },
   )
 
   async function fetchTypes(options?: { page?: number }) {

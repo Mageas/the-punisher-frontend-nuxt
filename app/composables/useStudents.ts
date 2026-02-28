@@ -12,6 +12,7 @@ export function useStudents() {
   >((options) => studentService.getStudents(options), {
     pageKey: 'page',
     filterKeys: ['search'],
+    stateKey: 'paginated:students',
   })
 
   async function fetchStudents(options?: { page?: number; search?: string }) {

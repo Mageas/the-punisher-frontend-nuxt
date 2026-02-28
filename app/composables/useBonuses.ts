@@ -1,25 +1,36 @@
 import type { Bonus } from '~/types/api'
+
+export type BonusFilters = {
+  student_id?: string
+  classroom_id?: string
+  bonus_type_id?: string
+  state?: 'used' | 'unused'
+  created_from?: string
+  created_to?: string
+}
+
 /**
  * Composable to fetch and manage bonuses with pagination.
  */
 export function useBonuses() {
   const bonusService = useBonusService()
-  const paginated = usePaginatedCollection<
-    Bonus,
+  const paginated = usePaginatedCollection<Bonus, BonusFilters>(
+    (options) => bonusService.getBonuses(options),
     {
-      state?: 'used' | 'unused'
-      search?: string
-    }
-  >((options) => bonusService.getBonuses(options), {
-    pageKey: 'page',
-    filterKeys: ['search', 'state'],
-  })
+      pageKey: 'page',
+      filterKeys: [
+        'student_id',
+        'classroom_id',
+        'bonus_type_id',
+        'state',
+        'created_from',
+        'created_to',
+      ],
+      stateKey: 'paginated:bonuses',
+    },
+  )
 
-  async function fetchBonuses(options?: {
-    page?: number
-    state?: 'used' | 'unused'
-    search?: string
-  }) {
+  async function fetchBonuses(options?: BonusFilters & { page?: number }) {
     await paginated.fetchPage(options)
   }
 

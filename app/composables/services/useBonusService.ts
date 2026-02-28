@@ -13,13 +13,25 @@ export function useBonusService() {
    * Fetch all bonuses with pagination.
    */
   async function getBonuses(
-    options?: { page?: number; search?: string; state?: string },
+    options?: {
+      page?: number
+      student_id?: string
+      classroom_id?: string
+      bonus_type_id?: string
+      state?: string
+      created_from?: string
+      created_to?: string
+    },
     requestOptions?: ApiRequestOptions,
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
-    if (options?.search) params.search = options.search
+    if (options?.student_id) params.student_id = options.student_id
+    if (options?.classroom_id) params.classroom_id = options.classroom_id
+    if (options?.bonus_type_id) params.bonus_type_id = options.bonus_type_id
     if (options?.state) params.state = options.state
+    if (options?.created_from) params.created_from = options.created_from
+    if (options?.created_to) params.created_to = options.created_to
     return $api<PaginatedResponse<Bonus>>('/bonuses', { params, ...requestOptions })
   }
 

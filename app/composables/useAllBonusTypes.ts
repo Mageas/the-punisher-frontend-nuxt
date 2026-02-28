@@ -4,8 +4,9 @@ import type { BonusType } from '~/types/api'
  */
 export function useAllBonusTypes() {
   const typeService = useTypeService()
-  const allPaginated = useAllPaginatedCollection<BonusType>((options) =>
-    typeService.getBonusTypes(options),
+  const allPaginated = useAllPaginatedCollection<BonusType>(
+    (options) => typeService.getBonusTypes(options),
+    { stateKey: 'all:bonus-types' },
   )
 
   async function fetchBonusTypes() {

@@ -6,12 +6,15 @@ import type { Student } from '~/types/api'
 export function useAllStudents() {
   const studentService = useStudentService()
   const classroomService = useClassroomService()
-  const allPaginated = useAllPaginatedCollection<Student, [string?]>((options, classroomId) => {
-    if (classroomId) {
-      return classroomService.getClassroomStudents(classroomId, options)
-    }
-    return studentService.getStudents(options)
-  })
+  const allPaginated = useAllPaginatedCollection<Student, [string?]>(
+    (options, classroomId) => {
+      if (classroomId) {
+        return classroomService.getClassroomStudents(classroomId, options)
+      }
+      return studentService.getStudents(options)
+    },
+    { stateKey: 'all:students' },
+  )
 
   async function fetchStudents(classroomId?: string) {
     await allPaginated.fetchAll(classroomId)

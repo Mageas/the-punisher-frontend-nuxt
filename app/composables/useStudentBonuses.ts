@@ -16,6 +16,7 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   >((options) => studentService.getStudentBonuses(toValue(studentId), options), {
     pageKey: 'bonuses_page',
     filterKeys: ['search', 'state'],
+    stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
   })
 
   async function fetchBonuses(options?: {

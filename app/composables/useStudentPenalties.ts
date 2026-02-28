@@ -15,6 +15,7 @@ export function useStudentPenalties(studentId: MaybeRefOrGetter<string>) {
   >((options) => studentService.getStudentPenalties(toValue(studentId), options), {
     pageKey: 'penalties_page',
     filterKeys: ['search'],
+    stateKey: `paginated:student:${toValue(studentId)}:penalties`,
   })
 
   async function fetchPenalties(options?: { page?: number; search?: string }) {

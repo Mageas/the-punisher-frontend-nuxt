@@ -9,7 +9,10 @@ export function useRules() {
     {
       page?: number
     }
-  >((options) => ruleService.getRules(options), { pageKey: 'page' })
+  >((options) => ruleService.getRules(options), {
+    pageKey: 'page',
+    stateKey: 'paginated:rules',
+  })
 
   async function fetchRules(options?: { page?: number }) {
     await paginated.fetchPage(options)

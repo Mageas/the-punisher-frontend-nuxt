@@ -13,6 +13,7 @@ export function useStudentHistory(studentId: MaybeRefOrGetter<string>) {
     }
   >((options) => studentService.getStudentHistory(toValue(studentId), options), {
     pageKey: 'history_page',
+    stateKey: `paginated:student:${toValue(studentId)}:history`,
   })
 
   async function fetchHistory(options?: { page?: number }) {
