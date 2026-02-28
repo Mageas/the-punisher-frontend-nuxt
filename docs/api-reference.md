@@ -1,38 +1,46 @@
-# API Reference
+# API Reference - The Punisher Backend (guide technique frontend IA)
 
-Base path: `/v1`
+## 1) Conventions globales
 
-## 1. Conventions globales
+### 1.1 Base URL
+- Local: `http://localhost:8080`
+- Prefix API: toutes les routes metier sont sous `/v1`
 
-- Auth Bearer requise sur toutes les routes sauf :
-  - `GET /health`
-  - `POST /auth/register`
-  - `POST /auth/login`
-  - `POST /auth/refresh`
-- JSON strict :
-  - champs inconnus rejetés (`400 invalid_request_body`)
-  - validation via tags `validate` (`400 validation_failed`)
-- Pagination :
-  - query param `?page=`
-  - taille fixe : `20`
-  - si `page` invalide ou <= 0, fallback sur page `1`
-- Dates : format RFC3339.
-- Réponse d'erreur standard :
+### 1.2 Authentification
+- Routes publiques:
+  - `GET /v1/health`
+  - `GET /v1/auth/register/status`
+  - `POST /v1/auth/register`
+  - `POST /v1/auth/login`
+  - `POST /v1/auth/refresh`
+  - `POST /v1/auth/logout`
+- Routes protegees: toutes les autres routes `/v1/**` exigent `Authorization: Bearer <access_token>`.
 
-```json
-{
-  "error": "validation_failed",
-  "error_code": 400,
-  "error_details": [
-    { "field": "first_name", "error": "validation_field_required" }
-  ]
-}
-```
+Flow recommande frontend:
+1. `POST /v1/auth/login` avec email/password
+2. Recuperer `access_token` dans le body
+3. Stocker `access_token` cote client (memoire de preference)
+4. Utiliser `Authorization: Bearer <token>`
+5. Quand 401/expiration: `POST /v1/auth/refresh` (cookie `refresh_token` automatiquement envoye si `credentials: include`)
 
-### Réponse paginée standard
+Notes cookie refresh:
+- Nom: `refresh_token`
+- `HttpOnly`, `SameSite=Strict`
+- Path cookie: `/v1/auth`
+- Le frontend doit utiliser `credentials: 'include'` pour `login`, `refresh`, `logout`.
 
-Toutes les routes `List*` renvoient :
+### 1.3 Types de donnees
+- UUID: format canonique (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
+- Date liste: `YYYY-MM-DD` (ex: `2026-02-28`)
+- DateTime body (punishments): `RFC3339` (ex: `2026-03-15T18:00:00Z`)
+- Bool query: `true` ou `false`
 
+### 1.4 Pagination
+- Parametre: `page` (int > 0)
+- Taille fixe backend: `20`
+- Si `page` invalide/absent: fallback page `1` (pas d erreur)
+
+Format reponse paginee:
 ```json
 {
   "page": 1,
@@ -44,195 +52,284 @@ Toutes les routes `List*` renvoient :
 }
 ```
 
-## 2. Objets de réponse
-
-### Student
-
+### 1.5 Format d erreur (global)
 ```json
 {
-  "id": "uuid",
-  "first_name": "Lucas",
-  "last_name": "Dubois",
-  "classrooms": [{ "id": "uuid", "name": "6eme A" }],
-  "available_bonus_points": 3,
-  "penalty_count": 5,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
-}
-```
-
-### Classroom
-
-```json
-{
-  "id": "uuid",
-  "name": "6eme A",
-  "year": "2025-2026",
-  "main_teacher": "Mme Martin",
-  "student_count": 12,
-  "students_preview": [
-    { "id": "uuid", "first_name": "Lucas", "last_name": "Dubois" }
+  "error": "malformed_parameter",
+  "error_details": [
+    {
+      "field": "created_from",
+      "error": "validation_malformed_parameter:expected_yyyy-mm-dd"
+    }
   ],
-  "total_bonus_points": 14.5,
-  "total_penalty_count": 23,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error_code": 400
 }
 ```
 
-`students_preview` est limité à 5 élèves max.
+## 2) Contrats JSON (schemas frontend)
 
-### Bonus
+```ts
+// Pagination
+interface PaginatedResponse<T> {
+  page: number;
+  item_per_page: number;
+  total_count: number;
+  previous_page: number | null;
+  next_page: number | null;
+  data: T[];
+}
 
-```json
-{
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Emma",
-  "student_last_name": "Bernard",
-  "bonus_type_id": "uuid",
-  "bonus_type_name": "Participation",
-  "points": 1,
-  "created_at": "2026-02-18T10:00:00Z",
-  "used_at": null
+interface ErrorDetail {
+  row?: number;
+  field: string;
+  error: string;
+  value?: string;
+}
+
+interface ErrorResponse {
+  error: string;
+  error_code: number;
+  error_details?: ErrorDetail[];
+}
+
+// Auth
+interface LoginRequestDto {
+  email: string;
+  password: string;
+}
+
+interface LoginResponseDto {
+  access_token: string;
+}
+
+interface RefreshResponseDto {
+  access_token: string;
+}
+
+interface RegisterStatusResponseDto {
+  register_allowed: boolean;
+}
+
+// User
+interface ReturnUserDto {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Students
+interface StudentClassroomDto {
+  id: string;
+  name: string;
+}
+
+interface ReturnStudentDto {
+  id: string;
+  first_name: string;
+  last_name: string;
+  classrooms: StudentClassroomDto[];
+  available_bonus_points: number;
+  penalty_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface StudentKpisDto {
+  available_bonus_points: number;
+  total_bonus_points: number;
+  active_bonus_count: number;
+  penalty_count: number;
+  total_penalty_count: number;
+  total_punishment_count: number;
+  overdue_punishment_count: number;
+  pending_punishment_count: number;
+}
+
+interface StudentHistoryItemDto {
+  type: string; // bonus | penalty | punishment
+  id: string;
+  penalty_type_id?: string;
+  penalty_type_name?: string;
+  bonus_type_id?: string;
+  bonus_type_name?: string;
+  points?: number;
+  used_at?: string;
+  punishment_type_id?: string;
+  punishment_type_name?: string;
+  triggering_rule_id?: string;
+  triggering_rule_name?: string;
+  automated?: boolean;
+  due_at?: string;
+  resolved_at?: string;
+  created_at: string;
+}
+
+// Classrooms
+interface ClassroomStudentPreviewDto {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface ReturnClassroomDto {
+  id: string;
+  name: string;
+  year: string | null;
+  main_teacher: string | null;
+  student_count: number;
+  students_preview: ClassroomStudentPreviewDto[];
+  created_at: string;
+  updated_at: string;
+}
+
+// Bonus / Penalty / Punishment
+interface ReturnBonusTypeDto {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ReturnPenaltyTypeDto {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ReturnPunishmentTypeDto {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ReturnBonusDto {
+  id: string;
+  student_id: string;
+  student_first_name: string;
+  student_last_name: string;
+  bonus_type_id: string;
+  bonus_type_name: string;
+  points: number;
+  created_at: string;
+  used_at: string | null;
+}
+
+interface ReturnPenaltyDto {
+  id: string;
+  student_id: string;
+  student_first_name: string;
+  student_last_name: string;
+  penalty_type_id: string;
+  penalty_type_name: string;
+  created_at: string;
+}
+
+interface ReturnPunishmentDto {
+  id: string;
+  student_id: string;
+  student_first_name: string;
+  student_last_name: string;
+  punishment_type_id: string;
+  punishment_type_name: string;
+  triggering_rule_id: string | null;
+  triggering_rule_name: string | null;
+  automated: boolean;
+  created_at: string;
+  due_at: string;
+  resolved_at: string | null;
+}
+
+// Rules
+interface ReturnRuleDto {
+  id: string;
+  name: string;
+  resulting_punishment_type_id: string;
+  resulting_punishment_type_name: string;
+  penalty_type_id: string;
+  penalty_type_name: string;
+  threshold: number;
+  due_at_after_days: number;
+  mode: "after" | "at" | "every";
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Dashboard
+interface DashboardKpisDto {
+  student_count: number;
+  available_bonus_points: number;
+  total_bonus_points: number;
+  unused_bonus_count: number;
+  penalty_count: number;
+  total_punishment_count: number;
+  overdue_punishment_count: number;
+  pending_punishment_count: number;
+}
+
+interface ReturnDashboardDto {
+  kpis: DashboardKpisDto;
+  recent_penalties: ReturnPenaltyDto[];
+  recent_bonuses: ReturnBonusDto[];
+  pending_punishments: ReturnPunishmentDto[];
+}
+
+// Health
+interface HealthCheckDto {
+  status: "healthy" | "unhealthy";
+  environment: string;
+  version: string;
+  services: Record<string, string>;
+}
+
+// Import
+interface StudentImportRowErrorDto {
+  row: number;
+  field: string;
+  message: string;
+  value?: string;
+}
+
+interface StudentImportSummaryDto {
+  rows_total: number;
+  rows_processed: number;
+  classrooms_created: number;
+  classrooms_existing: number;
+  students_created: number;
+  students_existing: number;
+  links_created: number;
+  links_existing: number;
+  rows_failed: number;
+}
+
+interface StudentImportResultDto {
+  summary: StudentImportSummaryDto;
+  errors: StudentImportRowErrorDto[];
 }
 ```
 
-### Penalty
+## 3) Reference complete des endpoints
 
-```json
-{
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Lucas",
-  "student_last_name": "Dubois",
-  "penalty_type_id": "uuid",
-  "penalty_type_name": "Bavardage",
-  "created_at": "2026-02-18T10:00:00Z"
-}
-```
+## 3.1 Health
 
-### Punishment
+### GET `/v1/health`
+- Auth: non
+- URL params: aucun
+- Query params: aucun
+- Body: aucun
+- 200: `HealthCheckDto`
+- 503: `HealthCheckDto` si DB down (`status="unhealthy"`)
 
-```json
-{
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Lucas",
-  "student_last_name": "Dubois",
-  "punishment_type_id": "uuid",
-  "punishment_type_name": "Retenue",
-  "triggering_rule_id": "uuid",
-  "triggering_rule_name": "3 bavardages => retenue",
-  "created_at": "2026-02-18T10:00:00Z",
-  "due_at": "2026-02-25T10:00:00Z",
-  "resolved_at": null
-}
-```
-
-Pour une punition manuelle :
-- `triggering_rule_id = null`
-- `triggering_rule_name = null`
-
-### Rule
-
-```json
-{
-  "id": "uuid",
-  "name": "3 bavardages => retenue",
-  "resulting_punishment_type_id": "uuid",
-  "resulting_punishment_type_name": "Retenue",
-  "penalty_type_id": "uuid",
-  "penalty_type_name": "Bavardage",
-  "threshold": 3,
-  "due_at_after_days": 7,
-  "mode": "every",
-  "is_active": true,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
-}
-```
-
-### Dashboard
-
-```json
-{
-  "kpis": {
-    "student_count": 34,
-    "available_bonus_points": 14.5,
-    "unused_bonus_count": 12,
-    "penalty_count": 47,
-    "pending_punishment_count": 5
-  },
-  "recent_penalties": [],
-  "recent_bonuses": [],
-  "pending_punishments": []
-}
-```
-
-Chaque liste est limitée à 10 éléments.
-
-### Student KPIs
-
-```json
-{
-  "available_bonus_points": 3,
-  "active_bonus_count": 2,
-  "total_penalty_count": 5,
-  "pending_punishment_count": 1
-}
-```
-
-### Student History
-
-```json
-[
-  {
-    "type": "punishment",
-    "id": "uuid",
-    "punishment_type_id": "uuid",
-    "punishment_type_name": "Retenue",
-    "triggering_rule_id": "uuid",
-    "triggering_rule_name": "3 bavardages => retenue",
-    "due_at": "2026-02-25T10:00:00Z",
-    "resolved_at": null,
-    "created_at": "2026-02-18T10:00:00Z"
-  },
-  {
-    "type": "penalty",
-    "id": "uuid",
-    "penalty_type_id": "uuid",
-    "penalty_type_name": "Bavardage",
-    "created_at": "2026-02-18T09:00:00Z"
-  },
-  {
-    "type": "bonus",
-    "id": "uuid",
-    "bonus_type_id": "uuid",
-    "bonus_type_name": "Participation",
-    "points": 1,
-    "used_at": null,
-    "created_at": "2026-02-18T08:00:00Z"
-  }
-]
-```
-
-`history` est trié par `created_at` desc et paginé (taille fixe 20).
-
-## 3. Health
-
-### GET `/health`
-
-Réponses :
-- `200` si healthy
-- `503` si unhealthy
-
-Body :
-
+Exemple 200:
 ```json
 {
   "status": "healthy",
-  "environment": "dev",
+  "environment": "development",
   "version": "dev",
   "services": {
     "database": "healthy"
@@ -240,602 +337,597 @@ Body :
 }
 ```
 
-## 4. Auth
+## 3.2 Auth
 
-### POST `/auth/register`
+### GET `/v1/auth/register/status`
+- Auth: non
+- Body: aucun
+- 200: `RegisterStatusResponseDto`
 
-Body :
-
+Exemple:
 ```json
 {
-  "email": "teacher@example.com",
+  "register_allowed": true
+}
+```
+
+### POST `/v1/auth/register`
+- Auth: non
+- Body:
+```json
+{
+  "email": "teacher@school.test",
+  "first_name": "Ada",
+  "last_name": "Lovelace",
+  "password": "super-secret-123"
+}
+```
+- 201: `ReturnUserDto`
+- Erreurs: `register_not_allowed`, `validation_failed`, `invalid_request_body`, `conflict`
+
+### POST `/v1/auth/login`
+- Auth: non
+- Body:
+```json
+{
+  "email": "teacher@school.test",
+  "password": "super-secret-123"
+}
+```
+- 200: `LoginResponseDto`
+- Side effect: set-cookie `refresh_token`
+- Erreurs: `validation_failed`, `invalid_request_body`, `invalid_credentials_or_user_doesnt_exist`
+
+Exemple 200:
+```json
+{
+  "access_token": "<jwt_access_token>"
+}
+```
+
+### POST `/v1/auth/refresh`
+- Auth: non (mais cookie refresh obligatoire)
+- Body: aucun
+- 200: `RefreshResponseDto`
+- Side effect: rotation du cookie refresh
+- Erreurs: `unauthorized`, `jwt_invalid_token`, `jwt_expired`, `jwt_invalid_signing_method`
+
+### POST `/v1/auth/logout`
+- Auth: non
+- Body: aucun
+- 204: no content
+- Side effect: suppression cookie refresh
+
+### DELETE `/v1/auth/refresh-tokens`
+- Auth: oui (`Bearer`)
+- Body: aucun
+- 204: no content
+- Side effect: revoke tous les refresh tokens de l utilisateur
+- Erreurs: `unauthorized`, `jwt_invalid_token`, `jwt_expired`, `jwt_invalid_signing_method`
+
+## 3.3 User
+
+### GET `/v1/user/me`
+- Auth: oui
+- Body: aucun
+- 200: `ReturnUserDto`
+- Erreurs: `unauthorized`
+
+## 3.4 Students
+
+### POST `/v1/students/`
+- Auth: oui
+- Body:
+```json
+{
   "first_name": "Jean",
-  "last_name": "Dupont",
-  "password": "password123"
+  "last_name": "Dupont"
 }
 ```
+- 201: `ReturnStudentDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `unauthorized`
 
-Réponses :
-- `201` -> `ReturnUserDto`
-- `401 register_not_allowed` si `ALLOW_REGISTER=false`
+### POST `/v1/students/import`
+- Auth: oui
+- Body: `multipart/form-data` avec champ fichier `file` (`.csv` ou `.xlsx`)
+- 200: `StudentImportResultDto`
+- Erreurs: `import_file_missing`, `import_file_invalid`, `import_template_invalid`, `import_validation_failed`, `unauthorized`
 
-### POST `/auth/login`
-
-Body :
-
-```json
-{
-  "email": "teacher@example.com",
-  "password": "password123"
-}
+Exemple curl:
+```bash
+curl -X POST "http://localhost:8080/v1/students/import" \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@students.xlsx"
 ```
 
-Réponse `200` :
+### GET `/v1/students/`
+- Auth: oui
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `first_name + last_name`)
+- Exemple URL:
+  - `/v1/students/?search=jean%20dupont&page=2`
+- 200: `PaginatedResponse<ReturnStudentDto>`
+- Erreurs: `unauthorized`
 
+### DELETE `/v1/students/`
+- Auth: oui
+- Body: aucun
+- 204: no content
+- Erreurs: `unauthorized`
+
+### GET `/v1/students/{student_id}`
+- Auth: oui
+- Path params:
+  - `student_id` (uuid)
+- 200: `ReturnStudentDto`
+- Erreurs: `student_not_found`, `not_found` (uuid path invalide), `unauthorized`
+
+### GET `/v1/students/{student_id}/kpis`
+- Auth: oui
+- 200: `StudentKpisDto`
+- Erreurs: `student_not_found`, `not_found`, `unauthorized`
+
+### GET `/v1/students/{student_id}/history`
+- Auth: oui
+- Query params:
+  - `page` (optionnel)
+- Exemple URL:
+  - `/v1/students/11111111-1111-1111-1111-111111111111/history?page=1`
+- 200: `PaginatedResponse<StudentHistoryItemDto>`
+- Erreurs: `student_not_found`, `not_found`, `unauthorized`
+
+### PUT `/v1/students/{student_id}`
+- Auth: oui
+- Body (partiel):
 ```json
 {
-  "access_token": "jwt"
+  "first_name": "Jeanne",
+  "last_name": "Durand"
 }
 ```
+- 200: `ReturnStudentDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `not_found`, `unauthorized`
 
-Cookie `HttpOnly` posé :
-- nom : `refresh_token`
-- path : `/v1/auth/refresh`
+### DELETE `/v1/students/{student_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `student_not_found`, `not_found`, `unauthorized`
 
-### POST `/auth/refresh`
+### GET `/v1/students/{student_id}/classrooms`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnClassroomDto>`
+- Erreurs: `student_not_found`, `not_found`, `unauthorized`
 
-Nécessite le cookie `refresh_token`.
+### GET `/v1/students/{student_id}/bonuses`
+- Auth: oui
+- Query params:
+  - `page`
+  - `state` optionnel: `used|unused`
+- Exemple URL:
+  - `/v1/students/{student_id}/bonuses?state=unused&page=1`
+- 200: `PaginatedResponse<ReturnBonusDto>`
+- Erreurs: `student_not_found`, `malformed_parameter`, `not_found`, `unauthorized`
 
-Réponse `200` :
+### GET `/v1/students/{student_id}/penalties`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnPenaltyDto>`
+- Erreurs: `student_not_found`, `not_found`, `unauthorized`
 
+### GET `/v1/students/{student_id}/punishments`
+- Auth: oui
+- Query params:
+  - `page`
+  - `state` optionnel: `pending|resolved`
+- Exemple URL:
+  - `/v1/students/{student_id}/punishments?state=pending&page=1`
+- 200: `PaginatedResponse<ReturnPunishmentDto>`
+- Erreurs: `student_not_found`, `malformed_parameter`, `not_found`, `unauthorized`
+
+## 3.5 Classrooms
+
+### POST `/v1/classrooms/`
+- Auth: oui
+- Body:
 ```json
 {
-  "access_token": "jwt"
-}
-```
-
-## 5. Dashboard
-
-### GET `/dashboard?classroom_id=uuid`
-
-Query params :
-- `classroom_id` optionnel
-
-Réponses :
-- `200` -> `ReturnDashboardDto`
-- `400 malformed_parameter` si `classroom_id` n'est pas un UUID
-- `404 classroom_not_found` si classe absente pour l'utilisateur
-
-## 6. Students
-
-### POST `/students/`
-
-Body :
-
-```json
-{
-  "first_name": "Lucas",
-  "last_name": "Dubois"
-}
-```
-
-Réponse :
-- `201` -> `ReturnStudentDto`
-
-### POST `/students/import`
-
-Request :
-- `Content-Type: multipart/form-data`
-- champ fichier obligatoire : `file`
-- formats supportés : `.xlsx`, `.csv`
-- en-têtes attendus : `Eleves`, `Classes`
-
-Règles :
-- validation complète avant écriture (aucun import partiel)
-- réutilisation d’un élève existant via `(first_name, last_name)` exact
-- création des classes manquantes (unicité applicative par `name`)
-- séparateurs de classes acceptés : `,` et `;`
-- limite : `1000` lignes de données
-
-Réponse :
-- `200` -> `StudentImportResponseDto`
-- `400 import_file_missing`
-- `400 import_file_invalid`
-- `400 import_template_invalid`
-- `400 import_validation_failed` (avec `error_details` contenant `row`, `field`, `error`, `value`)
-
-Exemple de succès :
-
-```json
-{
-  "summary": {
-    "rows_total": 3,
-    "rows_processed": 3,
-    "classrooms_created": 2,
-    "classrooms_existing": 1,
-    "students_created": 1,
-    "students_existing": 2,
-    "links_created": 3,
-    "links_existing": 2,
-    "rows_failed": 0
-  },
-  "errors": []
-}
-```
-
-Exemple d'erreur de validation :
-
-```json
-{
-  "error": "import_validation_failed",
-  "error_code": 400,
-  "error_details": [
-    {
-      "row": 4,
-      "field": "Classes",
-      "error": "validation_field_required",
-      "value": ""
-    }
-  ]
-}
-```
-
-### GET `/students/`
-
-Query params :
-- `page` optionnel
-- `search` optionnel : recherche sur `prénom + nom` de l'élève
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnStudentDto>`
-
-### GET `/students/{id}`
-
-Réponse :
-- `200` -> `ReturnStudentDto`
-
-### PUT `/students/{id}`
-
-Body partiel :
-
-```json
-{
-  "first_name": "Nouveau",
-  "last_name": "Nom"
-}
-```
-
-Réponse :
-- `200` -> `ReturnStudentDto`
-
-### DELETE `/students/{id}`
-
-Réponse :
-- `204` no content
-
-### GET `/students/{id}/kpis`
-
-Query params :
-- aucun
-
-Réponse :
-- `200` -> `StudentKpisDto`
-
-### GET `/students/{id}/history`
-
-Query params :
-- `page` optionnel
-- `history_page` optionnel (support legacy, prioritaire sur `page`)
-
-Réponse :
-- `200` -> `[]StudentHistoryItemDto`
-
-### GET `/students/{id}/classrooms`
-
-Query params :
-- `page` optionnel
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnClassroomDto>`
-
-### GET `/students/{id}/bonuses`
-
-Query params :
-- `page` optionnel
-- `state` optionnel : `used|unused`
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnBonusDto>`
-
-### GET `/students/{id}/penalties`
-
-Query params :
-- `page` optionnel
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnPenaltyDto>`
-
-### GET `/students/{id}/punishments`
-
-Query params :
-- `page` optionnel
-- `state` optionnel : `pending|resolved`
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnPunishmentDto>`
-
-## 7. Classrooms
-
-### POST `/classrooms/`
-
-Body :
-
-```json
-{
-  "name": "6eme A",
+  "name": "6A",
   "year": "2025-2026",
   "main_teacher": "Mme Martin"
 }
 ```
+- 201: `ReturnClassroomDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `unauthorized`
 
-Réponse :
-- `201` -> `ReturnClassroomDto`
+### GET `/v1/classrooms/`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnClassroomDto>`
+- Erreurs: `unauthorized`
 
-### GET `/classrooms/`
+### DELETE `/v1/classrooms/`
+- Auth: oui
+- 204: no content
+- Erreurs: `unauthorized`
 
-Query params :
-- `page` optionnel
+### GET `/v1/classrooms/{classroom_id}`
+- Auth: oui
+- 200: `ReturnClassroomDto`
+- Erreurs: `classroom_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `200` -> `PaginatedResponse<ReturnClassroomDto>`
+### GET `/v1/classrooms/{classroom_id}/kpis`
+- Auth: oui
+- 200: `DashboardKpisDto`
+- Erreurs: `classroom_not_found`, `not_found`, `unauthorized`
 
-### GET `/classrooms/{id}`
-
-Réponse :
-- `200` -> `ReturnClassroomDto`
-
-### PUT `/classrooms/{id}`
-
-Body partiel :
-
+### PUT `/v1/classrooms/{classroom_id}`
+- Auth: oui
+- Body partiel:
 ```json
 {
-  "name": "6eme B",
+  "name": "6B",
   "year": "2026-2027",
-  "main_teacher": "M. Leroy"
+  "main_teacher": "M. Bernard"
 }
 ```
+- 200: `ReturnClassroomDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `classroom_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `200` -> `ReturnClassroomDto`
+### DELETE `/v1/classrooms/{classroom_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `classroom_not_found`, `not_found`, `unauthorized`
 
-### DELETE `/classrooms/{id}`
-
-Réponse :
-- `204` no content
-
-### POST `/classrooms/{id}/students`
-
-Body :
-
+### POST `/v1/classrooms/{classroom_id}/students`
+- Auth: oui
+- Body:
 ```json
 {
-  "student_id": "uuid"
+  "student_id": "11111111-1111-1111-1111-111111111111"
 }
 ```
+- 204: no content
+- Erreurs: `invalid_request_body`, `validation_failed`, `student_classroom_relation_exists`, `student_or_classroom_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `204` no content
+### DELETE `/v1/classrooms/{classroom_id}/students/{student_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `student_or_classroom_not_found`, `not_found`, `unauthorized`
 
-### DELETE `/classrooms/{id}/students/{studentId}`
+### GET `/v1/classrooms/{classroom_id}/students`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnStudentDto>`
+- Erreurs: `classroom_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `204` no content
+## 3.6 Bonus types
 
-### GET `/classrooms/{id}/students`
-
-Query params :
-- `page` optionnel
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnStudentDto>`
-
-## 8. Bonus Types
-
-### POST `/bonus-types/`
-### GET `/bonus-types/`
-### GET `/bonus-types/{id}`
-### PUT `/bonus-types/{id}`
-### DELETE `/bonus-types/{id}`
-
-Payloads :
-- create/update body : `{ "name": "Participation" }`
-- list : `PaginatedResponse<ReturnBonusTypeDto>`
-- get/create/update : `ReturnBonusTypeDto`
-- delete : `204`
-
-## 9. Penalty Types
-
-### POST `/penalty-types/`
-### GET `/penalty-types/`
-### GET `/penalty-types/{id}`
-### PUT `/penalty-types/{id}`
-### DELETE `/penalty-types/{id}`
-
-Payloads :
-- create/update body : `{ "name": "Bavardage" }`
-- list : `PaginatedResponse<ReturnPenaltyTypeDto>`
-- get/create/update : `ReturnPenaltyTypeDto`
-- delete : `204`
-
-## 10. Punishment Types
-
-### POST `/punishment-types/`
-### GET `/punishment-types/`
-### GET `/punishment-types/{id}`
-### PUT `/punishment-types/{id}`
-### DELETE `/punishment-types/{id}`
-
-Payloads :
-- create/update body : `{ "name": "Retenue" }`
-- list : `PaginatedResponse<ReturnPunishmentTypeDto>`
-- get/create/update : `ReturnPunishmentTypeDto`
-- delete : `204`
-
-## 11. Bonuses
-
-### POST `/bonuses/`
-
-Body :
-
+### POST `/v1/bonus-types/`
+- Auth: oui
+- Body:
 ```json
 {
-  "student_id": "uuid",
-  "bonus_type_id": "uuid",
-  "points": 1.5
+  "name": "Participation"
 }
 ```
+- 201: `ReturnBonusTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `unauthorized`
 
-Réponse :
-- `201` -> `ReturnBonusDto`
+### GET `/v1/bonus-types/`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnBonusTypeDto>`
+- Erreurs: `unauthorized`
 
-### GET `/bonuses/`
+### GET `/v1/bonus-types/{bonus_type_id}`
+- Auth: oui
+- 200: `ReturnBonusTypeDto`
+- Erreurs: `bonus_type_not_found`, `not_found`, `unauthorized`
 
-Query params :
-- `page` optionnel
-- `state` optionnel : `used|unused`
-- `search` optionnel : recherche sur `prénom + nom` de l'élève
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnBonusDto>`
-
-### GET `/bonuses/{id}`
-
-Réponse :
-- `200` -> `ReturnBonusDto`
-
-### POST `/bonuses/{id}/use`
-
-Effet :
-- passe `used_at` de `null` à `now`
-
-Réponse :
-- `200` -> `ReturnBonusDto`
-
-### DELETE `/bonuses/{id}`
-
-Réponse :
-- `204` no content
-
-## 12. Penalties
-
-### POST `/penalties/`
-
-Body :
-
+### PUT `/v1/bonus-types/{bonus_type_id}`
+- Auth: oui
+- Body partiel:
 ```json
 {
-  "student_id": "uuid",
-  "penalty_type_id": "uuid"
+  "name": "Aide aux autres"
 }
 ```
+- 200: `ReturnBonusTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `bonus_type_not_found`, `not_found`, `unauthorized`
 
-Effet métier :
-- crée une pénalité
-- évalue les règles actives
-- peut créer automatiquement une punition
+### DELETE `/v1/bonus-types/{bonus_type_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `bonus_type_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `201` -> `ReturnPenaltyDto`
+## 3.7 Bonuses
 
-### GET `/penalties/`
-
-Query params :
-- `page` optionnel
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnPenaltyDto>`
-
-### GET `/penalties/{id}`
-
-Réponse :
-- `200` -> `ReturnPenaltyDto`
-
-### DELETE `/penalties/{id}`
-
-Réponse :
-- `204` no content
-
-## 13. Punishments
-
-### POST `/punishments/`
-
-Body :
-
+### POST `/v1/bonuses/`
+- Auth: oui
+- Body:
 ```json
 {
-  "student_id": "uuid",
-  "punishment_type_id": "uuid",
-  "due_at": "2026-02-20T17:00:00Z"
+  "student_id": "11111111-1111-1111-1111-111111111111",
+  "bonus_type_id": "22222222-2222-2222-2222-222222222222",
+  "points": 2.5
 }
 ```
+- 201: `ReturnBonusDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `bonus_type_not_found`, `unauthorized`
 
-Réponse :
-- `201` -> `ReturnPunishmentDto`
+### GET `/v1/bonuses/`
+- Auth: oui
+- Query params (metier):
+  - `student_id` (uuid)
+  - `classroom_id` (uuid)
+  - `bonus_type_id` (uuid)
+  - `state` (`used|unused`)
+  - `created_from` (`YYYY-MM-DD`)
+  - `created_to` (`YYYY-MM-DD`)
+  - `page`
+- Exemple URL:
+  - `/v1/bonuses/?state=unused&classroom_id=33333333-3333-3333-3333-333333333333&created_from=2026-02-01&created_to=2026-02-28&page=1`
+- 200: `PaginatedResponse<ReturnBonusDto>`
+- Erreurs: `malformed_parameter`, `unauthorized`
 
-### GET `/punishments/`
+### GET `/v1/bonuses/{bonus_id}`
+- Auth: oui
+- 200: `ReturnBonusDto`
+- Erreurs: `bonus_not_found`, `not_found`, `unauthorized`
 
-Query params :
-- `page` optionnel
-- `state` optionnel : `pending|resolved`
-- `search` optionnel : recherche sur `prénom + nom` de l'élève
+### POST `/v1/bonuses/{bonus_id}/use`
+- Auth: oui
+- Body: aucun
+- 200: `ReturnBonusDto` (avec `used_at` non null)
+- Erreurs: `bonus_not_found`, `bonus_already_used`, `not_found`, `unauthorized`
 
-Réponse :
-- `200` -> `PaginatedResponse<ReturnPunishmentDto>`
+### DELETE `/v1/bonuses/{bonus_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `bonus_not_found`, `not_found`, `unauthorized`
 
-### GET `/punishments/{id}`
+## 3.8 Penalty types
 
-Réponse :
-- `200` -> `ReturnPunishmentDto`
-
-### POST `/punishments/{id}/resolve`
-
-Effet :
-- passe `resolved_at` de `null` à `now`
-
-Réponse :
-- `200` -> `ReturnPunishmentDto`
-
-### DELETE `/punishments/{id}`
-
-Réponse :
-- `204` no content
-
-## 14. Rules
-
-### POST `/rules/`
-
-Body :
-
+### POST `/v1/penalty-types/`
+- Auth: oui
+- Body:
 ```json
 {
-  "name": "3 bavardages => retenue",
-  "resulting_punishment_type_id": "uuid",
-  "penalty_type_id": "uuid",
+  "name": "Bavardage"
+}
+```
+- 201: `ReturnPenaltyTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `unauthorized`
+
+### GET `/v1/penalty-types/`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnPenaltyTypeDto>`
+- Erreurs: `unauthorized`
+
+### GET `/v1/penalty-types/{penalty_type_id}`
+- Auth: oui
+- 200: `ReturnPenaltyTypeDto`
+- Erreurs: `penalty_type_not_found`, `not_found`, `unauthorized`
+
+### PUT `/v1/penalty-types/{penalty_type_id}`
+- Auth: oui
+- Body partiel:
+```json
+{
+  "name": "Retard"
+}
+```
+- 200: `ReturnPenaltyTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `penalty_type_not_found`, `not_found`, `unauthorized`
+
+### DELETE `/v1/penalty-types/{penalty_type_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `penalty_type_not_found`, `not_found`, `unauthorized`
+
+## 3.9 Penalties
+
+### POST `/v1/penalties/`
+- Auth: oui
+- Body:
+```json
+{
+  "student_id": "11111111-1111-1111-1111-111111111111",
+  "penalty_type_id": "44444444-4444-4444-4444-444444444444"
+}
+```
+- 201: `ReturnPenaltyDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `penalty_type_not_found`, `unauthorized`
+
+### GET `/v1/penalties/`
+- Auth: oui
+- Query params (metier):
+  - `student_id` (uuid)
+  - `classroom_id` (uuid)
+  - `penalty_type_id` (uuid)
+  - `created_from` (`YYYY-MM-DD`)
+  - `created_to` (`YYYY-MM-DD`)
+  - `page`
+- Exemple URL:
+  - `/v1/penalties/?penalty_type_id=44444444-4444-4444-4444-444444444444&classroom_id=33333333-3333-3333-3333-333333333333&created_from=2026-02-01&created_to=2026-02-28&page=1`
+- 200: `PaginatedResponse<ReturnPenaltyDto>`
+- Erreurs: `malformed_parameter`, `unauthorized`
+
+### GET `/v1/penalties/{penalty_id}`
+- Auth: oui
+- 200: `ReturnPenaltyDto`
+- Erreurs: `penalty_not_found`, `not_found`, `unauthorized`
+
+### DELETE `/v1/penalties/{penalty_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `penalty_not_found`, `not_found`, `unauthorized`
+
+## 3.10 Punishment types
+
+### POST `/v1/punishment-types/`
+- Auth: oui
+- Body:
+```json
+{
+  "name": "Exercice supplementaire"
+}
+```
+- 201: `ReturnPunishmentTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `unauthorized`
+
+### GET `/v1/punishment-types/`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnPunishmentTypeDto>`
+- Erreurs: `unauthorized`
+
+### GET `/v1/punishment-types/{punishment_type_id}`
+- Auth: oui
+- 200: `ReturnPunishmentTypeDto`
+- Erreurs: `punishment_type_not_found`, `not_found`, `unauthorized`
+
+### PUT `/v1/punishment-types/{punishment_type_id}`
+- Auth: oui
+- Body partiel:
+```json
+{
+  "name": "Presentation orale"
+}
+```
+- 200: `ReturnPunishmentTypeDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `punishment_type_not_found`, `not_found`, `unauthorized`
+
+### DELETE `/v1/punishment-types/{punishment_type_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `punishment_type_not_found`, `not_found`, `unauthorized`
+
+## 3.11 Punishments
+
+### POST `/v1/punishments/`
+- Auth: oui
+- Body:
+```json
+{
+  "student_id": "11111111-1111-1111-1111-111111111111",
+  "punishment_type_id": "55555555-5555-5555-5555-555555555555",
+  "due_at": "2026-03-15T18:00:00Z"
+}
+```
+- 201: `ReturnPunishmentDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `punishment_type_not_found`, `unauthorized`
+
+### GET `/v1/punishments/`
+- Auth: oui
+- Query params (metier):
+  - `student_id` (uuid)
+  - `classroom_id` (uuid)
+  - `punishment_type_id` (uuid)
+  - `state` (`pending|resolved`)
+  - `automated` (`true|false`)
+  - `overdue` (`true|false`)
+  - `created_from` (`YYYY-MM-DD`)
+  - `created_to` (`YYYY-MM-DD`)
+  - `due_from` (`YYYY-MM-DD`)
+  - `due_to` (`YYYY-MM-DD`)
+  - `page`
+- Exemple URL:
+  - `/v1/punishments/?state=pending&overdue=true&automated=false&classroom_id=33333333-3333-3333-3333-333333333333&due_from=2026-03-01&due_to=2026-03-31&page=1`
+- 200: `PaginatedResponse<ReturnPunishmentDto>`
+- Erreurs: `malformed_parameter`, `unauthorized`
+
+### GET `/v1/punishments/{punishment_id}`
+- Auth: oui
+- 200: `ReturnPunishmentDto`
+- Erreurs: `punishment_not_found`, `not_found`, `unauthorized`
+
+### POST `/v1/punishments/{punishment_id}/resolve`
+- Auth: oui
+- Body: aucun
+- 200: `ReturnPunishmentDto` (avec `resolved_at` non null)
+- Erreurs: `punishment_not_found`, `punishment_already_resolved`, `not_found`, `unauthorized`
+
+### DELETE `/v1/punishments/{punishment_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `punishment_not_found`, `not_found`, `unauthorized`
+
+## 3.12 Rules
+
+### POST `/v1/rules/`
+- Auth: oui
+- Body:
+```json
+{
+  "name": "3 retards = punition",
+  "resulting_punishment_type_id": "55555555-5555-5555-5555-555555555555",
+  "penalty_type_id": "44444444-4444-4444-4444-444444444444",
   "threshold": 3,
-  "due_at_after_days": 7,
-  "mode": "every",
+  "due_at_after_days": 2,
+  "mode": "after",
   "is_active": true
 }
 ```
+- 201: `ReturnRuleDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `punishment_type_not_found`, `penalty_type_not_found`, `unauthorized`
 
-Contraintes :
-- `mode` : `after|at|every`
-- `threshold >= 1`
-- `due_at_after_days >= 0`
+### GET `/v1/rules/`
+- Auth: oui
+- Query params: `page`
+- 200: `PaginatedResponse<ReturnRuleDto>`
+- Erreurs: `unauthorized`
 
-Réponse :
-- `201` -> `ReturnRuleDto`
+### GET `/v1/rules/{rule_id}`
+- Auth: oui
+- 200: `ReturnRuleDto`
+- Erreurs: `rule_not_found`, `not_found`, `unauthorized`
 
-### GET `/rules/`
-
-Query params :
-- `page` optionnel
-
-Réponse :
-- `200` -> `PaginatedResponse<ReturnRuleDto>`
-
-### GET `/rules/{id}`
-
-Réponse :
-- `200` -> `ReturnRuleDto`
-
-### PUT `/rules/{id}`
-
-Body partiel possible :
-
+### PUT `/v1/rules/{rule_id}`
+- Auth: oui
+- Body partiel:
 ```json
 {
-  "name": "4 bavardages => retenue",
+  "name": "4 retards = punition",
   "threshold": 4,
-  "mode": "at",
+  "mode": "every",
   "is_active": false
 }
 ```
+- 200: `ReturnRuleDto`
+- Erreurs: `validation_failed`, `invalid_request_body`, `rule_not_found`, `punishment_type_not_found`, `penalty_type_not_found`, `not_found`, `unauthorized`
 
-Réponse :
-- `200` -> `ReturnRuleDto`
+### DELETE `/v1/rules/{rule_id}`
+- Auth: oui
+- 204: no content
+- Erreurs: `rule_not_found`, `not_found`, `unauthorized`
 
-### DELETE `/rules/{id}`
+## 3.13 Dashboard
 
-Réponse :
-- `204` no content
+### GET `/v1/dashboard/`
+- Auth: oui
+- Query params:
+  - `classroom_id` optionnel (uuid)
+- Exemple URL:
+  - `/v1/dashboard/?classroom_id=33333333-3333-3333-3333-333333333333`
+- 200: `ReturnDashboardDto`
+- Erreurs: `malformed_parameter`, `classroom_not_found`, `unauthorized`
 
-## 15. Codes d'erreur utilisés
-
-Erreurs globales :
-- `internal_error`
-- `invalid_request_body`
-- `malformed_parameter`
-- `validation_failed`
-- `unauthorized`
-
-Auth :
-- `register_not_allowed`
-- `invalid_credentials_or_user_doesnt_exist`
-- `jwt_invalid_signing_method`
-- `jwt_invalid_token`
-- `jwt_expired`
-
-Not found :
-- `student_not_found`
-- `classroom_not_found`
-- `bonus_type_not_found`
-- `penalty_type_not_found`
-- `punishment_type_not_found`
-- `rule_not_found`
-- `bonus_not_found`
-- `penalty_not_found`
-- `punishment_not_found`
-- `student_or_classroom_not_found`
-
-Conflicts :
-- `conflict` (email déjà utilisé, via `error_details`)
-- `student_classroom_relation_exists`
-- `bonus_already_used`
-- `punishment_already_resolved`
-
-Imports :
-- `import_file_missing`
-- `import_file_invalid`
-- `import_template_invalid`
-- `import_validation_failed`
-
-## 16. Définitions des DTOs
-
-### ReturnUserDto
-
-```json
-{
-  "id": "uuid",
-  "email": "teacher@example.com",
-  "first_name": "Jean",
-  "last_name": "Dupont",
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
-}
-```
-
-### ReturnDashboardDto
-
+Exemple 200 (tronque):
 ```json
 {
   "kpis": {
-    "student_count": 34,
-    "available_bonus_points": 14.5,
-    "unused_bonus_count": 12,
-    "penalty_count": 47,
-    "pending_punishment_count": 5
+    "student_count": 28,
+    "available_bonus_points": 64.5,
+    "total_bonus_points": 91,
+    "unused_bonus_count": 19,
+    "penalty_count": 13,
+    "total_punishment_count": 5,
+    "overdue_punishment_count": 1,
+    "pending_punishment_count": 2
   },
   "recent_penalties": [],
   "recent_bonuses": [],
@@ -843,222 +935,342 @@ Imports :
 }
 ```
 
-### ReturnStudentDto
+## 4) Notes importantes pour le frontend IA
+
+- Les listes `bonuses`, `penalties`, `punishments` sont maintenant basees sur filtres metier (pas de `search` texte sur l eleve).
+- La recherche eleve reste sur `GET /v1/students/?search=...`.
+- Pour filtrer des evenements d un eleve: utiliser `student_id`.
+- Les bornes `created_to` / `due_to` sont inclusives sur la journee (backend fait `< date + 1 day`).
+- `overdue=true` sur punishments signifie: `resolved_at IS NULL` ET `due_at < now()`.
+- Pour les IDs path invalides (`{student_id}`, etc.), le backend renvoie `404 not_found` avec `error_details` indiquant le champ invalide.
+
+## 5) Catalogue complet des erreurs disponibles
+
+## 5.1 Schema unique
 
 ```json
 {
-  "id": "uuid",
-  "first_name": "Lucas",
-  "last_name": "Dubois",
-  "classrooms": [{ "id": "uuid", "name": "6eme A" }],
-  "available_bonus_points": 3,
-  "penalty_count": 5,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
-}
-```
-
-### StudentKpisDto
-
-```json
-{
-  "available_bonus_points": 3,
-  "active_bonus_count": 2,
-  "total_penalty_count": 5,
-  "pending_punishment_count": 1
-}
-```
-
-### StudentImportResponseDto
-
-```json
-{
-  "summary": {
-    "rows_total": 3,
-    "rows_processed": 3,
-    "classrooms_created": 2,
-    "classrooms_existing": 1,
-    "students_created": 1,
-    "students_existing": 2,
-    "links_created": 3,
-    "links_existing": 2,
-    "rows_failed": 0
-  },
-  "errors": [
+  "error": "<string>",
+  "error_code": 400,
+  "error_details": [
     {
-      "row": 4,
-      "field": "Classes",
-      "error": "validation_field_required",
-      "value": ""
+      "row": 12,
+      "field": "created_from",
+      "error": "validation_malformed_parameter:expected_yyyy-mm-dd",
+      "value": "15-01-2026"
     }
   ]
 }
 ```
 
-### StudentImportSummaryDto
+## 5.2 Erreurs sans `error_details` (ou details optionnels)
 
+### 500
+- `internal_error`
+```json
+{ "error": "internal_error", "error_code": 500 }
+```
+
+### 404
+- `not_found`
+```json
+{ "error": "not_found", "error_code": 404 }
+```
+- `student_not_found`
+```json
+{ "error": "student_not_found", "error_code": 404 }
+```
+- `bonus_type_not_found`
+```json
+{ "error": "bonus_type_not_found", "error_code": 404 }
+```
+- `penalty_type_not_found`
+```json
+{ "error": "penalty_type_not_found", "error_code": 404 }
+```
+- `rule_not_found`
+```json
+{ "error": "rule_not_found", "error_code": 404 }
+```
+- `bonus_not_found`
+```json
+{ "error": "bonus_not_found", "error_code": 404 }
+```
+- `penalty_not_found`
+```json
+{ "error": "penalty_not_found", "error_code": 404 }
+```
+- `punishment_type_not_found`
+```json
+{ "error": "punishment_type_not_found", "error_code": 404 }
+```
+- `punishment_not_found`
+```json
+{ "error": "punishment_not_found", "error_code": 404 }
+```
+- `classroom_not_found`
+```json
+{ "error": "classroom_not_found", "error_code": 404 }
+```
+- `student_or_classroom_not_found`
+```json
+{ "error": "student_or_classroom_not_found", "error_code": 404 }
+```
+
+### 401
+- `unauthorized`
+```json
+{ "error": "unauthorized", "error_code": 401 }
+```
+- `register_not_allowed`
+```json
+{ "error": "register_not_allowed", "error_code": 401 }
+```
+- `invalid_credentials_or_user_doesnt_exist`
+```json
+{ "error": "invalid_credentials_or_user_doesnt_exist", "error_code": 401 }
+```
+- `jwt_invalid_signing_method`
+```json
+{ "error": "jwt_invalid_signing_method", "error_code": 401 }
+```
+- `jwt_invalid_token`
+```json
+{ "error": "jwt_invalid_token", "error_code": 401 }
+```
+- `jwt_expired`
+```json
+{ "error": "jwt_expired", "error_code": 401 }
+```
+
+### 409
+- `punishment_already_resolved`
+```json
+{ "error": "punishment_already_resolved", "error_code": 409 }
+```
+- `bonus_already_used`
+```json
+{ "error": "bonus_already_used", "error_code": 409 }
+```
+- `student_classroom_relation_exists`
+```json
+{ "error": "student_classroom_relation_exists", "error_code": 409 }
+```
+
+## 5.3 Erreurs avec `error_details` importantes
+
+### `conflict` (email deja pris) - 409
 ```json
 {
-  "rows_total": 3,
-  "rows_processed": 3,
-  "classrooms_created": 2,
-  "classrooms_existing": 1,
-  "students_created": 1,
-  "students_existing": 2,
-  "links_created": 3,
-  "links_existing": 2,
-  "rows_failed": 0
+  "error": "conflict",
+  "error_code": 409,
+  "error_details": [
+    {
+      "field": "email",
+      "error": "validation_email_already_exists"
+    }
+  ]
 }
 ```
 
-### StudentImportRowErrorDto
+### `invalid_request_body` - 400
+Cas classiques:
+- type JSON invalide (`expected_string`, `expected_number`, etc.)
+- champ JSON inconnu
+- UUID body invalide
+- datetime RFC3339 invalide
 
+Exemples:
 ```json
 {
-  "row": 4,
-  "field": "Classes",
-  "error": "validation_field_required",
-  "value": ""
+  "error": "invalid_request_body",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "student_id",
+      "error": "validation_malformed_parameter:expected_uuid"
+    }
+  ]
 }
 ```
 
-### StudentHistoryItemDto
-
 ```json
 {
-  "type": "punishment|penalty|bonus",
-  "id": "uuid",
-  "penalty_type_id": "uuid|null",
-  "penalty_type_name": "string|null",
-  "bonus_type_id": "uuid|null",
-  "bonus_type_name": "string|null",
-  "points": 1.5,
-  "used_at": "2026-02-18T10:00:00Z|null",
-  "punishment_type_id": "uuid|null",
-  "punishment_type_name": "string|null",
-  "triggering_rule_id": "uuid|null",
-  "triggering_rule_name": "string|null",
-  "due_at": "2026-02-25T10:00:00Z|null",
-  "resolved_at": "2026-02-26T10:00:00Z|null",
-  "created_at": "2026-02-18T10:00:00Z"
+  "error": "invalid_request_body",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "due_at",
+      "error": "validation_malformed_parameter:expected_rfc3339_datetime"
+    }
+  ]
 }
 ```
 
-### ReturnClassroomDto
-
 ```json
 {
-  "id": "uuid",
-  "name": "6eme A",
-  "year": "2025-2026",
-  "main_teacher": "Mme Martin",
-  "student_count": 12,
-  "students_preview": [
-    { "id": "uuid", "first_name": "Lucas", "last_name": "Dubois" }
-  ],
-  "total_bonus_points": 14.5,
-  "total_penalty_count": 23,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error": "invalid_request_body",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "unknown_field",
+      "error": "validation_unknown_field"
+    }
+  ]
 }
 ```
 
-### ReturnBonusTypeDto
-
+### `validation_failed` - 400
+Exemple:
 ```json
 {
-  "id": "uuid",
-  "name": "Participation",
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error": "validation_failed",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "Password",
+      "error": "validation_min_length:8"
+    },
+    {
+      "field": "Email",
+      "error": "validation_invalid_email"
+    }
+  ]
 }
 ```
 
-### ReturnPenaltyTypeDto
+### `malformed_parameter` - 400
+Cas classiques:
+- UUID query invalide (`student_id`, `classroom_id`, etc.)
+- enum invalide (`state`)
+- bool invalide (`automated`, `overdue`)
+- date invalide (`created_from`, `due_to`)
+- plage invalide (`from > to`)
 
+Exemples:
 ```json
 {
-  "id": "uuid",
-  "name": "Bavardage",
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error": "malformed_parameter",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "state",
+      "error": "validation_malformed_parameter:expected_pending_or_resolved"
+    }
+  ]
 }
 ```
 
-### ReturnPunishmentTypeDto
-
 ```json
 {
-  "id": "uuid",
-  "name": "Retenue",
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error": "malformed_parameter",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "created_from",
+      "error": "validation_malformed_parameter:expected_created_from_lte_created_to"
+    }
+  ]
 }
 ```
 
-### ReturnBonusDto
-
+### `not_found` avec detail UUID path invalide - 404
+Exemple:
 ```json
 {
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Emma",
-  "student_last_name": "Bernard",
-  "bonus_type_id": "uuid",
-  "bonus_type_name": "Participation",
-  "points": 1,
-  "created_at": "2026-02-18T10:00:00Z",
-  "used_at": "2026-02-19T10:00:00Z|null"
+  "error": "not_found",
+  "error_code": 404,
+  "error_details": [
+    {
+      "field": "student_id",
+      "error": "validation_malformed_parameter:expected_uuid"
+    }
+  ]
 }
 ```
 
-### ReturnPenaltyDto
+## 5.4 Erreurs import students
 
+### `import_file_missing` - 400
 ```json
 {
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Lucas",
-  "student_last_name": "Dubois",
-  "penalty_type_id": "uuid",
-  "penalty_type_name": "Bavardage",
-  "created_at": "2026-02-18T10:00:00Z"
+  "error": "import_file_missing",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "file",
+      "error": "file_field_is_required"
+    }
+  ]
 }
 ```
 
-### ReturnPunishmentDto
+### `import_file_invalid` - 400
+Exemples `error_details` possibles:
+- `expected_multipart_form_data`
+- `failed_to_parse_multipart_form`
+- `unsupported_file_type`
+- `failed_to_read_xlsx`
+- `failed_to_read_xlsx_rows`
+- `failed_to_read_csv`
 
+Exemple:
 ```json
 {
-  "id": "uuid",
-  "student_id": "uuid",
-  "student_first_name": "Lucas",
-  "student_last_name": "Dubois",
-  "punishment_type_id": "uuid",
-  "punishment_type_name": "Retenue",
-  "triggering_rule_id": "uuid|null",
-  "triggering_rule_name": "string|null",
-  "created_at": "2026-02-18T10:00:00Z",
-  "due_at": "2026-02-25T10:00:00Z",
-  "resolved_at": "2026-02-26T10:00:00Z|null"
+  "error": "import_file_invalid",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "file",
+      "error": "unsupported_file_type",
+      "value": ".txt"
+    }
+  ]
 }
 ```
 
-### ReturnRuleDto
+### `import_template_invalid` - 400
+Exemples `error_details` possibles:
+- `missing_headers_row`
+- `missing_header_eleves`
+- `missing_header_classes`
 
+Exemple:
 ```json
 {
-  "id": "uuid",
-  "name": "3 bavardages => retenue",
-  "resulting_punishment_type_id": "uuid",
-  "resulting_punishment_type_name": "Retenue",
-  "penalty_type_id": "uuid",
-  "penalty_type_name": "Bavardage",
-  "threshold": 3,
-  "due_at_after_days": 7,
-  "mode": "after|at|every",
-  "is_active": true,
-  "created_at": "2026-02-18T10:00:00Z",
-  "updated_at": "2026-02-18T10:00:00Z"
+  "error": "import_template_invalid",
+  "error_code": 400,
+  "error_details": [
+    {
+      "field": "headers",
+      "error": "missing_header_eleves"
+    }
+  ]
+}
+```
+
+### `import_validation_failed` - 400
+- Erreurs ligne par ligne sur le contenu fichier
+- `row` est renseigne
+
+Exemple:
+```json
+{
+  "error": "import_validation_failed",
+  "error_code": 400,
+  "error_details": [
+    {
+      "row": 4,
+      "field": "eleves",
+      "error": "student name format must be 'NOM Prenom'",
+      "value": "Jean"
+    },
+    {
+      "row": 4,
+      "field": "classes",
+      "error": "at least one classroom is required",
+      "value": ""
+    }
+  ]
 }
 ```

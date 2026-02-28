@@ -81,7 +81,6 @@
   "punishments": {
     "title": "Punitions",
     "newPunishment": "Ajouter une punition",
-    "searchPlaceholder": "Rechercher une punition...",
     "noPunishments": "Aucune punition trouvée.",
     "pending": "En attente",
     "resolved": "Résolu",
@@ -91,13 +90,11 @@
   "penalties": {
     "title": "Pénalités",
     "newPenalty": "Ajouter une pénalité",
-    "searchPlaceholder": "Rechercher une pénalité...",
     "noPenalties": "Aucune pénalité trouvée."
   },
   "bonuses": {
     "title": "Bonus",
     "newBonus": "Ajouter un bonus",
-    "searchPlaceholder": "Rechercher un bonus...",
     "noBonuses": "Aucun bonus trouvé.",
     "usedAt": "Consommé le {date}"
   },
@@ -485,6 +482,39 @@
       "validation_unknown_field": "Champ inconnu.",
       "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}."
     }
+  },
+  "filters": {
+    "title": "Filtres",
+    "classroom": "Classe",
+    "student": "Élève",
+    "type": "Type",
+    "state": "État",
+    "dateRange": "Période de création",
+    "dueDateRange": "Période d'échéance",
+    "automated": "Automatique",
+    "overdue": "En retard",
+    "allClassrooms": "Toutes les classes",
+    "allStudents": "Tous les élèves",
+    "allTypes": "Tous les types",
+    "allStates": "Tous les états",
+    "from": "Du",
+    "to": "Au",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer",
+    "activeFilters": "Aucun filtre actif | {count} filtre actif | {count} filtres actifs",
+    "stateUsed": "Consommé",
+    "stateUnused": "Non consommé",
+    "statePending": "En attente",
+    "stateResolved": "Résolu",
+    "automatedYes": "Oui",
+    "automatedNo": "Non",
+    "overdueOnly": "En retard uniquement",
+    "showFilters": "Afficher les filtres",
+    "hideFilters": "Masquer les filtres",
+    "searchStudent": "Rechercher un élève...",
+    "noStudentFound": "Aucun élève trouvé.",
+    "searchType": "Rechercher un type...",
+    "noTypeFound": "Aucun type trouvé."
   },
   "errors": {
     "pageNotFound": "Page non trouvée",

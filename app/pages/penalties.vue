@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Plus, Search, Trash2 } from 'lucide-vue-next'
-import { refDebounced } from '@vueuse/core'
+import { Plus, Trash2 } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -17,13 +16,37 @@ const {
   deletePenalty,
 } = usePenalties()
 
-// Search
-const searchQuery = ref(filters.search || '')
-const searchDebounced = refDebounced(searchQuery, 300)
+// Filters local state
+const classroomId = ref(filters.classroom_id || '')
+const studentId = ref(filters.student_id || '')
+const penaltyTypeId = ref(filters.penalty_type_id || '')
+const createdFrom = ref(filters.created_from || '')
+const createdTo = ref(filters.created_to || '')
+
+// Reference data for filters
+const { classrooms, fetchClassrooms } = useAllClassrooms()
+const { students, fetchStudents } = useAllStudents()
+const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
+
+// Map students to {id, name} for IdNameSelect
+const studentOptions = computed(() =>
+  students.value.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}` })),
+)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+
+// Count active filters
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (classroomId.value) count++
+  if (studentId.value) count++
+  if (penaltyTypeId.value) count++
+  if (createdFrom.value) count++
+  if (createdTo.value) count++
+  return count
+})
 
 // Modals
 const showCreateModal = ref(false)
@@ -34,7 +57,11 @@ const penaltyToDeleteId = ref<string | null>(null)
 async function reload(pageToLoad = page.value || 1) {
   await fetchPenalties({
     page: pageToLoad,
-    search: searchDebounced.value || undefined,
+    classroom_id: classroomId.value || undefined,
+    student_id: studentId.value || undefined,
+    penalty_type_id: penaltyTypeId.value || undefined,
+    created_from: createdFrom.value || undefined,
+    created_to: createdTo.value || undefined,
   })
 }
 
@@ -56,13 +83,35 @@ async function onCreated() {
   await reload(1)
 }
 
-watch(searchDebounced, async (newSearch) => {
-  await applyFilters({ search: newSearch })
+function resetFilters() {
+  classroomId.value = ''
+  studentId.value = ''
+  penaltyTypeId.value = ''
+  createdFrom.value = ''
+  createdTo.value = ''
+}
+
+// Watch filter changes
+watch([classroomId, studentId, penaltyTypeId, createdFrom, createdTo], () => {
+  applyFilters({
+    classroom_id: classroomId.value || undefined,
+    student_id: studentId.value || undefined,
+    penalty_type_id: penaltyTypeId.value || undefined,
+    created_from: createdFrom.value || undefined,
+    created_to: createdTo.value || undefined,
+  })
+})
+
+// When classroom changes, reload students for that classroom
+watch(classroomId, async (newClassroomId) => {
+  studentId.value = ''
+  await fetchStudents(newClassroomId || undefined)
 })
 
 await useAsyncData(
   () => `penalties:initial:${route.fullPath}`,
   async () => {
+    await Promise.all([fetchClassrooms(), fetchStudents(), fetchPenaltyTypes()])
     await reload()
     return true
   },
@@ -92,10 +141,40 @@ await useAsyncData(
       </template>
     </PageHeaderBar>
 
-    <div class="relative mb-6">
-      <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input v-model="searchQuery" :placeholder="t('penalties.searchPlaceholder')" class="pl-9" />
-    </div>
+    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
+      <FilterIdNameSelect
+        v-model="classroomId"
+        :label="t('filters.classroom')"
+        :placeholder="t('filters.allClassrooms')"
+        :search-placeholder="t('common.searchClass')"
+        :empty-text="t('common.noClassFound')"
+        :options="classrooms"
+      />
+
+      <FilterIdNameSelect
+        v-model="studentId"
+        :label="t('filters.student')"
+        :placeholder="t('filters.allStudents')"
+        :search-placeholder="t('filters.searchStudent')"
+        :empty-text="t('filters.noStudentFound')"
+        :options="studentOptions"
+      />
+
+      <FilterIdNameSelect
+        v-model="penaltyTypeId"
+        :label="t('filters.type')"
+        :placeholder="t('filters.allTypes')"
+        :search-placeholder="t('filters.searchType')"
+        :empty-text="t('filters.noTypeFound')"
+        :options="penaltyTypes"
+      />
+
+      <FilterDateRange
+        v-model:from="createdFrom"
+        v-model:to="createdTo"
+        :label="t('filters.dateRange')"
+      />
+    </FilterBar>
 
     <div v-if="penalties.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
       {{ t('penalties.noPenalties') }}

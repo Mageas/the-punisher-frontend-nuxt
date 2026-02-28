@@ -16,6 +16,21 @@ export interface AllPaginatedCollectionOptions {
    * Useful for pages where partial SSR data is not acceptable.
    */
   throwOnError?: boolean
+  /**
+   * Base key used to persist and hydrate collection state via Nuxt payload.
+   */
+  stateKey?: string
+}
+
+let fallbackStateScopeId = 0
+
+function createScopedStateKey(baseStateKey: string): string {
+  if (getCurrentInstance()) {
+    return `${baseStateKey}:${useId()}`
+  }
+
+  fallbackStateScopeId += 1
+  return `${baseStateKey}:fallback:${fallbackStateScopeId}`
 }
 
 /**
@@ -26,7 +41,8 @@ export function useAllPaginatedCollection<TItem, TArgs extends unknown[] = []>(
   options: AllPaginatedCollectionOptions = {},
 ) {
   const nuxtApp = useNuxtApp()
-  const items = ref<TItem[]>([])
+  const stateKey = createScopedStateKey(options.stateKey || 'all-paginated-collection')
+  const items = useState<TItem[]>(`${stateKey}:items`, () => [])
   const loading = ref(false)
   const error = ref<ApiError | null>(null)
 

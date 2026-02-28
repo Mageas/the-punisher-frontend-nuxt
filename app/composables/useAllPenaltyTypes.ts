@@ -4,8 +4,9 @@ import type { PenaltyType } from '~/types/api'
  */
 export function useAllPenaltyTypes() {
   const typeService = useTypeService()
-  const allPaginated = useAllPaginatedCollection<PenaltyType>((options) =>
-    typeService.getPenaltyTypes(options),
+  const allPaginated = useAllPaginatedCollection<PenaltyType>(
+    (options) => typeService.getPenaltyTypes(options),
+    { stateKey: 'all:penalty-types' },
   )
 
   async function fetchPenaltyTypes() {

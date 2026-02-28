@@ -4,8 +4,9 @@ import type { PunishmentType } from '~/types/api'
  */
 export function useAllPunishmentTypes() {
   const typeService = useTypeService()
-  const allPaginated = useAllPaginatedCollection<PunishmentType>((options) =>
-    typeService.getPunishmentTypes(options),
+  const allPaginated = useAllPaginatedCollection<PunishmentType>(
+    (options) => typeService.getPunishmentTypes(options),
+    { stateKey: 'all:punishment-types' },
   )
 
   async function fetchPunishmentTypes() {

@@ -9,7 +9,10 @@ export function useClassrooms() {
     {
       page?: number
     }
-  >((options) => classroomService.getClassrooms(options), { pageKey: 'page' })
+  >((options) => classroomService.getClassrooms(options), {
+    pageKey: 'page',
+    stateKey: 'paginated:classrooms',
+  })
 
   async function fetchClassrooms(options?: { page?: number }) {
     await paginated.fetchPage(options)

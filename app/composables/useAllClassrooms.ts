@@ -6,6 +6,7 @@ export function useAllClassrooms() {
   const classroomService = useClassroomService()
   const allPaginated = useAllPaginatedCollection<Classroom, [ApiRequestOptions | undefined]>(
     (options, requestOptions) => classroomService.getClassrooms(options, requestOptions),
+    { stateKey: 'all:classrooms' },
   )
 
   async function fetchClassrooms(requestOptions?: ApiRequestOptions) {

@@ -3,6 +3,17 @@ import type { PaginatedResponse } from '~/types/api'
 type QueryValue = string | number | boolean | null | undefined
 type QueryOptions = Record<string, QueryValue>
 
+let fallbackStateScopeId = 0
+
+function createScopedStateKey(baseStateKey: string): string {
+  if (getCurrentInstance()) {
+    return `${baseStateKey}:${useId()}`
+  }
+
+  fallbackStateScopeId += 1
+  return `${baseStateKey}:fallback:${fallbackStateScopeId}`
+}
+
 /**
  * Defines a fetcher function that returns a response promise.
  */
@@ -24,6 +35,10 @@ export interface PaginatedCollectionOptions<TFilters> {
    * Default filter values.
    */
   defaultFilters?: Partial<TFilters>
+  /**
+   * Base key used to persist and hydrate collection state via Nuxt payload.
+   */
+  stateKey?: string
 }
 
 /**
@@ -39,17 +54,20 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
   const pageKey = options.pageKey === undefined ? 'page' : options.pageKey
   const filterKeys = options.filterKeys || []
   const defaultFilters = (options.defaultFilters || {}) as Partial<TFilters>
+  const stateKey = createScopedStateKey(options.stateKey || 'paginated-collection')
 
   // -- Reactive State --
-  const items = ref<TItem[]>([]) as Ref<TItem[]>
+  const items = useState<TItem[]>(`${stateKey}:items`, () => [])
   const loading = ref(false)
   const error = ref<unknown | null>(null)
-  const page = ref(1)
-  const filters = reactive({ ...defaultFilters }) as TFilters
-  const itemPerPage = ref(0)
-  const totalCount = ref(0)
-  const nextPage = ref<number | null>(null)
-  const previousPage = ref<number | null>(null)
+  const page = useState<number>(`${stateKey}:page`, () => 1)
+  const filters = reactive(
+    useState<TFilters>(`${stateKey}:filters`, () => ({ ...defaultFilters }) as TFilters).value,
+  ) as TFilters
+  const itemPerPage = useState<number>(`${stateKey}:item-per-page`, () => 0)
+  const totalCount = useState<number>(`${stateKey}:total-count`, () => 0)
+  const nextPage = useState<number | null>(`${stateKey}:next-page`, () => null)
+  const previousPage = useState<number | null>(`${stateKey}:previous-page`, () => null)
 
   function getQueryStringValue(value: unknown): string | undefined {
     if (typeof value === 'string') return value

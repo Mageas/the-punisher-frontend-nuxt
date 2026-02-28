@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { CircleCheck, Plus, Search, Trash2 } from 'lucide-vue-next'
-import { refDebounced } from '@vueuse/core'
+import { CircleCheck, Plus, Trash2 } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -18,13 +17,59 @@ const {
   deletePunishment,
 } = usePunishments()
 
-// Search
-const searchQuery = ref(filters.search || '')
-const searchDebounced = refDebounced(searchQuery, 300)
+// Filters local state
+const classroomId = ref(filters.classroom_id || '')
+const studentId = ref(filters.student_id || '')
+const punishmentTypeId = ref(filters.punishment_type_id || '')
+const state = ref(filters.state || '')
+const automated = ref(filters.automated || '')
+const overdue = ref(filters.overdue || '')
+const createdFrom = ref(filters.created_from || '')
+const createdTo = ref(filters.created_to || '')
+const dueFrom = ref(filters.due_from || '')
+const dueTo = ref(filters.due_to || '')
+
+// Reference data for filters
+const { classrooms, fetchClassrooms } = useAllClassrooms()
+const { students, fetchStudents } = useAllStudents()
+const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
+
+// Map students to {id, name} for IdNameSelect
+const studentOptions = computed(() =>
+  students.value.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}` })),
+)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+
+const stateOptions = computed(() => [
+  { value: 'pending', label: t('filters.statePending') },
+  { value: 'resolved', label: t('filters.stateResolved') },
+])
+
+const automatedOptions = computed(() => [
+  { value: 'true', label: t('filters.automatedYes') },
+  { value: 'false', label: t('filters.automatedNo') },
+])
+
+const overdueOptions = computed(() => [{ value: 'true', label: t('filters.overdueOnly') }])
+
+// Count active filters
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (classroomId.value) count++
+  if (studentId.value) count++
+  if (punishmentTypeId.value) count++
+  if (state.value) count++
+  if (automated.value) count++
+  if (overdue.value) count++
+  if (createdFrom.value) count++
+  if (createdTo.value) count++
+  if (dueFrom.value) count++
+  if (dueTo.value) count++
+  return count
+})
 
 // Modals
 const showCreateModal = ref(false)
@@ -37,8 +82,16 @@ const punishmentToResolveId = ref<string | null>(null)
 async function reload(pageToLoad = page.value || 1) {
   await fetchPunishments({
     page: pageToLoad,
-    search: searchDebounced.value || undefined,
-    state: filters.state,
+    classroom_id: classroomId.value || undefined,
+    student_id: studentId.value || undefined,
+    punishment_type_id: punishmentTypeId.value || undefined,
+    state: (state.value as 'pending' | 'resolved') || undefined,
+    automated: automated.value || undefined,
+    overdue: overdue.value || undefined,
+    created_from: createdFrom.value || undefined,
+    created_to: createdTo.value || undefined,
+    due_from: dueFrom.value || undefined,
+    due_to: dueTo.value || undefined,
   })
 }
 
@@ -79,14 +132,59 @@ async function onCreated() {
   await reload(1)
 }
 
-// Watch search changes
-watch(searchDebounced, async (newSearch) => {
-  await applyFilters({ search: newSearch })
+function resetFilters() {
+  classroomId.value = ''
+  studentId.value = ''
+  punishmentTypeId.value = ''
+  state.value = ''
+  automated.value = ''
+  overdue.value = ''
+  createdFrom.value = ''
+  createdTo.value = ''
+  dueFrom.value = ''
+  dueTo.value = ''
+}
+
+// Watch filter changes
+watch(
+  [
+    classroomId,
+    studentId,
+    punishmentTypeId,
+    state,
+    automated,
+    overdue,
+    createdFrom,
+    createdTo,
+    dueFrom,
+    dueTo,
+  ],
+  () => {
+    applyFilters({
+      classroom_id: classroomId.value || undefined,
+      student_id: studentId.value || undefined,
+      punishment_type_id: punishmentTypeId.value || undefined,
+      state: (state.value as 'pending' | 'resolved') || undefined,
+      automated: automated.value || undefined,
+      overdue: overdue.value || undefined,
+      created_from: createdFrom.value || undefined,
+      created_to: createdTo.value || undefined,
+      due_from: dueFrom.value || undefined,
+      due_to: dueTo.value || undefined,
+    })
+  },
+)
+
+// When classroom changes, reload students for that classroom
+watch(classroomId, async (newClassroomId) => {
+  studentId.value = ''
+  await fetchStudents(newClassroomId || undefined)
 })
 
 await useAsyncData(
   () => `punishments:initial:${route.fullPath}`,
   async () => {
+    await Promise.all([fetchClassrooms(), fetchStudents(), fetchPunishmentTypes()])
     await reload()
     return true
   },
@@ -116,10 +214,67 @@ await useAsyncData(
       </template>
     </PageHeaderBar>
 
-    <div class="relative mb-6">
-      <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input v-model="searchQuery" :placeholder="t('punishments.searchPlaceholder')" class="pl-9" />
-    </div>
+    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
+      <FilterIdNameSelect
+        v-model="classroomId"
+        :label="t('filters.classroom')"
+        :placeholder="t('filters.allClassrooms')"
+        :search-placeholder="t('common.searchClass')"
+        :empty-text="t('common.noClassFound')"
+        :options="classrooms"
+      />
+
+      <FilterIdNameSelect
+        v-model="studentId"
+        :label="t('filters.student')"
+        :placeholder="t('filters.allStudents')"
+        :search-placeholder="t('filters.searchStudent')"
+        :empty-text="t('filters.noStudentFound')"
+        :options="studentOptions"
+      />
+
+      <FilterIdNameSelect
+        v-model="punishmentTypeId"
+        :label="t('filters.type')"
+        :placeholder="t('filters.allTypes')"
+        :search-placeholder="t('filters.searchType')"
+        :empty-text="t('filters.noTypeFound')"
+        :options="punishmentTypes"
+      />
+
+      <FilterSelect
+        v-model="state"
+        :label="t('filters.state')"
+        :placeholder="t('filters.allStates')"
+        :options="stateOptions"
+      />
+
+      <FilterSelect
+        v-model="automated"
+        :label="t('filters.automated')"
+        :placeholder="t('filters.allStates')"
+        :options="automatedOptions"
+      />
+
+      <FilterSelect
+        v-model="overdue"
+        :label="t('filters.overdue')"
+        :placeholder="t('filters.allStates')"
+        :options="overdueOptions"
+      />
+
+      <FilterDateRange
+        v-model:from="createdFrom"
+        v-model:to="createdTo"
+        :label="t('filters.dateRange')"
+      />
+
+      <FilterDateRange
+        v-model:from="dueFrom"
+        v-model:to="dueTo"
+        :label="t('filters.dueDateRange')"
+      />
+    </FilterBar>
 
     <div
       v-if="punishments.length === 0 && !loading"

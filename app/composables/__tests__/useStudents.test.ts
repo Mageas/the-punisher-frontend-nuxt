@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { ref, type Ref } from 'vue'
 import { useStudents } from '../useStudents'
 
 // -- Mock Nuxt Composables --
@@ -8,6 +9,14 @@ const mockRoute = {
 const mockRouter = {
   push: vi.fn(),
 }
+const mockState = new Map<string, Ref<unknown>>()
+
+vi.mock('#app/composables/state', () => ({
+  useState: (key: string, init: () => unknown) => {
+    if (!mockState.has(key)) mockState.set(key, ref(init()))
+    return mockState.get(key)
+  },
+}))
 
 vi.mock('#app/composables/router', () => ({
   useRoute: () => mockRoute,
@@ -28,6 +37,7 @@ vi.mock('../services/useStudentService', () => ({
 describe('useStudents', () => {
   beforeEach(() => {
     mockRoute.query = {}
+    mockState.clear()
     vi.clearAllMocks()
   })
 

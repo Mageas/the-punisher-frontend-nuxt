@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Gift, Plus, Search, Trash2 } from 'lucide-vue-next'
-import { refDebounced } from '@vueuse/core'
+import { Gift, Plus, Trash2 } from 'lucide-vue-next'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -18,13 +17,44 @@ const {
   deleteBonus,
 } = useBonuses()
 
-// Search
-const searchQuery = ref(filters.search || '')
-const searchDebounced = refDebounced(searchQuery, 300)
+// Filters local state (synced via applyFilters)
+const classroomId = ref(filters.classroom_id || '')
+const studentId = ref(filters.student_id || '')
+const bonusTypeId = ref(filters.bonus_type_id || '')
+const state = ref(filters.state || '')
+const createdFrom = ref(filters.created_from || '')
+const createdTo = ref(filters.created_to || '')
+
+// Reference data for filters
+const { classrooms, fetchClassrooms } = useAllClassrooms()
+const { students, fetchStudents } = useAllStudents()
+const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
+
+// Map students to {id, name} for IdNameSelect
+const studentOptions = computed(() =>
+  students.value.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}` })),
+)
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+
+const stateOptions = computed(() => [
+  { value: 'unused', label: t('filters.stateUnused') },
+  { value: 'used', label: t('filters.stateUsed') },
+])
+
+// Count active filters
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (classroomId.value) count++
+  if (studentId.value) count++
+  if (bonusTypeId.value) count++
+  if (state.value) count++
+  if (createdFrom.value) count++
+  if (createdTo.value) count++
+  return count
+})
 
 // Modals
 const showCreateModal = ref(false)
@@ -37,8 +67,12 @@ const bonusToUseId = ref<string | null>(null)
 async function reload(pageToLoad = page.value || 1) {
   await fetchBonuses({
     page: pageToLoad,
-    search: searchDebounced.value || undefined,
-    state: filters.state,
+    classroom_id: classroomId.value || undefined,
+    student_id: studentId.value || undefined,
+    bonus_type_id: bonusTypeId.value || undefined,
+    state: (state.value as 'used' | 'unused') || undefined,
+    created_from: createdFrom.value || undefined,
+    created_to: createdTo.value || undefined,
   })
 }
 
@@ -73,13 +107,37 @@ async function onCreated() {
   await reload(1)
 }
 
-watch(searchDebounced, async (newSearch) => {
-  await applyFilters({ search: newSearch })
+function resetFilters() {
+  classroomId.value = ''
+  studentId.value = ''
+  bonusTypeId.value = ''
+  state.value = ''
+  createdFrom.value = ''
+  createdTo.value = ''
+}
+
+// Watch filter changes and apply with debounce
+watch([classroomId, studentId, bonusTypeId, state, createdFrom, createdTo], () => {
+  applyFilters({
+    classroom_id: classroomId.value || undefined,
+    student_id: studentId.value || undefined,
+    bonus_type_id: bonusTypeId.value || undefined,
+    state: (state.value as 'used' | 'unused') || undefined,
+    created_from: createdFrom.value || undefined,
+    created_to: createdTo.value || undefined,
+  })
+})
+
+// When classroom changes, reload students for that classroom
+watch(classroomId, async (newClassroomId) => {
+  studentId.value = ''
+  await fetchStudents(newClassroomId || undefined)
 })
 
 await useAsyncData(
   () => `bonuses:initial:${route.fullPath}`,
   async () => {
+    await Promise.all([fetchClassrooms(), fetchStudents(), fetchBonusTypes()])
     await reload()
     return true
   },
@@ -109,10 +167,47 @@ await useAsyncData(
       </template>
     </PageHeaderBar>
 
-    <div class="relative mb-6">
-      <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input v-model="searchQuery" :placeholder="t('bonuses.searchPlaceholder')" class="pl-9" />
-    </div>
+    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
+      <FilterIdNameSelect
+        v-model="classroomId"
+        :label="t('filters.classroom')"
+        :placeholder="t('filters.allClassrooms')"
+        :search-placeholder="t('common.searchClass')"
+        :empty-text="t('common.noClassFound')"
+        :options="classrooms"
+      />
+
+      <FilterIdNameSelect
+        v-model="studentId"
+        :label="t('filters.student')"
+        :placeholder="t('filters.allStudents')"
+        :search-placeholder="t('filters.searchStudent')"
+        :empty-text="t('filters.noStudentFound')"
+        :options="studentOptions"
+      />
+
+      <FilterIdNameSelect
+        v-model="bonusTypeId"
+        :label="t('filters.type')"
+        :placeholder="t('filters.allTypes')"
+        :search-placeholder="t('filters.searchType')"
+        :empty-text="t('filters.noTypeFound')"
+        :options="bonusTypes"
+      />
+
+      <FilterSelect
+        v-model="state"
+        :label="t('filters.state')"
+        :placeholder="t('filters.allStates')"
+        :options="stateOptions"
+      />
+
+      <FilterDateRange
+        v-model:from="createdFrom"
+        v-model:to="createdTo"
+        :label="t('filters.dateRange')"
+      />
+    </FilterBar>
 
     <div v-if="bonuses.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
       {{ t('bonuses.noBonuses') }}
