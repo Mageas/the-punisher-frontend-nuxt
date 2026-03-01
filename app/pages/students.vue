@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertCircle, ChevronRight, Plus, Search, Star } from 'lucide-vue-next'
+import { AlertCircle, ChevronRight, Plus, Search, Star, X } from 'lucide-vue-next'
 import { refDebounced } from '@vueuse/core'
 import { getInitials, formatPoints } from '~/lib/utils'
 
@@ -23,6 +23,7 @@ const showCreateModal = ref(false)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+const activeFilterCount = computed(() => (searchQuery.value ? 1 : 0))
 
 async function reload(pageToLoad = page.value || 1) {
   await fetchStudents({
@@ -40,8 +41,15 @@ async function onCreated() {
   await reload(1)
 }
 
+function resetFilters() {
+  searchQuery.value = ''
+}
+
 watch(searchDebounced, async (newSearch) => {
-  await applyFilters({ search: newSearch })
+  const normalizedSearch = newSearch || ''
+  if (normalizedSearch === (filters.search || '')) return
+
+  await applyFilters({ search: normalizedSearch || undefined })
 })
 
 // Initial fetch if not already loading (e.g. from watcher)
@@ -73,10 +81,34 @@ if (students.value.length === 0 && !loading.value) {
       </template>
     </PageHeaderBar>
 
-    <div class="relative mb-6">
-      <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <Input v-model="searchQuery" :placeholder="t('students.searchPlaceholder')" class="pl-9" />
-    </div>
+    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <Label class="text-xs font-medium text-muted-foreground">{{
+            t('filters.student')
+          }}</Label>
+          <Button
+            v-if="searchQuery"
+            variant="ghost"
+            size="icon-sm"
+            class="h-5 w-5 cursor-pointer text-muted-foreground hover:text-foreground"
+            @click="searchQuery = ''"
+          >
+            <X class="h-3 w-3" />
+          </Button>
+        </div>
+        <div class="relative">
+          <Search
+            class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            v-model="searchQuery"
+            :placeholder="t('students.searchPlaceholder')"
+            class="h-8 pl-8 text-xs"
+          />
+        </div>
+      </div>
+    </FilterBar>
 
     <div v-if="students.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
       {{ t('students.noStudents') }}
