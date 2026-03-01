@@ -194,7 +194,7 @@ watch(
       "
       align="start"
     >
-      <Command>
+      <Command :disable-local-filter="lazyOptions.isRemote.value">
         <CommandInput v-model="searchQuery" :placeholder="searchPlaceholder" />
         <CommandList @scroll="onListScroll">
           <p

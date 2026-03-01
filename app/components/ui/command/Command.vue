@@ -1,19 +1,29 @@
 <script setup lang="ts">
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Removed default filtering behavior.
 import type { ListboxRootEmits, ListboxRootProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
 import { ListboxRoot, useFilter, useForwardPropsEmits } from "reka-ui"
-import { reactive, ref, watch } from "vue"
+import { computed, reactive, ref, watch } from "vue"
 import { cn } from "@/lib/utils"
 import { provideCommandContext } from "."
 
-const props = withDefaults(defineProps<ListboxRootProps & { class?: HTMLAttributes["class"] }>(), {
-  modelValue: "",
-})
+const props = withDefaults(
+  defineProps<ListboxRootProps & {
+    class?: HTMLAttributes["class"]
+    disableLocalFilter?: boolean
+  }>(),
+  {
+    modelValue: "",
+    disableLocalFilter: false,
+  },
+)
 
 const emits = defineEmits<ListboxRootEmits>()
 
-const delegatedProps = reactiveOmit(props, "class")
+const delegatedProps = reactiveOmit(props, "class", "disableLocalFilter")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
@@ -34,6 +44,11 @@ const filterState = reactive({
 })
 
 function filterItems() {
+  if (props.disableLocalFilter) {
+    filterState.filtered.count = allItems.value.size
+    return
+  }
+
   if (!filterState.search) {
     filterState.filtered.count = allItems.value.size
     // Do nothing, each item will know to show itself because search is empty
@@ -72,6 +87,7 @@ watch(() => filterState.search, () => {
 provideCommandContext({
   allItems,
   allGroups,
+  disableLocalFilter: computed(() => props.disableLocalFilter),
   filterState,
 })
 </script>
