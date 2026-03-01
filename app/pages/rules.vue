@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next'
-import type { Rule, RulePayload } from '~/types/api'
+import type { Rule } from '~/types/api'
 
 const { t } = useI18n()
 const {
@@ -27,19 +27,6 @@ const ruleToEdit = ref<Rule | null>(null)
 const ruleToDeleteId = ref<string | null>(null)
 const togglingById = ref<Record<string, boolean>>({})
 
-function buildRulePayload(rule: Rule, overrides: Partial<RulePayload> = {}): RulePayload {
-  return {
-    name: rule.name,
-    resulting_punishment_type_id: rule.resulting_punishment_type_id,
-    penalty_type_id: rule.penalty_type_id,
-    threshold: rule.threshold,
-    due_at_after_days: rule.due_at_after_days,
-    mode: rule.mode,
-    is_active: rule.is_active,
-    ...overrides,
-  }
-}
-
 async function reload(pageToLoad = page.value || 1) {
   await fetchRules({ page: pageToLoad })
 }
@@ -50,13 +37,13 @@ async function onPageChange(nextPage: number) {
 }
 
 async function onToggleActive(rule: Rule, nextIsActive: boolean) {
-  if (togglingById.value[rule.id]) return
+  if (togglingById.value[rule.id] || nextIsActive === rule.is_active) return
 
   clearErrors()
   togglingById.value = { ...togglingById.value, [rule.id]: true }
 
   try {
-    await updateRule(rule.id, buildRulePayload(rule, { is_active: nextIsActive }))
+    await updateRule(rule.id, { is_active: nextIsActive })
     await reload(page.value)
   } catch (err) {
     handleApiError(err)
