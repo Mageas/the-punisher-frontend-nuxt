@@ -122,15 +122,15 @@ const onSubmit = handleSubmit(async (formValues) => {
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
-      <FormField
-        v-if="!hasPreselectedClassroom"
-        v-slot="{ value, handleChange }"
-        name="classroom_id"
-      >
+      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value }" name="classroom_id">
         <FormItem>
           <FormLabel>{{ t('modals.punishment.class') }}</FormLabel>
           <FormControl>
-            <ClassroomSelect :model-value="value" full-width @update:model-value="handleChange" />
+            <ClassroomSelect
+              :model-value="value"
+              full-width
+              @update:model-value="setFieldValue('classroom_id', $event, false)"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -141,8 +141,10 @@ const onSubmit = handleSubmit(async (formValues) => {
           <FormLabel>{{ t('modals.punishment.student') }}</FormLabel>
           <FormControl>
             <StudentSelect
+              :key="values.classroom_id || '__all_students__'"
               :model-value="value"
               :classroom-id="values.classroom_id || null"
+              :options-scope-key="values.classroom_id || '__all_students__'"
               :placeholder="t('modals.punishment.selectStudent')"
               :empty-text="t('modals.punishment.noStudentFound')"
               @update:model-value="handleChange"

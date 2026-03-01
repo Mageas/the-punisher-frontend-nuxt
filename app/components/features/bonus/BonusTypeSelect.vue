@@ -33,12 +33,13 @@ async function fetchBonusTypeOptions(options: { page: number; search?: string })
 </script>
 
 <template>
-  <IdNameSearchInput
+  <FilterIdNameSelect
     v-model="modelValue"
     :options="props.bonusTypes"
     :fetch-options="shouldUseRemoteOptions ? fetchBonusTypeOptions : undefined"
     :selected-label="props.selectedName"
     :placeholder="props.placeholder ?? t('modals.bonus.selectBonusType')"
+    :search-placeholder="props.placeholder ?? t('modals.bonus.selectBonusType')"
     :empty-text="props.emptyText ?? t('modals.bonus.noBonusTypeFound')"
     @selected-option="emit('selectedOption', $event)"
   />

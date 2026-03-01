@@ -37,13 +37,16 @@ async function fetchClassroomOptions(options: { page: number; search?: string })
 
 <template>
   <div :class="props.fullWidth ? 'w-full' : 'basis-full md:basis-auto md:w-[200px]'">
-    <IdNameSearchInput
+    <FilterIdNameSelect
       v-model="modelValue"
       :options="options"
       :fetch-options="shouldUseRemoteOptions ? fetchClassroomOptions : undefined"
       :selected-label="props.selectedName"
       :placeholder="t('common.selectClassOptional')"
+      :search-placeholder="t('common.searchClass')"
       :empty-text="t('common.noClassFound')"
+      :none-option-label="t('filters.allClassrooms')"
+      :none-value-label="t('common.selectClassOptional')"
     />
   </div>
 </template>

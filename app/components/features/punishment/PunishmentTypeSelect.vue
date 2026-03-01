@@ -33,12 +33,13 @@ async function fetchPunishmentTypeOptions(options: { page: number; search?: stri
 </script>
 
 <template>
-  <IdNameSearchInput
+  <FilterIdNameSelect
     v-model="modelValue"
     :options="props.punishmentTypes"
     :fetch-options="shouldUseRemoteOptions ? fetchPunishmentTypeOptions : undefined"
     :selected-label="props.selectedName"
     :placeholder="props.placeholder ?? t('modals.punishment.selectPunishmentType')"
+    :search-placeholder="props.placeholder ?? t('modals.punishment.selectPunishmentType')"
     :empty-text="props.emptyText ?? t('modals.punishment.noPunishmentTypeFound')"
     @selected-option="emit('selectedOption', $event)"
   />

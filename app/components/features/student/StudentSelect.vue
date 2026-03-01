@@ -54,13 +54,15 @@ async function fetchStudentOptions(options: { page: number; search?: string }) {
 </script>
 
 <template>
-  <IdNameSearchInput
+  <FilterIdNameSelect
+    :key="String(resolvedOptionsScopeKey)"
     v-model="modelValue"
     :options="options"
     :fetch-options="shouldUseRemoteOptions ? fetchStudentOptions : undefined"
     :options-scope-key="resolvedOptionsScopeKey"
     :selected-label="props.selectedName"
     :placeholder="props.placeholder ?? t('modals.penalty.selectStudent')"
+    :search-placeholder="props.placeholder ?? t('modals.penalty.selectStudent')"
     :empty-text="props.emptyText ?? t('modals.penalty.noStudentFound')"
     :keep-focus-on-select="props.keepFocusOnSelect"
   />

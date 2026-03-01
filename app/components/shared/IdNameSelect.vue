@@ -28,6 +28,8 @@ const props = withDefaults(
     searchPlaceholder: string
     emptyText: string
     fullWidth?: boolean
+    disabled?: boolean
+    keepFocusOnSelect?: boolean
     noneOptionLabel?: string
     noneValueLabel?: string
     noneOptionValue?: string
@@ -39,6 +41,8 @@ const props = withDefaults(
   {
     options: () => [],
     fullWidth: true,
+    disabled: false,
+    keepFocusOnSelect: false,
     noneOptionValue: NONE_OPTION_VALUE,
     noneOptionLabel: undefined,
     noneValueLabel: undefined,
@@ -50,6 +54,9 @@ const props = withDefaults(
 )
 
 const modelValue = defineModel<string>({ default: '' })
+const emit = defineEmits<{
+  selectedOption: [option: IdNameOption | null]
+}>()
 
 const open = ref(false)
 const searchQuery = ref('')
@@ -98,10 +105,33 @@ function isSelected(optionId: string) {
   return modelValue.value === optionId
 }
 
+function resolveOptionById(optionId: string): IdNameOption | null {
+  if (!optionId) return null
+
+  const optionInSelectList = selectOptions.value.find((option) => option.id === optionId)
+  if (optionInSelectList && optionInSelectList.id !== props.noneOptionValue) {
+    return optionInSelectList
+  }
+
+  const knownOption = lazyOptions.getKnownOption(optionId)
+  if (knownOption) return knownOption
+
+  if (props.selectedLabel) {
+    return { id: optionId, name: props.selectedLabel }
+  }
+
+  return null
+}
+
 function select(value: string) {
-  modelValue.value = value === props.noneOptionValue ? '' : value
-  open.value = false
+  const selectedValue = value === props.noneOptionValue ? '' : value
+  modelValue.value = selectedValue
+  emit('selectedOption', resolveOptionById(selectedValue))
   searchQuery.value = ''
+
+  if (!props.keepFocusOnSelect) {
+    open.value = false
+  }
 }
 
 function onListScroll(event: Event) {
@@ -140,6 +170,7 @@ watch(
       <Button
         variant="outline"
         role="combobox"
+        :disabled="props.disabled"
         :aria-expanded="open"
         :class="
           cn(
