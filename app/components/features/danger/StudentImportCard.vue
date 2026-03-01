@@ -282,7 +282,9 @@ const importSummary = computed(() => {
           </div>
 
           <!-- Stat cards -->
-          <div class="grid grid-cols-3 divide-x divide-border/50">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/50"
+          >
             <!-- Students -->
             <div class="p-3.5 space-y-1">
               <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
