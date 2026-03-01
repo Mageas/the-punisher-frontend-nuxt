@@ -49,6 +49,12 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   },
 })
 
+const modeOptions = computed(() => [
+  { id: 'at', name: t('rules.modes.at') },
+  { id: 'every', name: t('rules.modes.every') },
+  { id: 'after', name: t('rules.modes.after') },
+])
+
 watch(open, (isOpen) => {
   if (isOpen && props.rule) {
     clearErrors()
@@ -148,17 +154,14 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormItem>
           <FormLabel>{{ t('modals.rule.mode') }}</FormLabel>
           <FormControl>
-            <NativeSelect :model-value="value" @update:model-value="handleChange as any">
-              <option value="at">
-                {{ t('rules.modes.at') }}
-              </option>
-              <option value="every">
-                {{ t('rules.modes.every') }}
-              </option>
-              <option value="after">
-                {{ t('rules.modes.after') }}
-              </option>
-            </NativeSelect>
+            <FilterIdNameSelect
+              :model-value="value"
+              :options="modeOptions"
+              :placeholder="t('modals.rule.mode')"
+              :search-placeholder="t('modals.rule.mode')"
+              :empty-text="t('filters.noTypeFound')"
+              @update:model-value="handleChange"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

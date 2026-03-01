@@ -1,52 +1,46 @@
 <script setup lang="ts">
-import { X } from 'lucide-vue-next'
+import { computed } from 'vue'
 
 interface SelectOption {
   value: string
   label: string
 }
 
-const props = defineProps<{
-  label: string
-  placeholder: string
-  options: SelectOption[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    label: string
+    placeholder: string
+    options: readonly SelectOption[]
+    searchPlaceholder?: string
+    emptyText?: string
+  }>(),
+  {
+    searchPlaceholder: undefined,
+    emptyText: undefined,
+  },
+)
 
 const modelValue = defineModel<string>({ default: '' })
+const { t } = useI18n()
 
-function clear() {
-  modelValue.value = ''
-}
+const mappedOptions = computed(() =>
+  props.options.map((option) => ({
+    id: option.value,
+    name: option.label,
+  })),
+)
+
+const resolvedSearchPlaceholder = computed(() => props.searchPlaceholder ?? props.placeholder)
+const resolvedEmptyText = computed(() => props.emptyText ?? t('filters.noTypeFound'))
 </script>
 
 <template>
-  <div class="space-y-1.5">
-    <div class="flex items-center justify-between">
-      <Label class="text-xs font-medium text-muted-foreground">{{ props.label }}</Label>
-      <Button
-        v-if="modelValue"
-        variant="ghost"
-        size="icon-sm"
-        class="h-5 w-5 cursor-pointer text-muted-foreground hover:text-foreground"
-        @click="clear"
-      >
-        <X class="h-3 w-3" />
-      </Button>
-    </div>
-    <Select v-model="modelValue">
-      <SelectTrigger class="h-8 text-xs cursor-pointer">
-        <SelectValue :placeholder="props.placeholder" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem
-          v-for="option in props.options"
-          :key="option.value"
-          :value="option.value"
-          class="cursor-pointer text-xs"
-        >
-          {{ option.label }}
-        </SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+  <FilterIdNameSelect
+    v-model="modelValue"
+    :label="props.label"
+    :placeholder="props.placeholder"
+    :search-placeholder="resolvedSearchPlaceholder"
+    :empty-text="resolvedEmptyText"
+    :options="mappedOptions"
+  />
 </template>
