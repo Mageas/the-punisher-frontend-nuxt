@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Classroom, DashboardResponse } from '~/types/api'
+import type { DashboardResponse } from '~/types/api'
 import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
@@ -11,8 +11,6 @@ const dashboardService = useDashboardService()
 const punishmentService = usePunishmentService()
 
 // Classroom filter
-const { classrooms: allClassrooms, fetchClassrooms } = useAllClassrooms()
-const classrooms = ref<Classroom[]>([])
 const selectedClassroomId = ref<string>('')
 
 // Dashboard data
@@ -23,13 +21,6 @@ const loading = ref(true)
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
-
-function snapshotClassrooms(list: readonly Classroom[]): Classroom[] {
-  return list.map((classroom) => ({
-    ...classroom,
-    students_preview: classroom.students_preview.map((student) => ({ ...student })),
-  }))
-}
 
 async function fetchDashboard() {
   loading.value = true
@@ -60,19 +51,9 @@ watch(selectedClassroomId, async () => {
 const { data: initialData } = await useAsyncData(
   () => `dashboard:initial:${route.fullPath}`,
   async () => {
-    await fetchClassrooms()
-
-    const [dashboardData, classroomsData] = await Promise.all([
-      dashboardService.getDashboard({
-        classroomId: selectedClassroomId.value || undefined,
-      }),
-      Promise.resolve(snapshotClassrooms(allClassrooms.value)),
-    ])
-
-    return {
-      classrooms: classroomsData,
-      dashboard: dashboardData,
-    }
+    return dashboardService.getDashboard({
+      classroomId: selectedClassroomId.value || undefined,
+    })
   },
   {
     server: true,
@@ -80,8 +61,7 @@ const { data: initialData } = await useAsyncData(
 )
 
 if (initialData.value) {
-  classrooms.value = initialData.value.classrooms
-  dashboard.value = initialData.value.dashboard
+  dashboard.value = initialData.value
   loading.value = false
 }
 </script>
@@ -94,17 +74,13 @@ if (initialData.value) {
         <h1 class="text-2xl font-bold tracking-tight whitespace-nowrap">
           {{ t('dashboard.title') }}
         </h1>
-        <ClassroomSelect
-          v-model="selectedClassroomId"
-          :classrooms="classrooms"
-          class="hidden lg:inline-flex"
-        />
+        <ClassroomSelect v-model="selectedClassroomId" class="hidden lg:inline-flex" />
       </template>
 
       <template #actions>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center w-full lg:w-auto">
           <div class="flex-1 min-w-0 lg:hidden">
-            <ClassroomSelect v-model="selectedClassroomId" :classrooms="classrooms" />
+            <ClassroomSelect v-model="selectedClassroomId" />
           </div>
           <div class="shrink-0">
             <PageActionsMenu :create-label="t('common.add')">

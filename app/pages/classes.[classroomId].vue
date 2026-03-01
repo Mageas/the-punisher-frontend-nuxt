@@ -10,8 +10,6 @@ definePageMeta({
 
 const route = useRoute()
 
-const { students: classroomStudents, fetchStudents: fetchClassroomStudents } = useAllStudents()
-const { students: allStudents, fetchStudents: fetchAllStudents } = useAllStudents()
 const {
   globalError: addStudentError,
   handleApiError: handleAddStudentError,
@@ -25,6 +23,7 @@ const classroomId = computed<string>(() => {
 const { kpis: classroomKpis, fetchKpis: fetchClassroomKpis } = useClassroomKpis(classroomId)
 
 const classroom = ref<Classroom | null>(null)
+const classroomStudents = ref<Student[]>([])
 const loading = ref(false)
 const submittingAddStudent = ref(false)
 const addStudentId = ref('')
@@ -36,29 +35,33 @@ const studentToRemove = ref<Student | null>(null)
 
 const classroomName = computed(() => classroom.value?.name ?? '')
 
-const classStudentIds = computed(
-  () => new Set(classroomStudents.value.map((student) => student.id)),
-)
-const assignableStudents = computed(() =>
-  allStudents.value.filter((student) => !classStudentIds.value.has(student.id)),
-)
-const assignableStudentOptions = computed(() =>
-  assignableStudents.value.map((student) => ({
-    id: student.id,
-    name: studentFullName(student),
-  })),
-)
-
 function studentFullName(student: Student): string {
   return `${student.first_name} ${student.last_name}`
 }
 
-const selectedStudentToAdd = computed(() => {
-  if (!addStudentId.value) return null
-  return assignableStudents.value.find((student) => student.id === addStudentId.value) ?? null
-})
+const canAddStudent = computed(() => !!addStudentId.value && !submittingAddStudent.value)
 
-const canAddStudent = computed(() => !!selectedStudentToAdd.value && !submittingAddStudent.value)
+async function fetchAllClassroomStudents() {
+  const all: Student[] = []
+  let pageToLoad = 1
+  let hasMore = true
+
+  while (hasMore) {
+    const response = await classroomService.getClassroomStudents(classroomId.value, {
+      page: pageToLoad,
+    })
+    all.push(...response.data)
+
+    if (response.next_page === null) {
+      hasMore = false
+      continue
+    }
+
+    pageToLoad = response.next_page
+  }
+
+  classroomStudents.value = all
+}
 
 async function fetchClassroomProfile() {
   loading.value = true
@@ -66,8 +69,7 @@ async function fetchClassroomProfile() {
     const [classroomRes] = await Promise.all([
       classroomService.getClassroomById(classroomId.value),
       fetchClassroomKpis(),
-      fetchClassroomStudents(classroomId.value),
-      fetchAllStudents(),
+      fetchAllClassroomStudents(),
     ])
     classroom.value = classroomRes
   } finally {
@@ -76,14 +78,13 @@ async function fetchClassroomProfile() {
 }
 
 async function addStudentToClassroom() {
-  const student = selectedStudentToAdd.value
-  if (!classroomId.value || !student) return
+  if (!classroomId.value || !addStudentId.value) return
 
   submittingAddStudent.value = true
   clearAddStudentErrors()
 
   try {
-    await classroomService.addStudentToClassroom(classroomId.value, student.id)
+    await classroomService.addStudentToClassroom(classroomId.value, addStudentId.value)
     addStudentId.value = ''
     await fetchClassroomProfile()
   } catch (err) {
@@ -144,7 +145,6 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
         v-model="addStudentId"
         :students="classroomStudents"
         :student-count="classroom.student_count"
-        :assignable-student-options="assignableStudentOptions"
         :can-add-student="canAddStudent"
         :add-student-error="addStudentError"
         keep-focus-on-student-select

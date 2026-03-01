@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
+import type { IdNameOptionsFetcher } from '~/composables/useLazyIdNameOptions'
 
 interface IdNameOption {
   id: string
@@ -11,7 +12,11 @@ const props = defineProps<{
   placeholder: string
   searchPlaceholder: string
   emptyText: string
-  options: readonly IdNameOption[]
+  options?: readonly IdNameOption[]
+  fetchOptions?: IdNameOptionsFetcher
+  optionsScopeKey?: string | number | boolean | null
+  searchDebounceMs?: number
+  selectedLabel?: string
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
@@ -38,6 +43,10 @@ function clear() {
     <IdNameSelect
       v-model="modelValue"
       :options="props.options"
+      :fetch-options="props.fetchOptions"
+      :options-scope-key="props.optionsScopeKey"
+      :search-debounce-ms="props.searchDebounceMs"
+      :selected-label="props.selectedLabel"
       :placeholder="props.placeholder"
       :search-placeholder="props.searchPlaceholder"
       :empty-text="props.emptyText"

@@ -25,19 +25,14 @@ const state = ref(filters.state || '')
 const createdFrom = ref(filters.created_from || '')
 const createdTo = ref(filters.created_to || '')
 
-// Reference data for filters
-const { classrooms, fetchClassrooms } = useAllClassrooms()
-const { students, fetchStudents } = useAllStudents()
-const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
-
-// Map students to {id, name} for IdNameSelect
-const studentOptions = computed(() =>
-  students.value.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}` })),
-)
+const classroomService = useClassroomService()
+const studentService = useStudentService()
+const typeService = useTypeService()
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+const studentFilterScopeKey = computed(() => classroomId.value || '__all_students__')
 
 const stateOptions = computed(() => [
   { value: 'unused', label: t('filters.stateUnused') },
@@ -128,16 +123,44 @@ watch([classroomId, studentId, bonusTypeId, state, createdFrom, createdTo], () =
   })
 })
 
-// When classroom changes, reload students for that classroom
-watch(classroomId, async (newClassroomId) => {
+// When classroom changes, reset selected student filter
+watch(classroomId, () => {
   studentId.value = ''
-  await fetchStudents(newClassroomId || undefined)
 })
+
+async function fetchClassroomOptions(options: { page: number; search?: string }) {
+  const response = await classroomService.getClassrooms(options)
+  return {
+    ...response,
+    data: response.data.map((classroom) => ({ id: classroom.id, name: classroom.name })),
+  }
+}
+
+async function fetchStudentOptions(options: { page: number; search?: string }) {
+  const response = classroomId.value
+    ? await classroomService.getClassroomStudents(classroomId.value, options)
+    : await studentService.getStudents(options)
+
+  return {
+    ...response,
+    data: response.data.map((student) => ({
+      id: student.id,
+      name: `${student.first_name} ${student.last_name}`,
+    })),
+  }
+}
+
+async function fetchBonusTypeOptions(options: { page: number; search?: string }) {
+  const response = await typeService.getBonusTypes(options)
+  return {
+    ...response,
+    data: response.data.map((bonusType) => ({ id: bonusType.id, name: bonusType.name })),
+  }
+}
 
 await useAsyncData(
   () => `bonuses:initial:${route.fullPath}`,
   async () => {
-    await Promise.all([fetchClassrooms(), fetchStudents(), fetchBonusTypes()])
     await reload()
     return true
   },
@@ -174,7 +197,7 @@ await useAsyncData(
         :placeholder="t('filters.allClassrooms')"
         :search-placeholder="t('common.searchClass')"
         :empty-text="t('common.noClassFound')"
-        :options="classrooms"
+        :fetch-options="fetchClassroomOptions"
       />
 
       <FilterIdNameSelect
@@ -183,7 +206,8 @@ await useAsyncData(
         :placeholder="t('filters.allStudents')"
         :search-placeholder="t('filters.searchStudent')"
         :empty-text="t('filters.noStudentFound')"
-        :options="studentOptions"
+        :fetch-options="fetchStudentOptions"
+        :options-scope-key="studentFilterScopeKey"
       />
 
       <FilterIdNameSelect
@@ -192,7 +216,7 @@ await useAsyncData(
         :placeholder="t('filters.allTypes')"
         :search-placeholder="t('filters.searchType')"
         :empty-text="t('filters.noTypeFound')"
-        :options="bonusTypes"
+        :fetch-options="fetchBonusTypeOptions"
       />
 
       <FilterSelect

@@ -17,8 +17,6 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
-const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
-const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 const ruleService = useRuleService()
 
 const schema = toTypedSchema(
@@ -51,7 +49,7 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   },
 })
 
-watch(open, async (isOpen) => {
+watch(open, (isOpen) => {
   if (isOpen && props.rule) {
     clearErrors()
     resetForm({
@@ -64,7 +62,6 @@ watch(open, async (isOpen) => {
         due_at_after_days: props.rule.due_at_after_days,
       },
     })
-    await Promise.all([fetchPenaltyTypes(), fetchPunishmentTypes()])
   }
 })
 
@@ -126,7 +123,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormControl>
           <PenaltyTypeSelect
             :model-value="value"
-            :penalty-types="penaltyTypes"
+            :selected-name="props.rule?.penalty_type_name"
             :placeholder="t('modals.rule.selectPenaltyType')"
             :empty-text="t('modals.rule.noPenaltyTypeFound')"
             @update:model-value="handleChange"
@@ -174,7 +171,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormControl>
           <PunishmentTypeSelect
             :model-value="value"
-            :punishment-types="punishmentTypes"
+            :selected-name="props.rule?.resulting_punishment_type_name"
             :placeholder="t('modals.rule.selectPunishmentType')"
             :empty-text="t('modals.rule.noPunishmentTypeFound')"
             @update:model-value="handleChange"
