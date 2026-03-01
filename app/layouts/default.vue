@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useMediaQuery } from '@vueuse/core'
 import { useUserStore } from '~/stores/user'
 import {
   Sidebar,
@@ -44,6 +45,7 @@ const { t } = useI18n()
 const route = useRoute()
 const { logout: authLogout, isAuthenticated } = useAuth()
 const userStore = useUserStore()
+const isMobile = useMediaQuery('(max-width: 768px)')
 
 if (isAuthenticated.value) {
   await userStore.fetchUser()
@@ -170,7 +172,7 @@ function isActive(to: string): boolean {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                side="right"
+                :side="isMobile ? 'top' : 'right'"
                 align="end"
                 class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
               >
