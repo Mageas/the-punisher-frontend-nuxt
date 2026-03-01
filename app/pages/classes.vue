@@ -1,19 +1,32 @@
 <script setup lang="ts">
-import { AlertCircle, Plus, Star } from 'lucide-vue-next'
+import { refDebounced } from '@vueuse/core'
+import { AlertCircle, Plus, Search, Star, X } from 'lucide-vue-next'
 import type { Classroom, DashboardKpis } from '~/types/api'
 import { getInitials } from '~/lib/utils'
 
 const { t } = useI18n()
 const classroomService = useClassroomService()
-const { classrooms, loading, page, itemPerPage, totalCount, fetchClassrooms, gotoPage } =
-  useClassrooms()
+const {
+  classrooms,
+  loading,
+  page,
+  filters,
+  itemPerPage,
+  totalCount,
+  fetchClassrooms,
+  gotoPage,
+  applyFilters,
+} = useClassrooms()
 
 const showCreateModal = ref(false)
 const loadingClassroomKpis = ref(false)
 const classroomKpisById = ref<Record<string, DashboardKpis>>({})
+const searchQuery = ref(filters.search || '')
+const searchDebounced = refDebounced(searchQuery, 300)
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
 const showPagination = computed(() => totalCount.value > 0)
+const activeFilterCount = computed(() => (searchQuery.value ? 1 : 0))
 
 function extraStudentsCount(classroom: Classroom): number {
   return Math.max(0, classroom.student_count - previewStudents(classroom).length)
@@ -59,19 +72,39 @@ async function fetchVisibleClassroomKpis() {
 }
 
 async function reload(pageToLoad = page.value || 1) {
-  await fetchClassrooms({ page: pageToLoad })
-  await fetchVisibleClassroomKpis()
+  await fetchClassrooms({
+    page: pageToLoad,
+    search: searchDebounced.value || undefined,
+  })
 }
 
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
-  await fetchVisibleClassroomKpis()
 }
 
 async function onCreated() {
   await reload(1)
 }
+
+function resetFilters() {
+  searchQuery.value = ''
+}
+
+watch(
+  () => classrooms.value.map((classroom) => classroom.id).join(','),
+  async () => {
+    await fetchVisibleClassroomKpis()
+  },
+  { immediate: true },
+)
+
+watch(searchDebounced, async (newSearch) => {
+  const normalizedSearch = newSearch || ''
+  if (normalizedSearch === (filters.search || '')) return
+
+  await applyFilters({ search: normalizedSearch || undefined })
+})
 
 await reload()
 </script>
@@ -98,6 +131,35 @@ await reload()
         </Button>
       </template>
     </PageHeaderBar>
+
+    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <Label class="text-xs font-medium text-muted-foreground">{{
+            t('filters.classroom')
+          }}</Label>
+          <Button
+            v-if="searchQuery"
+            variant="ghost"
+            size="icon-sm"
+            class="h-5 w-5 cursor-pointer text-muted-foreground hover:text-foreground"
+            @click="searchQuery = ''"
+          >
+            <X class="h-3 w-3" />
+          </Button>
+        </div>
+        <div class="relative">
+          <Search
+            class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            v-model="searchQuery"
+            :placeholder="t('common.searchClass')"
+            class="h-8 pl-8 text-xs"
+          />
+        </div>
+      </div>
+    </FilterBar>
 
     <div v-if="classrooms.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
       {{ t('classes.noClasses') }}
