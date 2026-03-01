@@ -4,9 +4,14 @@ export function useTypeService() {
   const { $api } = useNuxtApp()
 
   // Bonus Types
-  async function getBonusTypes(options?: { page?: number }) {
+  async function getBonusTypes(options?: { page?: number; search?: string }) {
+    const params: { page?: number; search?: string } = {}
+
+    if (options?.page) params.page = options.page
+    if (options?.search) params.search = options.search
+
     return $api<PaginatedResponse<BonusType>>('/bonus-types', {
-      params: options,
+      params,
     })
   }
   async function createBonusType(data: { name: string }) {
@@ -23,9 +28,14 @@ export function useTypeService() {
   }
 
   // Penalty Types
-  async function getPenaltyTypes(options?: { page?: number }) {
+  async function getPenaltyTypes(options?: { page?: number; search?: string }) {
+    const params: { page?: number; search?: string } = {}
+
+    if (options?.page) params.page = options.page
+    if (options?.search) params.search = options.search
+
     return $api<PaginatedResponse<PenaltyType>>('/penalty-types', {
-      params: options,
+      params,
     })
   }
   async function createPenaltyType(data: { name: string }) {
@@ -42,9 +52,14 @@ export function useTypeService() {
   }
 
   // Punishment Types
-  async function getPunishmentTypes(options?: { page?: number }) {
+  async function getPunishmentTypes(options?: { page?: number; search?: string }) {
+    const params: { page?: number; search?: string } = {}
+
+    if (options?.page) params.page = options.page
+    if (options?.search) params.search = options.search
+
     return $api<PaginatedResponse<PunishmentType>>('/punishment-types', {
-      params: options,
+      params,
     })
   }
   async function createPunishmentType(data: { name: string }) {
