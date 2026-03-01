@@ -1,6 +1,10 @@
 import type { Ref } from "vue"
 import { createContext } from "reka-ui"
 
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Removed default filtering behavior.
+
 export { default as Command } from "./Command.vue"
 export { default as CommandDialog } from "./CommandDialog.vue"
 export { default as CommandEmpty } from "./CommandEmpty.vue"
@@ -14,6 +18,7 @@ export { default as CommandShortcut } from "./CommandShortcut.vue"
 export const [useCommand, provideCommandContext] = createContext<{
   allItems: Ref<Map<string, string>>
   allGroups: Ref<Map<string, Set<string>>>
+  disableLocalFilter: Ref<boolean>
   filterState: {
     search: string
     filtered: { count: number, items: Map<string, number>, groups: Set<string> }

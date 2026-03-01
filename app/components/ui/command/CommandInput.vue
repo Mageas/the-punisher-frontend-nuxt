@@ -2,6 +2,7 @@
 // This shadcn-generated file was locally modified and must not be overwritten.
 // Local change summary:
 // - Added synchronization between the internal filter state and the external modelValue prop, allowing for both controlled and uncontrolled usage of the CommandInput component.
+// - Removed default filtering behavior.
 import type { ListboxFilterProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"

@@ -15,7 +15,12 @@ Only the files listed below were customized locally and must not be overwritten 
 - `app/components/ui/sidebar/Sidebar.vue`
 - `app/components/ui/sidebar/SidebarRail.vue`
 - `app/components/ui/sidebar/SidebarTrigger.vue`
+- `app/components/ui/command/Command.vue`
+- `app/components/ui/command/CommandEmpty.vue`
+- `app/components/ui/command/CommandGroup.vue`
 - `app/components/ui/command/CommandInput.vue`
+- `app/components/ui/command/CommandItem.vue`
+- `app/components/ui/command/index.ts`
 
 ## Header Marker
 

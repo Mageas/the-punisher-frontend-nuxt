@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// This shadcn-generated file was locally modified and must not be overwritten.
+// Local change summary:
+// - Removed default filtering behavior.
 import type { ListboxGroupProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
@@ -14,10 +17,16 @@ const props = defineProps<ListboxGroupProps & {
 
 const delegatedProps = reactiveOmit(props, "class")
 
-const { allGroups, filterState } = useCommand()
+const { allGroups, filterState, disableLocalFilter } = useCommand()
 const id = useId()
 
-const isRender = computed(() => !filterState.search ? true : filterState.filtered.groups.has(id))
+const isRender = computed(() => {
+  if (disableLocalFilter.value) {
+    return true
+  }
+
+  return !filterState.search ? true : filterState.filtered.groups.has(id)
+})
 
 provideCommandGroupContext({ id })
 onMounted(() => {
