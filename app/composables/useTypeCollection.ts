@@ -8,7 +8,7 @@ export interface NamedTypeResource {
 }
 
 export interface TypeServiceFunctions<TType> {
-  getTypes: (options?: { page?: number }) => Promise<PaginatedResponse<TType>>
+  getTypes: (options?: { page?: number; search?: string }) => Promise<PaginatedResponse<TType>>
   createType: (data: { name: string }) => Promise<TType>
   updateType: (id: string, data: { name: string }) => Promise<TType>
   deleteType: (id: string) => Promise<void>
@@ -21,12 +21,12 @@ export function useTypeCollection<TType extends NamedTypeResource>(
   services: TypeServiceFunctions<TType>,
   stateKey = 'paginated:types',
 ) {
-  const paginated = usePaginatedCollection<TType, { page?: number }>(
+  const paginated = usePaginatedCollection<TType, { page?: number; search?: string }>(
     (options) => services.getTypes(options),
-    { pageKey: 'page', stateKey },
+    { pageKey: 'page', filterKeys: ['search'], stateKey },
   )
 
-  async function fetchTypes(options?: { page?: number }) {
+  async function fetchTypes(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
   }
 
