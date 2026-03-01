@@ -7,7 +7,6 @@ const props = withDefaults(
   defineProps<{
     students: readonly Student[]
     studentCount: number
-    assignableStudentOptions: readonly { id: string; name: string }[]
     canAddStudent: boolean
     addStudentError?: string | null
     keepFocusOnStudentSelect?: boolean
@@ -46,6 +45,8 @@ function onSubmit() {
 function onRemoveStudent(student: Student) {
   emit('removeStudent', student)
 }
+
+const existingStudentIds = computed(() => props.students.map((student) => student.id))
 </script>
 
 <template>
@@ -65,9 +66,9 @@ function onRemoveStudent(student: Student) {
 
     <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="onSubmit">
       <div class="flex-1">
-        <IdNameSearchInput
+        <StudentSelect
           v-model="modelValue"
-          :options="assignableStudentOptions"
+          :exclude-ids="existingStudentIds"
           :placeholder="t('classProfile.students.searchPlaceholder')"
           :empty-text="t('students.noStudents')"
           :keep-focus-on-select="props.keepFocusOnStudentSelect"

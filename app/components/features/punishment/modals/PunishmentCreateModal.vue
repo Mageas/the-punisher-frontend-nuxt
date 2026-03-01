@@ -23,9 +23,6 @@ const props = withDefaults(
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
-const { classrooms, fetchClassrooms } = useAllClassrooms()
-const { students, fetchStudents } = useAllStudents()
-const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 const punishmentService = usePunishmentService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
@@ -67,19 +64,18 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldVa
     },
   })
 
-// When classroom changes, re-fetch students and reset student selection
+// When classroom changes, reset student selection
 watch(
   () => values.classroom_id,
-  (newClassroomId) => {
+  () => {
     if (!open.value) return
     if (hasPreselectedStudent.value) return
     setFieldValue('student_id', '', false)
-    fetchStudents(newClassroomId || undefined)
   },
 )
 
 // Load data when modal opens
-watch(open, async (isOpen) => {
+watch(open, (isOpen) => {
   if (isOpen) {
     clearErrors()
     resetForm({
@@ -91,13 +87,6 @@ watch(open, async (isOpen) => {
         due_at_time: '08:00',
       },
     })
-    await Promise.all([
-      hasPreselectedStudent.value || hasPreselectedClassroom.value
-        ? Promise.resolve()
-        : fetchClassrooms(),
-      fetchStudents(values.classroom_id || undefined),
-      fetchPunishmentTypes(),
-    ])
   }
 })
 
@@ -141,12 +130,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormItem>
           <FormLabel>{{ t('modals.punishment.class') }}</FormLabel>
           <FormControl>
-            <ClassroomSelect
-              :model-value="value"
-              :classrooms="classrooms"
-              full-width
-              @update:model-value="handleChange"
-            />
+            <ClassroomSelect :model-value="value" full-width @update:model-value="handleChange" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -158,7 +142,7 @@ const onSubmit = handleSubmit(async (formValues) => {
           <FormControl>
             <StudentSelect
               :model-value="value"
-              :students="students"
+              :classroom-id="values.classroom_id || null"
               :placeholder="t('modals.punishment.selectStudent')"
               :empty-text="t('modals.punishment.noStudentFound')"
               @update:model-value="handleChange"
@@ -173,11 +157,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       <FormItem>
         <FormLabel>{{ t('modals.punishment.punishmentType') }}</FormLabel>
         <FormControl>
-          <PunishmentTypeSelect
-            :model-value="value"
-            :punishment-types="punishmentTypes"
-            @update:model-value="handleChange"
-          />
+          <PunishmentTypeSelect :model-value="value" @update:model-value="handleChange" />
         </FormControl>
         <FormMessage />
       </FormItem>

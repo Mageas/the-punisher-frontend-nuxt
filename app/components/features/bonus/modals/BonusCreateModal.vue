@@ -21,9 +21,6 @@ const props = withDefaults(
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
-const { classrooms, fetchClassrooms } = useAllClassrooms()
-const { students, fetchStudents } = useAllStudents()
-const { bonusTypes, fetchBonusTypes } = useAllBonusTypes()
 const bonusService = useBonusService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
@@ -63,19 +60,18 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldVa
     },
   })
 
-// When classroom changes, re-fetch students and reset student selection
+// When classroom changes, reset student selection
 watch(
   () => values.classroom_id,
-  (newClassroomId) => {
+  () => {
     if (!open.value) return
     if (hasPreselectedStudent.value) return
     setFieldValue('student_id', '', false)
-    fetchStudents(newClassroomId || undefined)
   },
 )
 
 // Load data when modal opens
-watch(open, async (isOpen) => {
+watch(open, (isOpen) => {
   if (isOpen) {
     clearErrors()
     resetForm({
@@ -86,13 +82,6 @@ watch(open, async (isOpen) => {
         points: 1,
       },
     })
-    await Promise.all([
-      hasPreselectedStudent.value || hasPreselectedClassroom.value
-        ? Promise.resolve()
-        : fetchClassrooms(),
-      fetchStudents(values.classroom_id || undefined),
-      fetchBonusTypes(),
-    ])
   }
 })
 
@@ -132,12 +121,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormItem>
           <FormLabel>{{ t('modals.bonus.class') }}</FormLabel>
           <FormControl>
-            <ClassroomSelect
-              :model-value="value"
-              :classrooms="classrooms"
-              full-width
-              @update:model-value="handleChange"
-            />
+            <ClassroomSelect :model-value="value" full-width @update:model-value="handleChange" />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -149,7 +133,7 @@ const onSubmit = handleSubmit(async (formValues) => {
           <FormControl>
             <StudentSelect
               :model-value="value"
-              :students="students"
+              :classroom-id="values.classroom_id || null"
               :placeholder="t('modals.bonus.selectStudent')"
               :empty-text="t('modals.bonus.noStudentFound')"
               @update:model-value="handleChange"
@@ -164,11 +148,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       <FormItem>
         <FormLabel>{{ t('modals.bonus.bonusType') }}</FormLabel>
         <FormControl>
-          <BonusTypeSelect
-            :model-value="value"
-            :bonus-types="bonusTypes"
-            @update:model-value="handleChange"
-          />
+          <BonusTypeSelect :model-value="value" @update:model-value="handleChange" />
         </FormControl>
         <FormMessage />
       </FormItem>

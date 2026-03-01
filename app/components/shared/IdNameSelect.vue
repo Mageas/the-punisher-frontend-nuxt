@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import type { IdNameOptionsFetcher } from '~/composables/useLazyIdNameOptions'
 
 interface IdNameOption {
   id: string
@@ -22,7 +23,7 @@ const NONE_OPTION_VALUE = '__none_option__'
 
 const props = withDefaults(
   defineProps<{
-    options: readonly IdNameOption[]
+    options?: readonly IdNameOption[]
     placeholder: string
     searchPlaceholder: string
     emptyText: string
@@ -30,28 +31,65 @@ const props = withDefaults(
     noneOptionLabel?: string
     noneValueLabel?: string
     noneOptionValue?: string
+    fetchOptions?: IdNameOptionsFetcher
+    optionsScopeKey?: string | number | boolean | null
+    searchDebounceMs?: number
+    selectedLabel?: string
   }>(),
   {
+    options: () => [],
     fullWidth: true,
     noneOptionValue: NONE_OPTION_VALUE,
     noneOptionLabel: undefined,
     noneValueLabel: undefined,
+    fetchOptions: undefined,
+    optionsScopeKey: null,
+    searchDebounceMs: 300,
+    selectedLabel: undefined,
   },
 )
 
 const modelValue = defineModel<string>({ default: '' })
 
 const open = ref(false)
+const searchQuery = ref('')
+const { t } = useI18n()
+
+const lazyOptions = useLazyIdNameOptions({
+  open,
+  search: searchQuery,
+  staticOptions: computed(() => props.options),
+  fetchOptions: props.fetchOptions,
+  optionsScopeKey: computed(() => props.optionsScopeKey),
+  searchDebounceMs: props.searchDebounceMs,
+})
+
+const selectedOption = computed<IdNameOption | null>(() => {
+  if (!modelValue.value) return null
+
+  const knownOption = lazyOptions.getKnownOption(modelValue.value)
+  if (knownOption) return knownOption
+
+  if (props.selectedLabel) {
+    return {
+      id: modelValue.value,
+      name: props.selectedLabel,
+    }
+  }
+
+  return null
+})
 
 const selectOptions = computed(() => {
-  if (!props.noneOptionLabel) return props.options
+  const options = lazyOptions.options.value
+  if (!props.noneOptionLabel) return options
 
-  return [{ id: props.noneOptionValue, name: props.noneOptionLabel }, ...props.options]
+  return [{ id: props.noneOptionValue, name: props.noneOptionLabel }, ...options]
 })
 
 const selectedLabel = computed(() => {
   if (!modelValue.value) return props.noneValueLabel ?? props.placeholder
-  const found = props.options.find((option) => option.id === modelValue.value)
+  const found = selectedOption.value
   return found?.name ?? props.placeholder
 })
 
@@ -63,7 +101,37 @@ function isSelected(optionId: string) {
 function select(value: string) {
   modelValue.value = value === props.noneOptionValue ? '' : value
   open.value = false
+  searchQuery.value = ''
 }
+
+function onListScroll(event: Event) {
+  if (!lazyOptions.isRemote.value || !lazyOptions.hasMore.value || lazyOptions.loadingMore.value) {
+    return
+  }
+
+  if (lazyOptions.loadingInitial.value) return
+
+  const target = event.target
+  if (!(target instanceof HTMLElement)) return
+
+  const thresholdPx = 12
+  const reachedBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - thresholdPx
+  if (!reachedBottom) return
+
+  void lazyOptions.loadMore()
+}
+
+watch(
+  () => open.value,
+  (isOpen) => {
+    if (!isOpen) {
+      searchQuery.value = ''
+      return
+    }
+
+    searchQuery.value = ''
+  },
+)
 </script>
 
 <template>
@@ -96,9 +164,18 @@ function select(value: string) {
       align="start"
     >
       <Command>
-        <CommandInput :placeholder="searchPlaceholder" />
-        <CommandList>
-          <CommandEmpty>{{ emptyText }}</CommandEmpty>
+        <CommandInput v-model="searchQuery" :placeholder="searchPlaceholder" />
+        <CommandList @scroll="onListScroll">
+          <p
+            v-if="lazyOptions.loadingInitial.value && selectOptions.length === 0"
+            class="px-2 py-2 text-sm text-muted-foreground"
+          >
+            {{ t('common.loading') }}
+          </p>
+          <p v-else-if="selectOptions.length === 0" class="px-2 py-2 text-sm text-muted-foreground">
+            {{ emptyText }}
+          </p>
+          <CommandEmpty v-if="selectOptions.length > 0">{{ emptyText }}</CommandEmpty>
           <CommandGroup>
             <CommandItem
               v-for="option in selectOptions"
@@ -113,6 +190,9 @@ function select(value: string) {
               <span class="min-w-0 flex-1 truncate" :title="option.name">{{ option.name }}</span>
             </CommandItem>
           </CommandGroup>
+          <p v-if="lazyOptions.loadingMore.value" class="px-2 py-2 text-xs text-muted-foreground">
+            {{ t('common.loading') }}
+          </p>
         </CommandList>
       </Command>
     </PopoverContent>

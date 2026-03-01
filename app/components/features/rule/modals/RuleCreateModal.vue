@@ -12,8 +12,6 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
-const { penaltyTypes, fetchPenaltyTypes } = useAllPenaltyTypes()
-const { punishmentTypes, fetchPunishmentTypes } = useAllPunishmentTypes()
 const ruleService = useRuleService()
 
 const schema = toTypedSchema(
@@ -30,7 +28,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, values, meta } = useForm({
+const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     penalty_type_id: '',
@@ -41,15 +39,8 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, meta } = u
   },
 })
 
-const selectedPenaltyTypeName = computed(
-  () => penaltyTypes.value.find((type) => type.id === values.penalty_type_id)?.name ?? '',
-)
-
-const selectedPunishmentTypeName = computed(
-  () =>
-    punishmentTypes.value.find((type) => type.id === values.resulting_punishment_type_id)?.name ??
-    '',
-)
+const selectedPenaltyTypeName = ref('')
+const selectedPunishmentTypeName = ref('')
 
 const generatedRuleName = computed(() => {
   if (selectedPenaltyTypeName.value && selectedPunishmentTypeName.value) {
@@ -62,7 +53,8 @@ watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
     resetForm()
-    await Promise.all([fetchPenaltyTypes(), fetchPunishmentTypes()])
+    selectedPenaltyTypeName.value = ''
+    selectedPunishmentTypeName.value = ''
   }
 })
 
@@ -99,10 +91,10 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormControl>
           <PenaltyTypeSelect
             :model-value="value"
-            :penalty-types="penaltyTypes"
             :placeholder="t('modals.rule.selectPenaltyType')"
             :empty-text="t('modals.rule.noPenaltyTypeFound')"
             @update:model-value="handleChange"
+            @selected-option="selectedPenaltyTypeName = $event?.name ?? ''"
           />
         </FormControl>
         <FormMessage />
@@ -147,10 +139,10 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormControl>
           <PunishmentTypeSelect
             :model-value="value"
-            :punishment-types="punishmentTypes"
             :placeholder="t('modals.rule.selectPunishmentType')"
             :empty-text="t('modals.rule.noPunishmentTypeFound')"
             @update:model-value="handleChange"
+            @selected-option="selectedPunishmentTypeName = $event?.name ?? ''"
           />
         </FormControl>
         <FormMessage />
