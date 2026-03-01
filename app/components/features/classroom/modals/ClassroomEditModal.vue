@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { buildDelta } from '~/lib/delta'
 
 const emit = defineEmits<{
   updated: []
@@ -57,12 +58,22 @@ const onSubmit = handleSubmit(async (values) => {
   if (!props.classroomId) return
   clearErrors()
   try {
-    await classroomService.updateClassroom(props.classroomId, {
+    const initialPayload = {
+      name: props.name,
+      year: props.year || null,
+    }
+    const currentPayload = {
       name: values.name,
       year: values.year || null,
-    })
+    }
+    const deltaPayload = buildDelta(initialPayload, currentPayload)
+
+    if (Object.keys(deltaPayload).length > 0) {
+      await classroomService.updateClassroom(props.classroomId, deltaPayload)
+      emit('updated')
+    }
+
     open.value = false
-    emit('updated')
   } catch (err) {
     setFormErrors(setFieldError, err)
   }

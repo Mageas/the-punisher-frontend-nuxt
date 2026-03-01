@@ -22,7 +22,7 @@ export function useRules() {
     return await ruleService.createRule(data)
   }
 
-  async function updateRule(id: string, body: RulePayload) {
+  async function updateRule(id: string, body: Partial<RulePayload>) {
     await ruleService.updateRule(id, body)
   }
 

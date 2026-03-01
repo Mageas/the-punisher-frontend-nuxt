@@ -3,6 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { Rule, RuleMode } from '~/types/api'
+import { buildDelta } from '~/lib/delta'
 
 const emit = defineEmits<{
   updated: []
@@ -71,12 +72,27 @@ const onSubmit = handleSubmit(async (formValues) => {
   if (!props.rule?.id) return
   clearErrors()
   try {
-    await ruleService.updateRule(props.rule.id, {
+    const initialPayload = {
+      name: props.rule.name,
+      penalty_type_id: props.rule.penalty_type_id,
+      resulting_punishment_type_id: props.rule.resulting_punishment_type_id,
+      threshold: props.rule.threshold,
+      mode: props.rule.mode,
+      due_at_after_days: props.rule.due_at_after_days,
+      is_active: props.rule.is_active,
+    }
+    const currentPayload = {
       ...formValues,
       is_active: props.rule.is_active,
-    })
+    }
+    const deltaPayload = buildDelta(initialPayload, currentPayload)
+
+    if (Object.keys(deltaPayload).length > 0) {
+      await ruleService.updateRule(props.rule.id, deltaPayload)
+      emit('updated')
+    }
+
     open.value = false
-    emit('updated')
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
