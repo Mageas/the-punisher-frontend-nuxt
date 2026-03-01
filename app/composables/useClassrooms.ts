@@ -8,13 +8,15 @@ export function useClassrooms() {
     Classroom,
     {
       page?: number
+      search?: string
     }
   >((options) => classroomService.getClassrooms(options), {
     pageKey: 'page',
+    filterKeys: ['search'],
     stateKey: 'paginated:classrooms',
   })
 
-  async function fetchClassrooms(options?: { page?: number }) {
+  async function fetchClassrooms(options?: { page?: number; search?: string }) {
     await paginated.fetchPage(options)
   }
 
