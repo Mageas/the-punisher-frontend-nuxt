@@ -112,6 +112,20 @@ export function useAuth() {
     }
   }
 
+  /**
+   * Confirm a user email from a token.
+   */
+  async function confirmEmail(token: string) {
+    return authService.confirmEmail(token)
+  }
+
+  /**
+   * Resend a confirmation email if needed.
+   */
+  async function resendConfirmationEmail(email: string) {
+    return authService.resendConfirmationEmail(email)
+  }
+
   return {
     accessToken: readonly(accessToken),
     isAuthenticated,
@@ -121,5 +135,7 @@ export function useAuth() {
     logout,
     logoutAll,
     refresh,
+    confirmEmail,
+    resendConfirmationEmail,
   }
 }

@@ -7,6 +7,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const route = useRoute()
 const { login, isAuthenticated } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
@@ -19,6 +20,7 @@ const form = reactive({
   password: '',
 })
 const isLoading = ref(false)
+const showConfirmedSuccess = computed(() => route.query.confirmed === '1')
 
 async function onSubmit() {
   clearErrors()
@@ -53,6 +55,10 @@ async function onSubmit() {
 
       <!-- Card -->
       <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+        <Alert v-if="showConfirmedSuccess" class="mb-4">
+          <AlertDescription>{{ t('auth.confirmEmail.loginSuccess') }}</AlertDescription>
+        </Alert>
+
         <!-- Global error -->
         <Alert v-if="globalError" variant="destructive" class="mb-4">
           <AlertDescription>{{ globalError }}</AlertDescription>

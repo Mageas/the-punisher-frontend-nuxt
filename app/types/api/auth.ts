@@ -29,3 +29,17 @@ export interface RegisterRequest {
   first_name: string
   last_name: string
 }
+
+/**
+ * Response for a successful email confirmation action.
+ */
+export interface EmailConfirmationResponse {
+  status: 'email_confirmed'
+}
+
+/**
+ * Response for a successful email confirmation resend action.
+ */
+export interface EmailConfirmationResendResponse {
+  status: 'confirmation_email_sent_if_needed'
+}

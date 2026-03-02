@@ -56,7 +56,13 @@ async function onSubmit() {
       last_name: form.lastName,
     })
 
-    await navigateTo('/login')
+    await navigateTo({
+      path: '/confirm-email',
+      query: {
+        email: form.email,
+        registered: '1',
+      },
+    })
   } catch (err) {
     handleApiError(err)
   } finally {

@@ -1,5 +1,7 @@
 import type {
   AuthResponse,
+  EmailConfirmationResendResponse,
+  EmailConfirmationResponse,
   LoginRequest,
   RegisterRequest,
   RegisterStatusResponse,
@@ -64,6 +66,26 @@ export function useAuthService() {
     })
   }
 
+  /**
+   * Confirm a user's email from a JWT token.
+   */
+  async function confirmEmail(token: string) {
+    return $api<EmailConfirmationResponse>('/auth/confirm-email', {
+      method: 'GET',
+      query: { token },
+    })
+  }
+
+  /**
+   * Resend a confirmation email if needed.
+   */
+  async function resendConfirmationEmail(email: string) {
+    return $api<EmailConfirmationResendResponse>('/auth/confirm-email/resend', {
+      method: 'POST',
+      body: { email },
+    })
+  }
+
   return {
     login,
     register,
@@ -71,5 +93,7 @@ export function useAuthService() {
     logout,
     logoutAll,
     refresh,
+    confirmEmail,
+    resendConfirmationEmail,
   }
 }
