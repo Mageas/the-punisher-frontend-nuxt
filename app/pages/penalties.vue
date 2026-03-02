@@ -223,7 +223,7 @@ await useAsyncData(
             :aria-label="t('modals.delete.confirm')"
             @click="openDeleteModal(penalty.id)"
           >
-            <Trash2 class="w-4 h-4 text-red-400" />
+            <Trash2 class="w-4 h-4 text-danger" />
           </Button>
         </template>
       </PenaltyCard>

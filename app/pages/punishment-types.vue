@@ -23,7 +23,7 @@ const punishmentTypeServices = {
     :edit-title="t('punishmentTypes.editTitle')"
     :delete-message="t('punishmentTypes.deleteMessage')"
     :icon="FileWarning"
-    icon-class="text-red-400"
-    icon-wrapper-class="bg-red-400/10"
+    icon-class="text-danger"
+    icon-wrapper-class="bg-danger-bg-subtle"
   />
 </template>

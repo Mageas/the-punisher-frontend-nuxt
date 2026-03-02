@@ -27,8 +27,8 @@ const cards = computed(() => [
     label: t('classProfile.kpis.availableBonusPoints'),
     value: formatRatio(props.kpis.available_bonus_points, props.kpis.total_bonus_points),
     icon: Star,
-    iconClass: 'text-amber-400',
-    valueClass: 'text-amber-400',
+    iconClass: 'text-warning',
+    valueClass: 'text-warning',
     subtitle: t('common.unusedBonus', props.kpis.unused_bonus_count),
   },
   {
@@ -45,8 +45,8 @@ const cards = computed(() => [
     label: t('classProfile.kpis.pendingPunishmentCount'),
     value: formatRatio(props.kpis.pending_punishment_count, props.kpis.total_punishment_count),
     icon: Gavel,
-    iconClass: 'text-red-400',
-    valueClass: 'text-red-400',
+    iconClass: 'text-danger',
+    valueClass: 'text-danger',
     subtitle: t('common.overduePunishments', props.kpis.overdue_punishment_count),
   },
 ])

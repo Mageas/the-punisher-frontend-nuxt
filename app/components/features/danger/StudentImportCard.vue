@@ -155,11 +155,11 @@ const importSummary = computed(() => {
 
 <template>
   <div
-    class="group relative rounded-xl border border-border/60 bg-card p-5 transition-all hover:border-primary/40 hover:shadow-sm"
+    class="group relative rounded-xl border border-border bg-card p-5 transition-all hover:border-primary-border hover:shadow-sm"
   >
     <div class="flex items-start gap-4">
       <div
-        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 transition-colors group-hover:bg-blue-500/15 dark:text-blue-400"
+        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-info-bg-subtle text-info-foreground transition-colors group-hover:bg-info-bg-subtle-hover"
       >
         <FileUp class="size-5" />
       </div>
@@ -177,8 +177,8 @@ const importSummary = computed(() => {
           class="rounded-lg border border-dashed p-4 transition-colors"
           :class="
             isDraggingFile
-              ? 'border-primary bg-primary/5'
-              : 'border-border/70 bg-muted/20 hover:border-primary/40'
+              ? 'border-primary bg-primary-bg-subtle'
+              : 'border-border hover:border-primary-border'
           "
           @dragover.stop="onDropZoneDragOver"
           @dragenter.stop="onDropZoneDragEnter"
@@ -228,7 +228,7 @@ const importSummary = computed(() => {
                 <span class="truncate max-w-48">{{ selectedFile.name }}</span>
                 <button
                   type="button"
-                  class="text-muted-foreground/60 hover:text-foreground transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                  class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                   :disabled="uploading"
                   :aria-label="t('dangerZone.importStudents.clearFile')"
                   @click="clearFile"
@@ -254,24 +254,21 @@ const importSummary = computed(() => {
           </div>
         </div>
 
-        <p class="text-xs text-muted-foreground/70">
+        <p class="text-xs text-muted-foreground">
           {{ t('dangerZone.importStudents.acceptedFormats') }}
         </p>
 
         <!-- Success result -->
-        <div
-          v-if="importSummary"
-          class="rounded-lg border border-green-200 dark:border-green-500/20 overflow-hidden"
-        >
+        <div v-if="importSummary" class="rounded-lg border border-success-border overflow-hidden">
           <!-- Header -->
           <div
-            class="flex flex-wrap items-center gap-x-2.5 gap-y-1 bg-green-50 dark:bg-green-500/10 px-4 py-2.5 border-b border-green-200 dark:border-green-500/20"
+            class="flex flex-wrap items-center gap-x-2.5 gap-y-1 bg-success-bg-subtle px-4 py-2.5 border-b border-success-border"
           >
-            <CheckCircle class="size-4 text-green-600 dark:text-green-400 shrink-0" />
-            <span class="text-sm font-semibold text-green-700 dark:text-green-300">
+            <CheckCircle class="size-4 text-success-foreground shrink-0" />
+            <span class="text-sm font-semibold text-success-foreground">
               {{ t('dangerZone.importStudents.successTitle') }}
             </span>
-            <span class="sm:ml-auto text-xs text-green-600/80 dark:text-green-400/70">
+            <span class="sm:ml-auto text-xs text-success-foreground">
               {{
                 t('dangerZone.importStudents.summaryProcessed', {
                   processed: importSummary.rows_processed,
@@ -283,7 +280,7 @@ const importSummary = computed(() => {
 
           <!-- Stat cards -->
           <div
-            class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/50"
+            class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border"
           >
             <!-- Students -->
             <div class="p-3.5 space-y-1">
@@ -296,7 +293,7 @@ const importSummary = computed(() => {
                   class="text-xl font-bold tabular-nums tracking-tight"
                   :class="
                     importSummary.students_created > 0
-                      ? 'text-green-600 dark:text-green-400'
+                      ? 'text-success-foreground'
                       : 'text-foreground'
                   "
                 >
@@ -306,7 +303,7 @@ const importSummary = computed(() => {
                   {{ t('dangerZone.importStudents.summaryStudentsCreated') }}
                 </span>
               </div>
-              <p class="text-xs text-muted-foreground/70">
+              <p class="text-xs text-muted-foreground">
                 {{ importSummary.students_existing }}
                 {{ t('dangerZone.importStudents.summaryStudentsExisting') }}
               </p>
@@ -323,7 +320,7 @@ const importSummary = computed(() => {
                   class="text-xl font-bold tabular-nums tracking-tight"
                   :class="
                     importSummary.classrooms_created > 0
-                      ? 'text-green-600 dark:text-green-400'
+                      ? 'text-success-foreground'
                       : 'text-foreground'
                   "
                 >
@@ -333,7 +330,7 @@ const importSummary = computed(() => {
                   {{ t('dangerZone.importStudents.summaryClassroomsCreated') }}
                 </span>
               </div>
-              <p class="text-xs text-muted-foreground/70">
+              <p class="text-xs text-muted-foreground">
                 {{ importSummary.classrooms_existing }}
                 {{ t('dangerZone.importStudents.summaryClassroomsExisting') }}
               </p>
@@ -349,9 +346,7 @@ const importSummary = computed(() => {
                 <span
                   class="text-xl font-bold tabular-nums tracking-tight"
                   :class="
-                    importSummary.links_created > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-foreground'
+                    importSummary.links_created > 0 ? 'text-success-foreground' : 'text-foreground'
                   "
                 >
                   {{ importSummary.links_created }}
@@ -360,7 +355,7 @@ const importSummary = computed(() => {
                   {{ t('dangerZone.importStudents.summaryLinksCreated') }}
                 </span>
               </div>
-              <p class="text-xs text-muted-foreground/70">
+              <p class="text-xs text-muted-foreground">
                 {{ importSummary.links_existing }}
                 {{ t('dangerZone.importStudents.summaryLinksExisting') }}
               </p>
@@ -370,7 +365,7 @@ const importSummary = computed(() => {
           <!-- Rows failed -->
           <div
             v-if="importSummary.rows_failed > 0"
-            class="flex items-center gap-2 px-4 py-2 border-t border-destructive/20 bg-destructive/5 text-xs font-medium text-destructive"
+            class="flex items-center gap-2 px-4 py-2 border-t border-destructive-border bg-destructive-bg-subtle text-xs font-medium text-destructive"
           >
             <AlertTriangle class="size-3.5" />
             {{ importSummary.rows_failed }}
@@ -390,7 +385,9 @@ const importSummary = computed(() => {
             <AlertTriangle class="size-4" />
             <AlertTitle>{{ t('dangerZone.importStudents.errorTitle') }}</AlertTitle>
             <AlertDescription>
-              <div class="mt-2 max-h-60 overflow-y-auto rounded-md border border-destructive/20">
+              <div
+                class="mt-2 max-h-60 overflow-y-auto rounded-md border border-destructive-border"
+              >
                 <Table>
                   <TableHeader>
                     <TableRow>

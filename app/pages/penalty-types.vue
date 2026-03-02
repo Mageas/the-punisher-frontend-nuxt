@@ -23,7 +23,7 @@ const penaltyTypeServices = {
     :edit-title="t('penaltyTypes.editTitle')"
     :delete-message="t('penaltyTypes.deleteMessage')"
     :icon="AlertCircle"
-    icon-class="text-amber-400"
-    icon-wrapper-class="bg-amber-400/10"
+    icon-class="text-warning"
+    icon-wrapper-class="bg-warning-bg-subtle"
   />
 </template>

@@ -21,6 +21,11 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Package Manager:** [Bun](https://bun.sh/)
 - **Testing:** [Vitest](https://vitest.dev/) (Unit) + [Playwright](https://playwright.dev/) (E2E)
 
+### 🎨 Design Tokens
+
+- Subtle semantic background tokens use the `*-bg-subtle` suffix (example: `bg-warning-bg-subtle`).
+- Hover variants use `*-bg-subtle-hover` (example: `bg-destructive-bg-subtle` with `hover:bg-destructive-bg-subtle-hover`).
+
 ## 📁 Architecture
 
 - `app/components/features`: Domain-specific components grouped by feature.

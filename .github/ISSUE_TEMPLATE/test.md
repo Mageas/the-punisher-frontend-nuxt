@@ -7,8 +7,10 @@ assignees: ''
 ---
 
 ## Description de la tâche
+
 > Décrivez les tests à ajouter ou le pipeline à améliorer.
 
 ## Critères d'acceptation
+
 - [ ] Les tests sont rédigés et couvrent les cas nominaux et d'erreurs.
 - [ ] Le pipeline d'intégration continue (CI) s'exécute correctement.

@@ -33,7 +33,7 @@ async function deleteAllClassrooms(_: string) {
     <PageHeaderBar>
       <template #left>
         <div class="flex items-center gap-3">
-          <div class="flex size-10 items-center justify-center rounded-lg bg-destructive/10">
+          <div class="flex size-10 items-center justify-center rounded-lg bg-destructive-bg-subtle">
             <ShieldAlert class="size-5 text-destructive" />
           </div>
           <div>

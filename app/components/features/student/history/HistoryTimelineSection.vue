@@ -14,9 +14,9 @@ const sectionTitle = computed(() => props.title ?? t('studentProfile.historyTitl
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.history'))
 
 function eventDotClass(item: StudentHistoryItem): string {
-  if (item.type === 'bonus') return 'bg-amber-400'
-  if (item.type === 'penalty') return 'bg-orange-400'
-  return 'bg-red-400'
+  if (item.type === 'bonus') return 'bg-warning'
+  if (item.type === 'penalty') return 'bg-caution'
+  return 'bg-danger'
 }
 
 function isPunishmentAutomated(item: StudentHistoryPunishmentItem): boolean {
@@ -67,7 +67,7 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
               <Badge
                 v-if="isPunishmentAutomated(item)"
                 variant="outline"
-                class="text-xs text-blue-400 border-blue-400/30"
+                class="text-xs text-info border-info-border"
               >
                 {{ t('common.auto') }}
               </Badge>
@@ -76,8 +76,8 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
                 class="text-xs"
                 :class="
                   item.resolved_at
-                    ? 'text-green-400 border-green-400/30'
-                    : 'text-amber-400 border-amber-400/30'
+                    ? 'text-success border-success-border'
+                    : 'text-warning border-warning-border'
                 "
               >
                 {{ item.resolved_at ? t('punishments.resolved') : t('punishments.pending') }}
@@ -115,7 +115,7 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
                 :class="
                   item.used_at
                     ? 'bg-secondary text-muted-foreground'
-                    : 'bg-amber-400/10 text-amber-400'
+                    : 'bg-warning-bg-subtle text-warning'
                 "
               >
                 +{{ item.points }}
@@ -124,7 +124,7 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
                 variant="outline"
                 class="text-xs"
                 :class="
-                  item.used_at ? 'text-muted-foreground' : 'text-green-400 border-green-400/30'
+                  item.used_at ? 'text-muted-foreground' : 'text-success border-success-border'
                 "
               >
                 {{ item.used_at ? t('common.used') : t('common.available') }}

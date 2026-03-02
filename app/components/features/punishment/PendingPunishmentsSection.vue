@@ -61,7 +61,7 @@ function onResolved() {
       <h2 class="text-lg font-semibold">
         {{ sectionTitle }}
       </h2>
-      <Badge v-if="showCountBadge" variant="outline" class="border-red-400/30 text-red-400">
+      <Badge v-if="showCountBadge" variant="outline" class="border-danger-border text-danger">
         {{ t('common.nToResolve', { count: punishments.length }) }}
       </Badge>
     </div>
@@ -96,7 +96,7 @@ function onResolved() {
             :aria-label="t('common.resolve')"
             @click="openResolveModal(punishment.id)"
           >
-            <CircleCheck class="h-5 w-5 text-green-400" />
+            <CircleCheck class="h-5 w-5 text-success" />
           </Button>
         </template>
       </PunishmentCard>

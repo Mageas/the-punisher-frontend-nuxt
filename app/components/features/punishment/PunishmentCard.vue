@@ -43,8 +43,8 @@ const subtitle = computed(() => {
   >
     <!-- Mobile: vertical layout -->
     <div class="flex items-start gap-3 sm:hidden">
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
-        <Gavel class="h-4 w-4 text-red-400" />
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle">
+        <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2">
@@ -61,11 +61,7 @@ const subtitle = computed(() => {
             </span>
             <span v-else>{{ punishmentTypeName }}</span>
           </p>
-          <Badge
-            v-if="isAutomated"
-            variant="outline"
-            class="text-xs text-blue-400 border-blue-400/30"
-          >
+          <Badge v-if="isAutomated" variant="outline" class="text-xs text-info border-info-border">
             {{ t('common.auto') }}
           </Badge>
         </div>
@@ -74,10 +70,10 @@ const subtitle = computed(() => {
         </p>
         <div class="mt-2 flex items-center justify-between">
           <div>
-            <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
+            <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
               {{ t('punishments.pending') }}
             </Badge>
-            <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
+            <Badge v-else variant="outline" class="text-success border-success-border">
               {{ t('punishments.resolved') }}
             </Badge>
             <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
@@ -96,8 +92,8 @@ const subtitle = computed(() => {
 
     <!-- Desktop: horizontal layout -->
     <div class="hidden items-center gap-4 sm:flex">
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400/10">
-        <Gavel class="h-4 w-4 text-red-400" />
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle">
+        <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2">
@@ -114,11 +110,7 @@ const subtitle = computed(() => {
             </span>
             <span v-else>{{ punishmentTypeName }}</span>
           </p>
-          <Badge
-            v-if="isAutomated"
-            variant="outline"
-            class="text-xs text-blue-400 border-blue-400/30"
-          >
+          <Badge v-if="isAutomated" variant="outline" class="text-xs text-info border-info-border">
             {{ t('common.auto') }}
           </Badge>
         </div>
@@ -127,10 +119,10 @@ const subtitle = computed(() => {
         </p>
       </div>
       <div class="text-right">
-        <Badge v-if="!resolvedAt" variant="outline" class="text-amber-400 border-amber-400/30">
+        <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
           {{ t('punishments.pending') }}
         </Badge>
-        <Badge v-else variant="outline" class="text-green-400 border-green-400/30">
+        <Badge v-else variant="outline" class="text-success border-success-border">
           {{ t('punishments.resolved') }}
         </Badge>
         <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">

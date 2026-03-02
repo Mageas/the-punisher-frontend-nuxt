@@ -62,7 +62,7 @@ const { t } = useI18n()
         :aria-label="t('modals.delete.confirm')"
         @click="emit('delete')"
       >
-        <Trash2 class="h-4 w-4 text-red-400" />
+        <Trash2 class="h-4 w-4 text-danger" />
       </Button>
     </div>
   </div>

@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
       <p class="text-sm text-muted-foreground">
         {{ message }}
       </p>
-      <p v-if="warningMessage" class="text-sm font-medium text-red-500">
+      <p v-if="warningMessage" class="text-sm font-medium text-destructive">
         {{ warningMessage }}
       </p>
 

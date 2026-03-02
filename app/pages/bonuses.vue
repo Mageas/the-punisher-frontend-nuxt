@@ -259,7 +259,7 @@ await useAsyncData(
             :aria-label="t('common.consume')"
             @click="openUseModal(bonus.id)"
           >
-            <Gift class="w-5 h-5 text-amber-400" />
+            <Gift class="w-5 h-5 text-warning" />
           </Button>
 
           <Button
@@ -270,7 +270,7 @@ await useAsyncData(
             :aria-label="t('modals.delete.confirm')"
             @click="openDeleteModal(bonus.id)"
           >
-            <Trash2 class="w-4 h-4 text-red-400" />
+            <Trash2 class="w-4 h-4 text-danger" />
           </Button>
         </template>
       </BonusCard>

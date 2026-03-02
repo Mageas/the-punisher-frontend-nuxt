@@ -91,7 +91,7 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
       v-for="student in students"
       :key="student.id"
       :to="`/students/${student.id}`"
-      class="flex items-center gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-secondary/40"
+      class="flex items-center gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-secondary-hover"
     >
       <div
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium"
@@ -107,7 +107,7 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
 
       <div class="flex items-center gap-1.5 text-xs">
         <span
-          class="inline-flex items-center gap-1 rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400"
+          class="inline-flex items-center gap-1 rounded-full bg-warning-bg-subtle px-2 py-0.5 font-bold text-warning"
         >
           <Star class="h-3 w-3" />
           {{ formatBonusPoints(student.available_bonus_points) }}
@@ -131,7 +131,7 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
         :aria-label="t('classProfile.actions.removeStudent')"
         @click.prevent.stop="onRemoveStudent(student)"
       >
-        <X class="w-4 h-4 text-red-400" />
+        <X class="w-4 h-4 text-danger" />
       </Button>
     </NuxtLink>
   </div>

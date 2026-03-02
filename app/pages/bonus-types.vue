@@ -23,7 +23,7 @@ const bonusTypeServices = {
     :edit-title="t('bonusTypes.editTitle')"
     :delete-message="t('bonusTypes.deleteMessage')"
     :icon="Trophy"
-    icon-class="text-amber-400"
-    icon-wrapper-class="bg-amber-400/10"
+    icon-class="text-warning"
+    icon-wrapper-class="bg-warning-bg-subtle"
   />
 </template>
