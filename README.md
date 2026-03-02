@@ -9,7 +9,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Behavior Tracking:** Log penalties and assign punishments based on rules.
 - **Reward System:** Distribute and track bonus points for students.
 - **Type Management:** Customizable types for bonuses, penalties, and punishments.
-- **Authentication:** Secure teacher login/registration with token rotation.
+- **Authentication:** Secure teacher login/registration with token rotation and email confirmation flow.
 - **Internationalization:** Full French (fr-FR) support.
 
 ## 🛠 Tech Stack

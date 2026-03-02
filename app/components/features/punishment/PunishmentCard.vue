@@ -43,7 +43,9 @@ const subtitle = computed(() => {
   >
     <!-- Mobile: vertical layout -->
     <div class="flex items-start gap-3 sm:hidden">
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle">
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle"
+      >
         <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">
@@ -92,7 +94,9 @@ const subtitle = computed(() => {
 
     <!-- Desktop: horizontal layout -->
     <div class="hidden items-center gap-4 sm:flex">
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle">
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle"
+      >
         <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">

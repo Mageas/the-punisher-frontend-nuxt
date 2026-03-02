@@ -15,7 +15,9 @@ const hasStudentName = computed(() => Boolean(props.studentFirstName && props.st
 
 <template>
   <div class="flex items-center gap-4 rounded-lg border border-border p-4">
-    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-bg-subtle">
+    <div
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-bg-subtle"
+    >
       <AlertTriangle class="h-4 w-4 text-warning" />
     </div>
 

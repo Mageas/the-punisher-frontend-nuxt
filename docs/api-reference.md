@@ -11,6 +11,8 @@
   - `GET /v1/health`
   - `GET /v1/auth/register/status`
   - `POST /v1/auth/register`
+  - `GET /v1/auth/confirm-email`
+  - `POST /v1/auth/confirm-email/resend`
   - `POST /v1/auth/login`
   - `POST /v1/auth/refresh`
   - `POST /v1/auth/logout`
@@ -84,7 +86,6 @@ interface ErrorDetail {
   field: string;
   error: string;
   value?: string;
-  error_details?: string[];
 }
 
 interface ErrorResponse {
@@ -109,6 +110,18 @@ interface RefreshResponseDto {
 
 interface RegisterStatusResponseDto {
   register_allowed: boolean;
+}
+
+interface ConfirmEmailResponseDto {
+  status: "email_confirmed";
+}
+
+interface ResendConfirmEmailRequestDto {
+  email: string;
+}
+
+interface ResendConfirmEmailResponseDto {
+  status: "confirmation_email_sent_if_needed";
 }
 
 // User
@@ -292,8 +305,9 @@ interface HealthCheckDto {
 interface StudentImportRowErrorDto {
   row: number;
   field: string;
-  message: string;
+  key: string;
   value?: string;
+  error_details?: string[];
 }
 
 interface StudentImportSummaryDto {
@@ -364,7 +378,41 @@ Exemple:
 }
 ```
 - 201: `ReturnUserDto`
+- Side effect: envoi d'un email de confirmation avec un lien vers `GET /v1/auth/confirm-email?token=...`
 - Erreurs: `register_not_allowed`, `validation_failed`, `invalid_request_body`, `conflict`
+
+### GET `/v1/auth/confirm-email`
+- Auth: non
+- Query params:
+  - `token` (obligatoire, JWT de confirmation)
+- 200: `ConfirmEmailResponseDto`
+- Erreurs: `email_confirmation_token_missing`, `email_confirmation_token_invalid`, `email_confirmation_token_expired`, `email_confirmation_token_already_used`, `email_already_verified`, `email_confirmation_user_not_found`
+
+Exemple 200:
+```json
+{
+  "status": "email_confirmed"
+}
+```
+
+### POST `/v1/auth/confirm-email/resend`
+- Auth: non
+- Body:
+```json
+{
+  "email": "teacher@school.test"
+}
+```
+- 200: `ResendConfirmEmailResponseDto`
+- Comportement: réponse neutre. Si l'utilisateur n'existe pas ou a déjà confirmé son email, la réponse reste 200.
+- Erreurs: `validation_failed`, `invalid_request_body`
+
+Exemple 200:
+```json
+{
+  "status": "confirmation_email_sent_if_needed"
+}
+```
 
 ### POST `/v1/auth/login`
 - Auth: non
@@ -377,7 +425,7 @@ Exemple:
 ```
 - 200: `LoginResponseDto`
 - Side effect: set-cookie `refresh_token`
-- Erreurs: `validation_failed`, `invalid_request_body`, `invalid_credentials_or_user_doesnt_exist`
+- Erreurs: `validation_failed`, `invalid_request_body`, `invalid_credentials_or_user_doesnt_exist`, `email_not_verified`
 
 Exemple 200:
 ```json
@@ -544,7 +592,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 
 ### GET `/v1/classrooms/`
 - Auth: oui
-- Query params: `page`
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `name`)
 - 200: `PaginatedResponse<ReturnClassroomDto>`
 - Erreurs: `unauthorized`
 
@@ -599,7 +649,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 
 ### GET `/v1/classrooms/{classroom_id}/students`
 - Auth: oui
-- Query params: `page`
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `first_name + last_name`)
 - 200: `PaginatedResponse<ReturnStudentDto>`
 - Erreurs: `classroom_not_found`, `not_found`, `unauthorized`
 
@@ -618,7 +670,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 
 ### GET `/v1/bonus-types/`
 - Auth: oui
-- Query params: `page`
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `name`)
 - 200: `PaginatedResponse<ReturnBonusTypeDto>`
 - Erreurs: `unauthorized`
 
@@ -704,7 +758,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 
 ### GET `/v1/penalty-types/`
 - Auth: oui
-- Query params: `page`
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `name`)
 - 200: `PaginatedResponse<ReturnPenaltyTypeDto>`
 - Erreurs: `unauthorized`
 
@@ -782,7 +838,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 
 ### GET `/v1/punishment-types/`
 - Auth: oui
-- Query params: `page`
+- Query params:
+  - `page` (optionnel)
+  - `search` (optionnel, recherche sur `name`)
 - 200: `PaginatedResponse<ReturnPunishmentTypeDto>`
 - Erreurs: `unauthorized`
 
@@ -939,7 +997,8 @@ Exemple 200 (tronque):
 ## 4) Notes importantes pour le frontend IA
 
 - Les listes `bonuses`, `penalties`, `punishments` sont maintenant basees sur filtres metier (pas de `search` texte sur l eleve).
-- La recherche eleve reste sur `GET /v1/students/?search=...`.
+- La recherche eleve est disponible sur `GET /v1/students/?search=...` et `GET /v1/classrooms/{classroom_id}/students?search=...`.
+- Les listes `classrooms`, `bonus-types`, `penalty-types`, `punishment-types` supportent `search` (sur `name`).
 - Pour filtrer des evenements d un eleve: utiliser `student_id`.
 - Les bornes `created_to` / `due_to` sont inclusives sur la journee (backend fait `< date + 1 day`).
 - `overdue=true` sur punishments signifie: `resolved_at IS NULL` ET `due_at < now()`.
@@ -965,6 +1024,32 @@ Exemple 200 (tronque):
 ```
 
 ## 5.2 Erreurs sans `error_details` (ou details optionnels)
+
+### 400
+- `malformed_parameter`
+```json
+{ "error": "malformed_parameter", "error_code": 400 }
+```
+- `invalid_request_body`
+```json
+{ "error": "invalid_request_body", "error_code": 400 }
+```
+- `validation_failed`
+```json
+{ "error": "validation_failed", "error_code": 400 }
+```
+- `email_confirmation_token_missing`
+```json
+{ "error": "email_confirmation_token_missing", "error_code": 400 }
+```
+- `email_confirmation_token_invalid`
+```json
+{ "error": "email_confirmation_token_invalid", "error_code": 400 }
+```
+- `email_confirmation_token_expired`
+```json
+{ "error": "email_confirmation_token_expired", "error_code": 400 }
+```
 
 ### 500
 - `internal_error`
@@ -1017,6 +1102,10 @@ Exemple 200 (tronque):
 ```json
 { "error": "student_or_classroom_not_found", "error_code": 404 }
 ```
+- `email_confirmation_user_not_found`
+```json
+{ "error": "email_confirmation_user_not_found", "error_code": 404 }
+```
 
 ### 401
 - `unauthorized`
@@ -1044,6 +1133,12 @@ Exemple 200 (tronque):
 { "error": "jwt_expired", "error_code": 401 }
 ```
 
+### 403
+- `email_not_verified`
+```json
+{ "error": "email_not_verified", "error_code": 403 }
+```
+
 ### 409
 - `punishment_already_resolved`
 ```json
@@ -1056,6 +1151,14 @@ Exemple 200 (tronque):
 - `student_classroom_relation_exists`
 ```json
 { "error": "student_classroom_relation_exists", "error_code": 409 }
+```
+- `email_confirmation_token_already_used`
+```json
+{ "error": "email_confirmation_token_already_used", "error_code": 409 }
+```
+- `email_already_verified`
+```json
+{ "error": "email_already_verified", "error_code": 409 }
 ```
 
 ## 5.3 Erreurs avec `error_details` importantes
@@ -1192,14 +1295,6 @@ Exemple:
 
 ## 5.4 Erreurs import students
 
-`error` top-level possibles:
-- `unauthorized` (401)
-- `import_file_missing` (400)
-- `import_file_invalid` (400)
-- `import_template_invalid` (400)
-- `import_validation_failed` (400)
-- `internal_error` (500)
-
 ### `import_file_missing` - 400
 ```json
 {
@@ -1261,10 +1356,15 @@ Exemple:
 ### `import_validation_failed` - 400
 - Erreurs ligne par ligne sur le contenu fichier
 - `row` est renseigne
-- `error` contient une cle stable (`import_*`)
-- `error_details` fournit du contexte optionnel (`min`, `max`, `expected`, ...)
-- `field` possibles: `eleves`, `classes`, `file`, `rows`
-- cles de contexte possibles: `field`, `expected`, `min`, `max`, `min_rows`, `received`
+- `error` est une cle stable `import_*` (pas un message texte)
+- `error_details` (liste de strings) apporte le contexte de validation (min/max/expected/field)
+
+Exemples de cles possibles:
+- `import_required_field`
+- `import_invalid_format`
+- `import_invalid_length`
+- `import_no_data_rows`
+- `import_max_rows_exceeded`
 
 Exemple:
 ```json

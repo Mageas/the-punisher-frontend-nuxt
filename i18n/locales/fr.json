@@ -439,7 +439,22 @@
     "passwordConfirm": "Confirmer le mot de passe",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
     "registerClosed": "Les inscriptions sont fermées.",
-    "registerClosedHelp": "La création de compte est désactivée pour le moment."
+    "registerClosedHelp": "La création de compte est désactivée pour le moment.",
+    "confirmEmail": {
+      "title": "Confirmer votre email",
+      "subtitle": "Validez votre compte pour vous connecter.",
+      "registerSuccessNotice": "Un email de confirmation vous a été envoyé.",
+      "tokenHint": "Si vous avez ouvert le lien de votre email, le token est prérempli automatiquement.",
+      "tokenLabel": "Token de confirmation",
+      "tokenPlaceholder": "Collez votre token JWT",
+      "submit": "Confirmer mon email",
+      "emailLabel": "Email du compte",
+      "resendLink": "Renvoyer un email de confirmation",
+      "resendSuccess": "Si un compte existe et n'est pas encore confirmé, un email a été envoyé.",
+      "tokenRequired": "Le token de confirmation est requis.",
+      "emailRequired": "L'email est requis pour renvoyer la confirmation.",
+      "loginSuccess": "Votre email est confirmé. Vous pouvez maintenant vous connecter."
+    }
   },
   "apiErrors": {
     "messages": {
@@ -451,6 +466,13 @@
       "validation_failed": "La validation a échoué.",
       "conflict": "Conflit détecté avec les données existantes.",
       "invalid_credentials_or_user_doesnt_exist": "Identifiants invalides ou utilisateur introuvable.",
+      "email_not_verified": "Votre email n'est pas encore confirmé.",
+      "email_confirmation_token_missing": "Le token de confirmation est manquant.",
+      "email_confirmation_token_invalid": "Le token de confirmation est invalide.",
+      "email_confirmation_token_expired": "Le token de confirmation a expiré.",
+      "email_confirmation_token_already_used": "Ce token de confirmation a déjà été utilisé.",
+      "email_already_verified": "Cet email est déjà confirmé.",
+      "email_confirmation_user_not_found": "Aucun utilisateur associé à ce token n'a été trouvé.",
       "jwt_invalid_signing_method": "Méthode de signature du token invalide.",
       "jwt_invalid_token": "Token invalide.",
       "jwt_expired": "Votre session a expiré.",
