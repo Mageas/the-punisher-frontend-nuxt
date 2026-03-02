@@ -18,7 +18,7 @@ const handleError = () => clearError({ redirect: '/' })
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-center">
     <div
-      class="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-destructive/10 text-destructive"
+      class="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-destructive-bg-subtle text-destructive"
     >
       <AlertTriangle v-if="statusCode >= 500" class="h-12 w-12" />
       <span v-else class="text-4xl font-bold">{{ statusCode }}</span>

@@ -26,7 +26,7 @@ function formatPoints(points: number): string {
     <div class="flex items-start gap-3 sm:hidden">
       <div
         class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-amber-400/10 text-amber-400'"
+        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
       >
         {{ formatPoints(points) }}
       </div>
@@ -59,7 +59,7 @@ function formatPoints(points: number): string {
           <div>
             <Badge
               variant="outline"
-              :class="usedAt ? 'text-muted-foreground' : 'text-green-400 border-green-400/30'"
+              :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
             >
               {{ usedAt ? t('common.used') : t('common.available') }}
             </Badge>
@@ -78,7 +78,7 @@ function formatPoints(points: number): string {
     <div class="hidden items-center gap-4 sm:flex">
       <div
         class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-amber-400/10 text-amber-400'"
+        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
       >
         {{ formatPoints(points) }}
       </div>
@@ -111,7 +111,7 @@ function formatPoints(points: number): string {
       <div class="text-right">
         <Badge
           variant="outline"
-          :class="usedAt ? 'text-muted-foreground' : 'text-green-400 border-green-400/30'"
+          :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
         >
           {{ usedAt ? t('common.used') : t('common.available') }}
         </Badge>

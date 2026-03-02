@@ -119,7 +119,7 @@ if (students.value.length === 0 && !loading.value) {
         v-for="student in students"
         :key="student.id"
         :to="`/students/${student.id}`"
-        class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-secondary/40 sm:flex-nowrap sm:items-center"
+        class="flex flex-wrap items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-secondary-hover sm:flex-nowrap sm:items-center"
       >
         <div
           class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-medium shrink-0"
@@ -145,12 +145,12 @@ if (students.value.length === 0 && !loading.value) {
         </div>
 
         <div class="ml-auto flex items-center gap-5 text-sm">
-          <div class="flex items-center gap-1.5 text-amber-400">
+          <div class="flex items-center gap-1.5 text-warning">
             <Star class="w-3.5 h-3.5" />
             <span class="font-medium">{{ formatPoints(student.available_bonus_points) }}</span>
           </div>
 
-          <div class="flex items-center gap-1.5 text-red-400">
+          <div class="flex items-center gap-1.5 text-danger">
             <AlertCircle class="w-3.5 h-3.5" />
             <span class="font-medium">{{ student.penalty_count }}</span>
           </div>

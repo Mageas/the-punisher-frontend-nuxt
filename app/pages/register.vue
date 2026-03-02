@@ -180,7 +180,7 @@ const registerSubtitle = computed(() =>
       <div v-else class="rounded-lg border border-border bg-card p-6 shadow-sm">
         <div class="flex flex-col items-center text-center space-y-4">
           <div
-            class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-destructive/10"
+            class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-destructive-bg-subtle"
           >
             <LockKeyhole class="w-6 h-6 text-destructive" />
           </div>

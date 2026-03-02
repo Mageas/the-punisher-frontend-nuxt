@@ -334,7 +334,7 @@ await useAsyncData(
             :aria-label="t('common.resolve')"
             @click="openResolveModal(punishment.id)"
           >
-            <CircleCheck class="w-5 h-5 text-green-400" />
+            <CircleCheck class="w-5 h-5 text-success" />
           </Button>
 
           <Button
@@ -345,7 +345,7 @@ await useAsyncData(
             :aria-label="t('modals.delete.confirm')"
             @click="openDeleteModal(punishment.id)"
           >
-            <Trash2 class="w-4 h-4 text-red-400" />
+            <Trash2 class="w-4 h-4 text-danger" />
           </Button>
         </template>
       </PunishmentCard>

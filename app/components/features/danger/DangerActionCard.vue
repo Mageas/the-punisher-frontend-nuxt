@@ -23,11 +23,11 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group relative rounded-xl border border-border/60 bg-card p-5 transition-all hover:border-destructive/40 hover:shadow-sm"
+    class="group relative rounded-xl border border-border bg-card p-5 transition-all hover:border-destructive-border hover:shadow-sm"
   >
     <div class="flex items-start gap-4">
       <div
-        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive transition-colors group-hover:bg-destructive/15"
+        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-destructive-bg-subtle text-destructive transition-colors group-hover:bg-destructive-bg-subtle-hover"
       >
         <component :is="props.icon" class="size-5" />
       </div>
@@ -37,7 +37,7 @@ const emit = defineEmits<{
           <p class="text-sm text-muted-foreground leading-relaxed">{{ props.description }}</p>
           <p
             v-if="props.disabled && props.disabledMessage"
-            class="text-xs text-muted-foreground/70 italic pt-1"
+            class="text-xs text-muted-foreground italic pt-1"
           >
             {{ props.disabledMessage }}
           </p>

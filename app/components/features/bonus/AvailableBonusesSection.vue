@@ -76,7 +76,7 @@ function onUsed() {
             :aria-label="t('common.consume')"
             @click="openUseBonusModal(bonus.id)"
           >
-            <Gift class="h-5 w-5 text-amber-400" />
+            <Gift class="h-5 w-5 text-warning" />
           </Button>
         </template>
       </BonusCard>

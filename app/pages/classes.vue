@@ -170,7 +170,7 @@ await reload()
         v-for="classroom in classrooms"
         :key="classroom.id"
         :to="`/classes/${classroom.id}`"
-        class="flex flex-col rounded-lg border border-border p-5 transition-colors hover:bg-secondary/40"
+        class="flex flex-col rounded-lg border border-border p-5 transition-colors hover:bg-secondary-hover"
       >
         <div class="mb-3 flex items-center justify-between gap-2">
           <h3 class="text-base font-semibold">
@@ -209,7 +209,7 @@ await reload()
             <span
               class="inline-flex items-center gap-1 tabular-nums whitespace-nowrap text-[11px] sm:text-xs"
             >
-              <Star class="h-3 w-3 text-amber-400" />
+              <Star class="h-3 w-3 text-warning" />
               {{
                 formatRatio(
                   classroomKpisById[classroom.id]?.available_bonus_points ?? 0,

@@ -86,15 +86,15 @@ if (initialData.value) {
             <PageActionsMenu :create-label="t('common.add')">
               <template #create>
                 <DropdownMenuItem class="cursor-pointer" @click="showBonusModal = true">
-                  <Star class="w-4 h-4 text-amber-400" />
+                  <Star class="w-4 h-4 text-warning" />
                   {{ t('dashboard.newBonus') }}
                 </DropdownMenuItem>
                 <DropdownMenuItem class="cursor-pointer" @click="showPenaltyModal = true">
-                  <AlertTriangle class="w-4 h-4 text-amber-400" />
+                  <AlertTriangle class="w-4 h-4 text-warning" />
                   {{ t('dashboard.newPenalty') }}
                 </DropdownMenuItem>
                 <DropdownMenuItem class="cursor-pointer" @click="showPunishmentModal = true">
-                  <Gavel class="w-4 h-4 text-red-400" />
+                  <Gavel class="w-4 h-4 text-danger" />
                   {{ t('dashboard.newPunishment') }}
                 </DropdownMenuItem>
               </template>

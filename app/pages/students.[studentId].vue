@@ -179,15 +179,15 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           <PageActionsMenu :create-label="t('common.add')" align="end">
             <template #create>
               <DropdownMenuItem class="cursor-pointer" @click="showBonusCreateModal = true">
-                <Star class="w-4 h-4 text-amber-400" />
+                <Star class="w-4 h-4 text-warning" />
                 {{ t('studentProfile.actions.addBonus') }}
               </DropdownMenuItem>
               <DropdownMenuItem class="cursor-pointer" @click="showPenaltyCreateModal = true">
-                <AlertTriangle class="w-4 h-4 text-amber-400" />
+                <AlertTriangle class="w-4 h-4 text-warning" />
                 {{ t('studentProfile.actions.addPenalty') }}
               </DropdownMenuItem>
               <DropdownMenuItem class="cursor-pointer" @click="showPunishmentCreateModal = true">
-                <Gavel class="w-4 h-4 text-red-400" />
+                <Gavel class="w-4 h-4 text-danger" />
                 {{ t('studentProfile.actions.addPunishment') }}
               </DropdownMenuItem>
             </template>
@@ -215,10 +215,10 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
             <p class="text-xs sm:text-sm font-medium text-muted-foreground">
               {{ t('studentProfile.kpis.availableBonusPoints') }}
             </p>
-            <Star class="w-4 h-4 text-amber-400" />
+            <Star class="w-4 h-4 text-warning" />
           </div>
           <p
-            class="text-xl sm:text-3xl font-bold text-amber-400 tabular-nums whitespace-nowrap leading-none"
+            class="text-xl sm:text-3xl font-bold text-warning tabular-nums whitespace-nowrap leading-none"
           >
             {{ formatRatio(kpis.available_bonus_points, kpis.total_bonus_points) }}
           </p>
@@ -247,10 +247,10 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
             <p class="text-xs sm:text-sm font-medium text-muted-foreground">
               {{ t('studentProfile.kpis.pendingPunishmentCount') }}
             </p>
-            <Gavel class="w-4 h-4 text-red-400" />
+            <Gavel class="w-4 h-4 text-danger" />
           </div>
           <p
-            class="text-xl sm:text-3xl font-bold text-red-400 tabular-nums whitespace-nowrap leading-none"
+            class="text-xl sm:text-3xl font-bold text-danger tabular-nums whitespace-nowrap leading-none"
           >
             {{ formatRatio(kpis.pending_punishment_count, kpis.total_punishment_count) }}
           </p>
