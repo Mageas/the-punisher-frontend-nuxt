@@ -84,6 +84,7 @@ interface ErrorDetail {
   field: string;
   error: string;
   value?: string;
+  error_details?: string[];
 }
 
 interface ErrorResponse {
@@ -1191,6 +1192,14 @@ Exemple:
 
 ## 5.4 Erreurs import students
 
+`error` top-level possibles:
+- `unauthorized` (401)
+- `import_file_missing` (400)
+- `import_file_invalid` (400)
+- `import_template_invalid` (400)
+- `import_validation_failed` (400)
+- `internal_error` (500)
+
 ### `import_file_missing` - 400
 ```json
 {
@@ -1252,6 +1261,10 @@ Exemple:
 ### `import_validation_failed` - 400
 - Erreurs ligne par ligne sur le contenu fichier
 - `row` est renseigne
+- `error` contient une cle stable (`import_*`)
+- `error_details` fournit du contexte optionnel (`min`, `max`, `expected`, ...)
+- `field` possibles: `eleves`, `classes`, `file`, `rows`
+- cles de contexte possibles: `field`, `expected`, `min`, `max`, `min_rows`, `received`
 
 Exemple:
 ```json
@@ -1262,14 +1275,16 @@ Exemple:
     {
       "row": 4,
       "field": "eleves",
-      "error": "student name format must be 'NOM Prenom'",
-      "value": "Jean"
+      "error": "import_invalid_format",
+      "value": "Jean",
+      "error_details": ["expected:uppercase_last_name_then_first_name"]
     },
     {
       "row": 4,
       "field": "classes",
-      "error": "at least one classroom is required",
-      "value": ""
+      "error": "import_invalid_length",
+      "value": "A",
+      "error_details": ["min:2", "max:100"]
     }
   ]
 }

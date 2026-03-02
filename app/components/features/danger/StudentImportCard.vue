@@ -10,7 +10,11 @@ import {
   Link2,
 } from 'lucide-vue-next'
 import { extractApiError } from '~/lib/api-error'
-import { extractStudentImportRowErrors } from '~/lib/student-import'
+import {
+  extractStudentImportRowErrors,
+  getStudentImportGlobalErrorMessage,
+  getStudentImportRowErrorMessage,
+} from '~/lib/student-import'
 import type { StudentImportResponse, StudentImportRowError } from '~/types/api'
 
 const { t, te } = useI18n()
@@ -137,8 +141,7 @@ async function handleImport() {
 
     if (apiError) {
       importErrors.value = extractStudentImportRowErrors(apiError.error_details)
-      const i18nKey = `apiErrors.messages.${apiError.error}`
-      globalError.value = te(i18nKey) ? t(i18nKey) : t('apiErrors.messages.internal_error')
+      globalError.value = getStudentImportGlobalErrorMessage(apiError, t, te)
     } else {
       globalError.value = t('apiErrors.messages.internal_error')
     }
@@ -151,6 +154,13 @@ const importSummary = computed(() => {
   if (!importResult.value) return null
   return importResult.value.summary
 })
+
+const displayedImportErrors = computed(() =>
+  importErrors.value.map((error) => ({
+    ...error,
+    message: getStudentImportRowErrorMessage(error, t, te),
+  })),
+)
 </script>
 
 <template>
@@ -380,7 +390,7 @@ const importSummary = computed(() => {
         </Alert>
 
         <!-- Row-level errors -->
-        <div v-if="importErrors.length > 0" class="space-y-2">
+        <div v-if="displayedImportErrors.length > 0" class="space-y-2">
           <Alert variant="destructive">
             <AlertTriangle class="size-4" />
             <AlertTitle>{{ t('dangerZone.importStudents.errorTitle') }}</AlertTitle>
@@ -400,10 +410,13 @@ const importSummary = computed(() => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow v-for="(err, idx) in importErrors" :key="idx">
+                    <TableRow
+                      v-for="(err, idx) in displayedImportErrors"
+                      :key="`${err.row}-${err.field}-${err.error}-${idx}`"
+                    >
                       <TableCell class="font-mono text-xs">{{ err.row }}</TableCell>
                       <TableCell class="text-xs">{{ err.field }}</TableCell>
-                      <TableCell class="text-xs">{{ err.error }}</TableCell>
+                      <TableCell class="text-xs">{{ err.message }}</TableCell>
                       <TableCell class="text-xs font-mono">{{ err.value || '—' }}</TableCell>
                     </TableRow>
                   </TableBody>
