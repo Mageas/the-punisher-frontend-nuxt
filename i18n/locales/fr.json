@@ -473,6 +473,21 @@
       "import_validation_failed": "La validation du fichier a échoué. Consultez les détails ci-dessous."
     },
     "details": {
+      "file_field_is_required": "Le champ de fichier est requis pour l'import.",
+      "expected_multipart_form_data": "Le fichier doit être envoyé avec le format multipart/form-data.",
+      "failed_to_parse_multipart_form": "Impossible de lire les données multipart du fichier.",
+      "unsupported_file_type": "Type de fichier non supporté: {value}. Formats acceptés: .csv, .xlsx.",
+      "failed_to_read_xlsx": "Impossible de lire le fichier XLSX.",
+      "failed_to_read_xlsx_rows": "Impossible de lire les lignes du fichier XLSX.",
+      "failed_to_read_csv": "Impossible de lire le fichier CSV.",
+      "missing_headers_row": "La ligne d'en-tête est manquante dans le fichier.",
+      "missing_header_eleves": "La colonne d'en-tête \"eleves\" est manquante.",
+      "missing_header_classes": "La colonne d'en-tête \"classes\" est manquante.",
+      "import_required_field": "Le champ {field} est requis pour l'import.",
+      "import_invalid_format": "Format invalide. Attendu : {expected}.",
+      "import_invalid_length": "Longueur invalide. Minimum : {min}, maximum : {max}.",
+      "import_no_data_rows": "Aucune ligne de données valide n'a été trouvée dans le fichier.",
+      "import_max_rows_exceeded": "Le nombre maximal de lignes autorisé ({max}) est dépassé (reçu : {received}).",
       "validation_error": "Erreur de validation: {value}.",
       "validation_field_required": "Ce champ est requis.",
       "validation_invalid_email": "Adresse email invalide.",
@@ -481,6 +496,18 @@
       "validation_email_already_exists": "Cette adresse email existe déjà.",
       "validation_unknown_field": "Champ inconnu.",
       "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}."
+    },
+    "importContext": {
+      "field": {
+        "classes": "classes",
+        "classroom_name": "nom de classe",
+        "student_name": "nom complet élève",
+        "last_name": "nom de famille",
+        "first_name": "prénom"
+      },
+      "expected": {
+        "uppercase_last_name_then_first_name": "NOM Prenom (nom en majuscules puis prénom)"
+      }
     }
   },
   "filters": {

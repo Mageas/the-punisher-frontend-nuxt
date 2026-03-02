@@ -121,6 +121,8 @@
   * **Import initial :**
   * Carte dédiée à l'import des élèves et classes depuis un fichier CSV/XLSX.
   * Affichage d'un résumé d'import (créations, existants, liens, lignes en erreur).
+  * Traduction frontend des codes d'erreur `import_*` avec enrichissement via le contexte API (`expected`, `min`, `max`).
+  * En cas d'erreur de template/fichier, affichage du message global enrichi des détails backend (`error_details[].error`).
   * Tableau scrollable des erreurs de lignes quand la validation échoue.
 
 ---

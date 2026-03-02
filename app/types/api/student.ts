@@ -110,4 +110,5 @@ export interface StudentImportRowError {
   field: string
   error: string
   value?: string
+  error_details?: string[]
 }

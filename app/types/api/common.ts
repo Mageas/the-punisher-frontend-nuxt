@@ -27,6 +27,7 @@ export interface ApiErrorDetail {
   error: string
   row?: number
   value?: string
+  error_details?: string[]
 }
 
 /**
