@@ -4,9 +4,13 @@ import type {
   ChangePasswordResponse,
   EmailConfirmationResendResponse,
   EmailConfirmationResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
   LoginRequest,
   RegisterRequest,
   RegisterStatusResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from '~/types/api'
 
 export function useAuthService() {
@@ -98,6 +102,26 @@ export function useAuthService() {
     })
   }
 
+  /**
+   * Send a neutral forgot-password request.
+   */
+  async function forgotPassword(email: string) {
+    return $api<ForgotPasswordResponse>('/auth/forgot-password', {
+      method: 'POST',
+      body: { email } as ForgotPasswordRequest,
+    })
+  }
+
+  /**
+   * Reset password from a password-reset token.
+   */
+  async function resetPassword(body: ResetPasswordRequest) {
+    return $api<ResetPasswordResponse>('/auth/reset-password', {
+      method: 'POST',
+      body,
+    })
+  }
+
   return {
     login,
     register,
@@ -108,5 +132,7 @@ export function useAuthService() {
     refresh,
     confirmEmail,
     resendConfirmationEmail,
+    forgotPassword,
+    resetPassword,
   }
 }
