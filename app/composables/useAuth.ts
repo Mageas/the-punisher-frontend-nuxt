@@ -99,6 +99,21 @@ export function useAuth() {
   }
 
   /**
+   * Change current user's password.
+   */
+  async function changePassword(
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string,
+  ) {
+    return authService.changePassword({
+      current_password: currentPassword,
+      new_password: newPassword,
+      confirm_password: confirmPassword,
+    })
+  }
+
+  /**
    * Attempt to refresh the access_token using the HttpOnly refresh_token cookie.
    */
   async function refresh(): Promise<boolean> {
@@ -134,6 +149,7 @@ export function useAuth() {
     isRegisterAllowed,
     logout,
     logoutAll,
+    changePassword,
     refresh,
     confirmEmail,
     resendConfirmationEmail,

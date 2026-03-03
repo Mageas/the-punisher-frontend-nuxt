@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { Monitor, School, ShieldAlert, Users } from 'lucide-vue-next'
+import { School, ShieldAlert, Users } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
-const { logoutAll } = useAuth()
 const { deleteAllStudents: deleteAllStudentsRequest } = useStudents()
 const { deleteAllClassrooms: deleteAllClassroomsRequest } = useClassrooms()
-const userStore = useUserStore()
 
-const showLogoutAllConfirm = ref(false)
 const showDeleteStudentsConfirm = ref(false)
 const showDeleteClassroomsConfirm = ref(false)
-
-async function logoutAllDevices(_: string) {
-  userStore.clearUser()
-  await logoutAll()
-}
 
 async function deleteAllStudents(_: string) {
   await deleteAllStudentsRequest()
@@ -60,14 +52,6 @@ async function deleteAllClassrooms(_: string) {
         :button-label="t('dangerZone.deleteAllClassrooms.button')"
         @action="showDeleteClassroomsConfirm = true"
       />
-
-      <DangerActionCard
-        :icon="Monitor"
-        :title="t('dangerZone.logoutAll.title')"
-        :description="t('dangerZone.logoutAll.description')"
-        :button-label="t('dangerZone.logoutAll.button')"
-        @action="showLogoutAllConfirm = true"
-      />
     </div>
 
     <Separator class="my-6" />
@@ -75,19 +59,6 @@ async function deleteAllClassrooms(_: string) {
     <div class="space-y-3">
       <StudentImportCard />
     </div>
-
-    <ConfirmActionModal
-      v-model:open="showLogoutAllConfirm"
-      item-id="logout-all-devices"
-      :action-fn="logoutAllDevices"
-      :title="t('dangerZone.logoutAll.confirmTitle')"
-      :message="t('dangerZone.logoutAll.confirmMessage')"
-      :warning-message="t('dangerZone.logoutAll.confirmWarning')"
-      :cancel-label="t('common.cancel')"
-      :confirm-label="t('dangerZone.logoutAll.confirmButton')"
-      confirm-variant="destructive"
-      :lock-duration-seconds="3"
-    />
 
     <ConfirmActionModal
       v-model:open="showDeleteStudentsConfirm"

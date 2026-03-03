@@ -9,6 +9,7 @@ import {
   LogOut,
   School,
   Scale,
+  Settings,
   ShieldAlert,
   Skull,
   Star,
@@ -190,6 +191,12 @@ function isActive(to: string): boolean {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem as-child class="cursor-pointer gap-2">
+                  <NuxtLink to="/settings">
+                    <Settings class="size-4" />
+                    {{ t('sidebar.settings') }}
+                  </NuxtLink>
+                </DropdownMenuItem>
                 <DropdownMenuItem as-child class="cursor-pointer gap-2">
                   <NuxtLink to="/management/danger">
                     <ShieldAlert class="size-4" />

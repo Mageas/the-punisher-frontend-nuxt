@@ -31,6 +31,7 @@ const mockAuthService = {
   getRegisterStatus: vi.fn(),
   logout: vi.fn(),
   logoutAll: vi.fn(),
+  changePassword: vi.fn(),
   refresh: vi.fn(),
 }
 
@@ -92,6 +93,19 @@ describe('useAuth', () => {
     expect(accessToken.value).toBe(null)
     expect(isAuthenticated.value).toBe(false)
     expect(mockCookies.get('access_token')?.value).toBe(null)
+  })
+
+  it('changes password with expected payload', async () => {
+    mockAuthService.changePassword.mockResolvedValue({ status: 'password_changed' })
+    const { changePassword } = useAuth()
+
+    await changePassword('CurrentPass1!', 'NewSecurePass2@', 'NewSecurePass2@')
+
+    expect(mockAuthService.changePassword).toHaveBeenCalledWith({
+      current_password: 'CurrentPass1!',
+      new_password: 'NewSecurePass2@',
+      confirm_password: 'NewSecurePass2@',
+    })
   })
 
   it('refreshes token successfully', async () => {
