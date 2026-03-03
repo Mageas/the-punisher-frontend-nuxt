@@ -1,4 +1,4 @@
-import type { RegisterRequest } from '~/types/api'
+import type { RegisterRequest, ResetPasswordRequest } from '~/types/api'
 
 /**
  * Composable for managing authentication state.
@@ -141,6 +141,20 @@ export function useAuth() {
     return authService.resendConfirmationEmail(email)
   }
 
+  /**
+   * Ask for a password reset email (neutral response).
+   */
+  async function forgotPassword(email: string) {
+    return authService.forgotPassword(email)
+  }
+
+  /**
+   * Reset the password using a reset token.
+   */
+  async function resetPassword(body: ResetPasswordRequest) {
+    return authService.resetPassword(body)
+  }
+
   return {
     accessToken: readonly(accessToken),
     isAuthenticated,
@@ -153,5 +167,7 @@ export function useAuth() {
     refresh,
     confirmEmail,
     resendConfirmationEmail,
+    forgotPassword,
+    resetPassword,
   }
 }

@@ -8,6 +8,7 @@ test.describe('Login Page', () => {
     await expect(page.locator('input[type="email"]')).toBeVisible()
     await expect(page.locator('input[type="password"]')).toBeVisible()
     await expect(page.locator('button[type="submit"]')).toBeVisible()
+    await expect(page.locator('a[href="/forgot-password"]')).toBeVisible()
   })
 
   test('should keep password masked and navigate to register page', async ({ page }) => {

@@ -33,6 +33,8 @@ const mockAuthService = {
   logoutAll: vi.fn(),
   changePassword: vi.fn(),
   refresh: vi.fn(),
+  forgotPassword: vi.fn(),
+  resetPassword: vi.fn(),
 }
 
 vi.mock('../services/useAuthService', () => ({
@@ -137,5 +139,33 @@ describe('useAuth', () => {
 
     expect(mockAuthService.getRegisterStatus).toHaveBeenCalled()
     expect(result).toBe(false)
+  })
+
+  it('requests forgot-password with expected payload', async () => {
+    mockAuthService.forgotPassword.mockResolvedValue({
+      status: 'password_reset_email_sent_if_needed',
+    })
+    const { forgotPassword } = useAuth()
+
+    await forgotPassword('test@example.com')
+
+    expect(mockAuthService.forgotPassword).toHaveBeenCalledWith('test@example.com')
+  })
+
+  it('resets password with expected payload', async () => {
+    mockAuthService.resetPassword.mockResolvedValue({ status: 'password_reset' })
+    const { resetPassword } = useAuth()
+
+    await resetPassword({
+      token: 'token-123',
+      new_password: 'NewSecurePass2@',
+      confirm_password: 'NewSecurePass2@',
+    })
+
+    expect(mockAuthService.resetPassword).toHaveBeenCalledWith({
+      token: 'token-123',
+      new_password: 'NewSecurePass2@',
+      confirm_password: 'NewSecurePass2@',
+    })
   })
 })

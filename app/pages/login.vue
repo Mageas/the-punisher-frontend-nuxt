@@ -21,6 +21,7 @@ const form = reactive({
 })
 const isLoading = ref(false)
 const showConfirmedSuccess = computed(() => route.query.confirmed === '1')
+const showPasswordResetSuccess = computed(() => route.query.reset === '1')
 
 async function onSubmit() {
   clearErrors()
@@ -57,6 +58,9 @@ async function onSubmit() {
       <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
         <Alert v-if="showConfirmedSuccess" class="mb-4">
           <AlertDescription>{{ t('auth.confirmEmail.loginSuccess') }}</AlertDescription>
+        </Alert>
+        <Alert v-if="showPasswordResetSuccess" class="mb-4">
+          <AlertDescription>{{ t('auth.resetPassword.loginSuccess') }}</AlertDescription>
         </Alert>
 
         <!-- Global error -->
@@ -95,6 +99,14 @@ async function onSubmit() {
             <p v-if="fieldErrors.password" class="text-sm text-destructive">
               {{ fieldErrors.password }}
             </p>
+            <div class="flex justify-end">
+              <NuxtLink
+                to="/forgot-password"
+                class="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+              >
+                {{ t('auth.forgotPasswordLink') }}
+              </NuxtLink>
+            </div>
           </div>
 
           <!-- Submit -->

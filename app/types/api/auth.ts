@@ -30,6 +30,36 @@ export interface ChangePasswordResponse {
 }
 
 /**
+ * Request payload for forgot-password.
+ */
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+/**
+ * Response for forgot-password request.
+ */
+export interface ForgotPasswordResponse {
+  status: 'password_reset_email_sent_if_needed'
+}
+
+/**
+ * Request payload for reset-password.
+ */
+export interface ResetPasswordRequest {
+  token: string
+  new_password: string
+  confirm_password: string
+}
+
+/**
+ * Response for successful password reset.
+ */
+export interface ResetPasswordResponse {
+  status: 'password_reset'
+}
+
+/**
  * Response for public registration availability.
  */
 export interface RegisterStatusResponse {

@@ -450,8 +450,23 @@
     "passwordPlaceholder": "••••••••",
     "passwordConfirm": "Confirmer le mot de passe",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "forgotPasswordLink": "Mot de passe oublié ?",
     "registerClosed": "Les inscriptions sont fermées.",
     "registerClosedHelp": "La création de compte est désactivée pour le moment.",
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Recevez un lien de réinitialisation par email.",
+      "submit": "Envoyer le lien de réinitialisation",
+      "emailRequired": "L'email est requis pour demander une réinitialisation.",
+      "success": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé."
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Définissez un nouveau mot de passe pour votre compte.",
+      "tokenRequired": "Le token de réinitialisation est manquant dans l'URL.",
+      "submit": "Mettre à jour mon mot de passe",
+      "loginSuccess": "Votre mot de passe a bien été réinitialisé. Vous pouvez vous connecter."
+    },
     "confirmEmail": {
       "title": "Confirmer votre email",
       "subtitle": "Validez votre compte pour vous connecter.",
@@ -486,6 +501,11 @@
       "email_confirmation_token_already_used": "Ce token de confirmation a déjà été utilisé.",
       "email_already_verified": "Cet email est déjà confirmé.",
       "email_confirmation_user_not_found": "Aucun utilisateur associé à ce token n'a été trouvé.",
+      "password_reset_token_missing": "Le token de réinitialisation est manquant.",
+      "password_reset_token_invalid": "Le token de réinitialisation est invalide.",
+      "password_reset_token_expired": "Le token de réinitialisation a expiré.",
+      "password_reset_token_already_used": "Ce token de réinitialisation a déjà été utilisé.",
+      "password_reset_user_not_found": "Aucun utilisateur associé à ce token de réinitialisation n'a été trouvé.",
       "jwt_invalid_signing_method": "Méthode de signature du token invalide.",
       "jwt_invalid_token": "Token invalide.",
       "jwt_expired": "Votre session a expiré.",
