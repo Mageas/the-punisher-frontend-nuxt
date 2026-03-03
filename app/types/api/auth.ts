@@ -14,6 +14,22 @@ export interface AuthResponse {
 }
 
 /**
+ * Request payload for password change.
+ */
+export interface ChangePasswordRequest {
+  current_password: string
+  new_password: string
+  confirm_password: string
+}
+
+/**
+ * Response for a successful password change.
+ */
+export interface ChangePasswordResponse {
+  status: 'password_changed'
+}
+
+/**
  * Response for public registration availability.
  */
 export interface RegisterStatusResponse {

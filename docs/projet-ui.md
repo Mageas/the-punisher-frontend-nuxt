@@ -45,9 +45,12 @@
 ### E. Menu utilisateur
 
 *Les actions liées au compte et aux opérations sensibles.*
+  * **📄 Paramètres utilisateur**
+    * *Icone :* `Settings`
+    * *Rôle :* Modifier le mot de passe et déclencher la déconnexion de tous les appareils (avec confirmation).
   * **📄 Zone de danger**
     * *Icone :* `ShieldAlert`
-    * *Rôle :* Regroupe les opérations globales et sensibles du tenant, dont l'import initial des élèves/classes.
+    * *Rôle :* Regroupe les opérations globales et sensibles du tenant, dont l'import initial des élèves/classes et les suppressions massives.
 
 ---
 
@@ -117,13 +120,26 @@
   * **Accès :** depuis le menu utilisateur.
   * **Actions destructives :**
   * Cartes de suppression globale des élèves et des classes.
-  * Carte de déconnexion de tous les appareils.
   * **Import initial :**
   * Carte dédiée à l'import des élèves et classes depuis un fichier CSV/XLSX.
   * Affichage d'un résumé d'import (créations, existants, liens, lignes en erreur).
   * Traduction frontend des codes d'erreur `import_*` avec enrichissement via le contexte API (`expected`, `min`, `max`).
   * En cas d'erreur de template/fichier, affichage du message global enrichi des détails backend (`error_details[].error`).
   * Tableau scrollable des erreurs de lignes quand la validation échoue.
+
+---
+
+### 👤 Paramètres utilisateur
+
+*Vue dédiée à la sécurité du compte connecté.*
+  * **Accès :** depuis le menu utilisateur (footer de la sidebar).
+  * **Sécurité :**
+  * Formulaire "Modifier le mot de passe" branché sur l'API `POST /v1/auth/change-password`.
+  * Affichage des erreurs de validation API au niveau des champs.
+  * Toast de confirmation après mise à jour réussie.
+  * **Sessions :**
+  * Action "Déconnecter tous les appareils" déplacée ici.
+  * Confirmation obligatoire avant exécution.
 
 ---
 

@@ -1,5 +1,7 @@
 import type {
   AuthResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   EmailConfirmationResendResponse,
   EmailConfirmationResponse,
   LoginRequest,
@@ -58,6 +60,16 @@ export function useAuthService() {
   }
 
   /**
+   * Change current user's password.
+   */
+  async function changePassword(body: ChangePasswordRequest) {
+    return $api<ChangePasswordResponse>('/auth/change-password', {
+      method: 'POST',
+      body,
+    })
+  }
+
+  /**
    * Attempt to refresh the access_token using the HttpOnly refresh_token cookie.
    */
   async function refresh() {
@@ -92,6 +104,7 @@ export function useAuthService() {
     getRegisterStatus,
     logout,
     logoutAll,
+    changePassword,
     refresh,
     confirmEmail,
     resendConfirmationEmail,

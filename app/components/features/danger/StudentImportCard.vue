@@ -164,268 +164,242 @@ const displayedImportErrors = computed(() =>
 </script>
 
 <template>
-  <div
-    class="group relative rounded-xl border border-border bg-card p-5 transition-all hover:border-primary-border hover:shadow-sm"
+  <ActionPanelCard
+    :title="t('dangerZone.importStudents.title')"
+    :description="t('dangerZone.importStudents.description')"
+    :icon="FileUp"
+    variant="primary"
   >
-    <div class="flex items-start gap-4">
-      <div
-        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-info-bg-subtle text-info-foreground transition-colors group-hover:bg-info-bg-subtle-hover"
-      >
-        <FileUp class="size-5" />
-      </div>
-      <div class="flex-1 min-w-0 space-y-3">
-        <div class="space-y-1">
-          <h3 class="text-sm font-semibold leading-none tracking-tight">
-            {{ t('dangerZone.importStudents.title') }}
-          </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            {{ t('dangerZone.importStudents.description') }}
-          </p>
+    <div
+      class="rounded-lg border border-dashed p-4 transition-colors"
+      :class="
+        isDraggingFile
+          ? 'border-primary bg-primary-bg-subtle'
+          : 'border-border hover:border-primary-border'
+      "
+      @dragover.stop="onDropZoneDragOver"
+      @dragenter.stop="onDropZoneDragEnter"
+      @dragleave.stop="onDropZoneDragLeave"
+      @drop.stop="onDropZoneDrop"
+    >
+      <input
+        ref="fileInput"
+        type="file"
+        :accept="acceptedTypes"
+        class="hidden"
+        @change="onFileChange"
+      />
+
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-sm">
+          <Upload class="size-4 text-muted-foreground" />
+          <span class="font-medium">
+            {{
+              isDraggingFile
+                ? t('dangerZone.importStudents.dropActive')
+                : t('dangerZone.importStudents.dropHint')
+            }}
+          </span>
         </div>
 
-        <div
-          class="rounded-lg border border-dashed p-4 transition-colors"
-          :class="
-            isDraggingFile
-              ? 'border-primary bg-primary-bg-subtle'
-              : 'border-border hover:border-primary-border'
-          "
-          @dragover.stop="onDropZoneDragOver"
-          @dragenter.stop="onDropZoneDragEnter"
-          @dragleave.stop="onDropZoneDragLeave"
-          @drop.stop="onDropZoneDrop"
-        >
-          <input
-            ref="fileInput"
-            type="file"
-            :accept="acceptedTypes"
-            class="hidden"
-            @change="onFileChange"
-          />
-
-          <div class="flex flex-col gap-3">
-            <div class="flex items-center gap-2 text-sm">
-              <Upload class="size-4 text-muted-foreground" />
-              <span class="font-medium">
-                {{
-                  isDraggingFile
-                    ? t('dangerZone.importStudents.dropActive')
-                    : t('dangerZone.importStudents.dropHint')
-                }}
-              </span>
-            </div>
-
-            <div class="flex items-center gap-3 flex-wrap">
-              <Button
-                variant="outline"
-                size="sm"
-                class="cursor-pointer"
-                :disabled="uploading"
-                @click="triggerFileSelect"
-              >
-                <Upload class="size-4 mr-2" />
-                {{
-                  selectedFile
-                    ? t('dangerZone.importStudents.changeFile')
-                    : t('dangerZone.importStudents.selectFile')
-                }}
-              </Button>
-
-              <div
-                v-if="selectedFile"
-                class="flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <span class="truncate max-w-48">{{ selectedFile.name }}</span>
-                <button
-                  type="button"
-                  class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
-                  :disabled="uploading"
-                  :aria-label="t('dangerZone.importStudents.clearFile')"
-                  @click="clearFile"
-                >
-                  <X class="size-3.5" />
-                </button>
-              </div>
-
-              <Button
-                v-if="selectedFile"
-                size="sm"
-                class="cursor-pointer"
-                :disabled="uploading"
-                @click="handleImport"
-              >
-                {{
-                  uploading
-                    ? t('dangerZone.importStudents.uploading')
-                    : t('dangerZone.importStudents.button')
-                }}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <p class="text-xs text-muted-foreground">
-          {{ t('dangerZone.importStudents.acceptedFormats') }}
-        </p>
-
-        <!-- Success result -->
-        <div v-if="importSummary" class="rounded-lg border border-success-border overflow-hidden">
-          <!-- Header -->
-          <div
-            class="flex flex-wrap items-center gap-x-2.5 gap-y-1 bg-success-bg-subtle px-4 py-2.5 border-b border-success-border"
+        <div class="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="uploading"
+            @click="triggerFileSelect"
           >
-            <CheckCircle class="size-4 text-success-foreground shrink-0" />
-            <span class="text-sm font-semibold text-success-foreground">
-              {{ t('dangerZone.importStudents.successTitle') }}
-            </span>
-            <span class="sm:ml-auto text-xs text-success-foreground">
-              {{
-                t('dangerZone.importStudents.summaryProcessed', {
-                  processed: importSummary.rows_processed,
-                  total: importSummary.rows_total,
-                })
-              }}
-            </span>
+            <Upload class="size-4 mr-2" />
+            {{
+              selectedFile
+                ? t('dangerZone.importStudents.changeFile')
+                : t('dangerZone.importStudents.selectFile')
+            }}
+          </Button>
+
+          <div v-if="selectedFile" class="flex items-center gap-2 text-sm text-muted-foreground">
+            <span class="truncate max-w-48">{{ selectedFile.name }}</span>
+            <button
+              type="button"
+              class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+              :disabled="uploading"
+              :aria-label="t('dangerZone.importStudents.clearFile')"
+              @click="clearFile"
+            >
+              <X class="size-3.5" />
+            </button>
           </div>
 
-          <!-- Stat cards -->
-          <div
-            class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border"
+          <Button
+            v-if="selectedFile"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="uploading"
+            @click="handleImport"
           >
-            <!-- Students -->
-            <div class="p-3.5 space-y-1">
-              <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <Users class="size-3.5" />
-                {{ t('dangerZone.importStudents.summaryStudents') }}
-              </div>
-              <div class="flex items-baseline gap-1.5">
-                <span
-                  class="text-xl font-bold tabular-nums tracking-tight"
-                  :class="
-                    importSummary.students_created > 0
-                      ? 'text-success-foreground'
-                      : 'text-foreground'
-                  "
-                >
-                  {{ importSummary.students_created }}
-                </span>
-                <span class="text-xs text-muted-foreground">
-                  {{ t('dangerZone.importStudents.summaryStudentsCreated') }}
-                </span>
-              </div>
-              <p class="text-xs text-muted-foreground">
-                {{ importSummary.students_existing }}
-                {{ t('dangerZone.importStudents.summaryStudentsExisting') }}
-              </p>
-            </div>
-
-            <!-- Classrooms -->
-            <div class="p-3.5 space-y-1">
-              <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <School class="size-3.5" />
-                {{ t('dangerZone.importStudents.summaryClassrooms') }}
-              </div>
-              <div class="flex items-baseline gap-1.5">
-                <span
-                  class="text-xl font-bold tabular-nums tracking-tight"
-                  :class="
-                    importSummary.classrooms_created > 0
-                      ? 'text-success-foreground'
-                      : 'text-foreground'
-                  "
-                >
-                  {{ importSummary.classrooms_created }}
-                </span>
-                <span class="text-xs text-muted-foreground">
-                  {{ t('dangerZone.importStudents.summaryClassroomsCreated') }}
-                </span>
-              </div>
-              <p class="text-xs text-muted-foreground">
-                {{ importSummary.classrooms_existing }}
-                {{ t('dangerZone.importStudents.summaryClassroomsExisting') }}
-              </p>
-            </div>
-
-            <!-- Links -->
-            <div class="p-3.5 space-y-1">
-              <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <Link2 class="size-3.5" />
-                {{ t('dangerZone.importStudents.summaryLinks') }}
-              </div>
-              <div class="flex items-baseline gap-1.5">
-                <span
-                  class="text-xl font-bold tabular-nums tracking-tight"
-                  :class="
-                    importSummary.links_created > 0 ? 'text-success-foreground' : 'text-foreground'
-                  "
-                >
-                  {{ importSummary.links_created }}
-                </span>
-                <span class="text-xs text-muted-foreground">
-                  {{ t('dangerZone.importStudents.summaryLinksCreated') }}
-                </span>
-              </div>
-              <p class="text-xs text-muted-foreground">
-                {{ importSummary.links_existing }}
-                {{ t('dangerZone.importStudents.summaryLinksExisting') }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Rows failed -->
-          <div
-            v-if="importSummary.rows_failed > 0"
-            class="flex items-center gap-2 px-4 py-2 border-t border-destructive-border bg-destructive-bg-subtle text-xs font-medium text-destructive"
-          >
-            <AlertTriangle class="size-3.5" />
-            {{ importSummary.rows_failed }}
-            {{ t('dangerZone.importStudents.rowsFailed').toLowerCase() }}
-          </div>
-        </div>
-
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive">
-          <AlertTriangle class="size-4" />
-          <AlertTitle>{{ globalError }}</AlertTitle>
-        </Alert>
-
-        <!-- Row-level errors -->
-        <div v-if="displayedImportErrors.length > 0" class="space-y-2">
-          <Alert variant="destructive">
-            <AlertTriangle class="size-4" />
-            <AlertTitle>{{ t('dangerZone.importStudents.errorTitle') }}</AlertTitle>
-            <AlertDescription>
-              <div
-                class="mt-2 max-h-60 overflow-y-auto rounded-md border border-destructive-border"
-              >
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead class="w-20">{{
-                        t('dangerZone.importStudents.errorRowHeader')
-                      }}</TableHead>
-                      <TableHead>{{ t('dangerZone.importStudents.errorFieldHeader') }}</TableHead>
-                      <TableHead>{{ t('dangerZone.importStudents.errorMessageHeader') }}</TableHead>
-                      <TableHead>{{ t('dangerZone.importStudents.errorValueHeader') }}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow
-                      v-for="(err, idx) in displayedImportErrors"
-                      :key="`${err.row}-${err.field}-${err.error}-${idx}`"
-                    >
-                      <TableCell class="font-mono text-xs">{{ err.row }}</TableCell>
-                      <TableCell class="text-xs">{{ err.field }}</TableCell>
-                      <TableCell class="text-xs">{{ err.message }}</TableCell>
-                      <TableCell class="text-xs font-mono">{{ err.value || '—' }}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </AlertDescription>
-          </Alert>
+            {{
+              uploading
+                ? t('dangerZone.importStudents.uploading')
+                : t('dangerZone.importStudents.button')
+            }}
+          </Button>
         </div>
       </div>
     </div>
-  </div>
+
+    <p class="text-xs text-muted-foreground">
+      {{ t('dangerZone.importStudents.acceptedFormats') }}
+    </p>
+
+    <!-- Success result -->
+    <div v-if="importSummary" class="rounded-lg border border-success-border overflow-hidden">
+      <!-- Header -->
+      <div
+        class="flex flex-wrap items-center gap-x-2.5 gap-y-1 bg-success-bg-subtle px-4 py-2.5 border-b border-success-border"
+      >
+        <CheckCircle class="size-4 text-success-foreground shrink-0" />
+        <span class="text-sm font-semibold text-success-foreground">
+          {{ t('dangerZone.importStudents.successTitle') }}
+        </span>
+        <span class="sm:ml-auto text-xs text-success-foreground">
+          {{
+            t('dangerZone.importStudents.summaryProcessed', {
+              processed: importSummary.rows_processed,
+              total: importSummary.rows_total,
+            })
+          }}
+        </span>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
+        <!-- Students -->
+        <div class="p-3.5 space-y-1">
+          <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Users class="size-3.5" />
+            {{ t('dangerZone.importStudents.summaryStudents') }}
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span
+              class="text-xl font-bold tabular-nums tracking-tight"
+              :class="
+                importSummary.students_created > 0 ? 'text-success-foreground' : 'text-foreground'
+              "
+            >
+              {{ importSummary.students_created }}
+            </span>
+            <span class="text-xs text-muted-foreground">
+              {{ t('dangerZone.importStudents.summaryStudentsCreated') }}
+            </span>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            {{ importSummary.students_existing }}
+            {{ t('dangerZone.importStudents.summaryStudentsExisting') }}
+          </p>
+        </div>
+
+        <!-- Classrooms -->
+        <div class="p-3.5 space-y-1">
+          <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <School class="size-3.5" />
+            {{ t('dangerZone.importStudents.summaryClassrooms') }}
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span
+              class="text-xl font-bold tabular-nums tracking-tight"
+              :class="
+                importSummary.classrooms_created > 0 ? 'text-success-foreground' : 'text-foreground'
+              "
+            >
+              {{ importSummary.classrooms_created }}
+            </span>
+            <span class="text-xs text-muted-foreground">
+              {{ t('dangerZone.importStudents.summaryClassroomsCreated') }}
+            </span>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            {{ importSummary.classrooms_existing }}
+            {{ t('dangerZone.importStudents.summaryClassroomsExisting') }}
+          </p>
+        </div>
+
+        <!-- Links -->
+        <div class="p-3.5 space-y-1">
+          <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Link2 class="size-3.5" />
+            {{ t('dangerZone.importStudents.summaryLinks') }}
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span
+              class="text-xl font-bold tabular-nums tracking-tight"
+              :class="
+                importSummary.links_created > 0 ? 'text-success-foreground' : 'text-foreground'
+              "
+            >
+              {{ importSummary.links_created }}
+            </span>
+            <span class="text-xs text-muted-foreground">
+              {{ t('dangerZone.importStudents.summaryLinksCreated') }}
+            </span>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            {{ importSummary.links_existing }}
+            {{ t('dangerZone.importStudents.summaryLinksExisting') }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Rows failed -->
+      <div
+        v-if="importSummary.rows_failed > 0"
+        class="flex items-center gap-2 px-4 py-2 border-t border-destructive-border bg-destructive-bg-subtle text-xs font-medium text-destructive"
+      >
+        <AlertTriangle class="size-3.5" />
+        {{ importSummary.rows_failed }}
+        {{ t('dangerZone.importStudents.rowsFailed').toLowerCase() }}
+      </div>
+    </div>
+
+    <!-- Global error -->
+    <Alert v-if="globalError" variant="destructive">
+      <AlertTriangle class="size-4" />
+      <AlertTitle>{{ globalError }}</AlertTitle>
+    </Alert>
+
+    <!-- Row-level errors -->
+    <div v-if="displayedImportErrors.length > 0" class="space-y-2">
+      <Alert variant="destructive">
+        <AlertTriangle class="size-4" />
+        <AlertTitle>{{ t('dangerZone.importStudents.errorTitle') }}</AlertTitle>
+        <AlertDescription>
+          <div class="mt-2 max-h-60 overflow-y-auto rounded-md border border-destructive-border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead class="w-20">{{
+                    t('dangerZone.importStudents.errorRowHeader')
+                  }}</TableHead>
+                  <TableHead>{{ t('dangerZone.importStudents.errorFieldHeader') }}</TableHead>
+                  <TableHead>{{ t('dangerZone.importStudents.errorMessageHeader') }}</TableHead>
+                  <TableHead>{{ t('dangerZone.importStudents.errorValueHeader') }}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow
+                  v-for="(err, idx) in displayedImportErrors"
+                  :key="`${err.row}-${err.field}-${err.error}-${idx}`"
+                >
+                  <TableCell class="font-mono text-xs">{{ err.row }}</TableCell>
+                  <TableCell class="text-xs">{{ err.field }}</TableCell>
+                  <TableCell class="text-xs">{{ err.message }}</TableCell>
+                  <TableCell class="text-xs font-mono">{{ err.value || '—' }}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </AlertDescription>
+      </Alert>
+    </div>
+  </ActionPanelCard>
 </template>
