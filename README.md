@@ -26,6 +26,9 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 
 - Subtle semantic background tokens use the `*-bg-subtle` suffix (example: `bg-warning-bg-subtle`).
 - Hover variants use `*-bg-subtle-hover` (example: `bg-destructive-bg-subtle` with `hover:bg-destructive-bg-subtle-hover`).
+- Used/Done visual state tokens are centralized with `status-used-*`:
+  `border-status-used-border`, `text-status-used-icon`, `bg-status-used-bonus`,
+  `bg-status-used-punishment`.
 
 ## 📁 Architecture
 
