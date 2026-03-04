@@ -7,17 +7,25 @@ import type { Punishment } from '~/types/api'
 export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
   const punishmentService = usePunishmentService()
   const studentService = useStudentService()
+  const PROFILE_SECTION_PAGE_SIZE = 5
   const paginated = usePaginatedCollection<
     Punishment,
     {
       state?: 'pending' | 'resolved'
       search?: string
     }
-  >((options) => studentService.getStudentPunishments(toValue(studentId), options), {
-    pageKey: 'punishments_page',
-    filterKeys: ['search', 'state'],
-    stateKey: `paginated:student:${toValue(studentId)}:punishments`,
-  })
+  >(
+    (options) =>
+      studentService.getStudentPunishments(toValue(studentId), {
+        ...options,
+        item_per_page: PROFILE_SECTION_PAGE_SIZE,
+      }),
+    {
+      pageKey: 'punishments_page',
+      filterKeys: ['search', 'state'],
+      stateKey: `paginated:student:${toValue(studentId)}:punishments`,
+    },
+  )
 
   async function fetchPunishments(options?: {
     page?: number

@@ -6,12 +6,24 @@ const props = defineProps<{
   history: StudentHistoryItem[]
   title?: string
   emptyLabel?: string
+  page?: number
+  totalPages?: number
+  loading?: boolean
+  disabled?: boolean
+}>()
+
+const emit = defineEmits<{
+  'update:page': [value: number]
 }>()
 
 const { t } = useI18n()
 
 const sectionTitle = computed(() => props.title ?? t('studentProfile.historyTitle'))
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.history'))
+const currentPage = computed(() => props.page ?? 1)
+const currentTotalPages = computed(() => props.totalPages ?? 1)
+const paginationLoading = computed(() => props.loading ?? false)
+const paginationDisabled = computed(() => props.disabled ?? false)
 
 function eventDotClass(item: StudentHistoryItem): string {
   if (item.type === 'bonus') return 'bg-warning'
@@ -32,9 +44,20 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
 
 <template>
   <div>
-    <h2 class="mb-4 text-lg font-semibold">
-      {{ sectionTitle }}
-    </h2>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex min-w-0 items-center gap-3">
+        <h2 class="text-lg font-semibold">
+          {{ sectionTitle }}
+        </h2>
+        <SectionHeaderPagination
+          :page="currentPage"
+          :total-pages="currentTotalPages"
+          :loading="paginationLoading"
+          :disabled="paginationDisabled"
+          @update:page="emit('update:page', $event)"
+        />
+      </div>
+    </div>
 
     <div
       v-if="history.length === 0"

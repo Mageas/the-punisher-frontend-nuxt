@@ -11,10 +11,15 @@ const props = defineProps<{
   title?: string
   emptyLabel?: string
   useFn?: (id: string) => Promise<void>
+  page?: number
+  totalPages?: number
+  loading?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
   used: []
+  'update:page': [value: number]
 }>()
 </script>
 
@@ -24,6 +29,11 @@ const emit = defineEmits<{
     :title="props.title"
     :empty-label="props.emptyLabel"
     :use-fn="props.useFn"
+    :page="props.page"
+    :total-pages="props.totalPages"
+    :loading="props.loading"
+    :disabled="props.disabled"
     @used="emit('used')"
+    @update:page="emit('update:page', $event)"
   />
 </template>

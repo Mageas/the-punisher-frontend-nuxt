@@ -43,12 +43,13 @@ export function useStudentService() {
    */
   async function getStudentBonuses(
     studentId: string,
-    options?: { page?: number; state?: string; search?: string },
+    options?: { page?: number; state?: string; search?: string; item_per_page?: number },
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.state) params.state = options.state
     if (options?.search) params.search = options.search
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
 
     return $api<PaginatedResponse<Bonus>>(`/students/${studentId}/bonuses`, { params })
   }
@@ -58,11 +59,12 @@ export function useStudentService() {
    */
   async function getStudentPenalties(
     studentId: string,
-    options?: { page?: number; search?: string },
+    options?: { page?: number; search?: string; item_per_page?: number },
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.search) params.search = options.search
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
 
     return $api<PaginatedResponse<Penalty>>(`/students/${studentId}/penalties`, { params })
   }
@@ -72,12 +74,13 @@ export function useStudentService() {
    */
   async function getStudentPunishments(
     studentId: string,
-    options?: { page?: number; state?: string; search?: string },
+    options?: { page?: number; state?: string; search?: string; item_per_page?: number },
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
     if (options?.state) params.state = options.state
     if (options?.search) params.search = options.search
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
 
     return $api<PaginatedResponse<Punishment>>(`/students/${studentId}/punishments`, { params })
   }
@@ -85,9 +88,13 @@ export function useStudentService() {
   /**
    * Get history timeline for a student.
    */
-  async function getStudentHistory(studentId: string, options?: { page?: number }) {
+  async function getStudentHistory(
+    studentId: string,
+    options?: { page?: number; item_per_page?: number },
+  ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
 
     return $api<PaginatedResponse<StudentHistoryItem>>(`/students/${studentId}/history`, {
       params,
