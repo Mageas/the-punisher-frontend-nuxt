@@ -110,6 +110,7 @@ await reload()
       <RuleCard
         v-for="rule in rules"
         :key="rule.id"
+        :name="rule.name"
         :penalty-type-name="rule.penalty_type_name"
         :punishment-type-name="rule.resulting_punishment_type_name"
         :threshold="rule.threshold"

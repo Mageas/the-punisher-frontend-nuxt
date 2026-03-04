@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Gavel } from 'lucide-vue-next'
+import { Gavel, Scale } from 'lucide-vue-next'
 import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
@@ -18,21 +18,29 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
+const studentFullName = computed(() => {
+  if (!hasStudentName.value) return ''
+  return `${props.studentFirstName} ${props.studentLastName}`
+})
 const isAutomated = computed(() => props.automated === true)
+const hasRuleName = computed(() => Boolean(props.triggeringRuleName))
+const hasRuleLink = computed(
+  () => isAutomated.value && hasRuleName.value && Boolean(props.triggeringRuleId),
+)
+const rulesLink = computed(() =>
+  props.triggeringRuleId ? `/rules?ruleId=${props.triggeringRuleId}` : '/rules',
+)
 
-const subtitle = computed(() => {
-  if (hasStudentName.value) {
-    const parts = [props.punishmentTypeName]
-    if (props.triggeringRuleName) {
-      parts.push(props.triggeringRuleName)
-    } else if (!isAutomated.value) {
-      parts.push(t('punishments.manualPunishment'))
-    }
-    return parts.join(' — ')
+const automatedLabel = computed(() => {
+  if (!isAutomated.value) return ''
+  if (hasRuleName.value && props.triggeringRuleName) {
+    return t('punishments.autoByRule', { name: props.triggeringRuleName })
   }
+  return t('punishments.deletedRule')
+})
 
-  if (props.triggeringRuleName) return props.triggeringRuleName
-  return isAutomated.value ? t('common.auto') : t('punishments.manualPunishment')
+const secondaryLine = computed(() => {
+  return props.punishmentTypeName
 })
 </script>
 
@@ -49,26 +57,34 @@ const subtitle = computed(() => {
         <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <p class="text-sm font-medium">
+        <div class="flex items-center gap-2 min-w-0">
+          <p class="text-sm font-medium min-w-0 truncate">
             <NuxtLink
               v-if="hasStudentName && props.studentId"
               :to="`/students/${props.studentId}`"
               class="transition-colors hover:text-primary hover:underline underline-offset-4"
             >
-              {{ props.studentFirstName }} {{ props.studentLastName }}
+              {{ studentFullName }}
             </NuxtLink>
             <span v-else-if="hasStudentName">
-              {{ props.studentFirstName }} {{ props.studentLastName }}
+              {{ studentFullName }}
             </span>
             <span v-else>{{ punishmentTypeName }}</span>
           </p>
-          <Badge v-if="isAutomated" variant="outline" class="text-xs text-info border-info-border">
-            {{ t('common.auto') }}
-          </Badge>
         </div>
-        <p class="mt-0.5 text-xs text-muted-foreground">
-          {{ subtitle }}
+        <p v-if="secondaryLine" class="mt-0.5 text-xs text-muted-foreground">
+          {{ secondaryLine }}
+        </p>
+        <p v-if="isAutomated" class="mt-1 inline-flex items-center gap-1.5 text-xs text-info">
+          <Scale class="h-3 w-3 shrink-0" />
+          <NuxtLink
+            v-if="hasRuleLink"
+            :to="rulesLink"
+            class="truncate transition-colors hover:text-primary hover:underline underline-offset-4"
+          >
+            {{ automatedLabel }}
+          </NuxtLink>
+          <span v-else class="truncate">{{ automatedLabel }}</span>
         </p>
         <div class="mt-2 flex items-center justify-between">
           <div>
@@ -100,26 +116,40 @@ const subtitle = computed(() => {
         <Gavel class="h-4 w-4 text-danger" />
       </div>
       <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <p class="text-sm font-medium">
+        <div class="flex items-center gap-2 min-w-0">
+          <p class="text-sm font-medium min-w-0 truncate">
             <NuxtLink
               v-if="hasStudentName && props.studentId"
               :to="`/students/${props.studentId}`"
               class="transition-colors hover:text-primary hover:underline underline-offset-4"
             >
-              {{ props.studentFirstName }} {{ props.studentLastName }}
+              {{ studentFullName }}
             </NuxtLink>
             <span v-else-if="hasStudentName">
-              {{ props.studentFirstName }} {{ props.studentLastName }}
+              {{ studentFullName }}
             </span>
             <span v-else>{{ punishmentTypeName }}</span>
           </p>
-          <Badge v-if="isAutomated" variant="outline" class="text-xs text-info border-info-border">
-            {{ t('common.auto') }}
-          </Badge>
         </div>
-        <p class="mt-0.5 text-xs text-muted-foreground">
-          {{ subtitle }}
+        <p
+          v-if="secondaryLine"
+          class="mt-0.5 flex items-center text-xs text-muted-foreground"
+        >
+          <span>{{ secondaryLine }}</span>
+          <template v-if="isAutomated">
+            <span class="mx-1.5">·</span>
+            <span class="inline-flex items-center gap-1 text-info">
+              <Scale class="h-3 w-3 shrink-0" />
+              <NuxtLink
+                v-if="hasRuleLink"
+                :to="rulesLink"
+                class="transition-colors hover:text-primary hover:underline underline-offset-4"
+              >
+                {{ automatedLabel }}
+              </NuxtLink>
+              <span v-else>{{ automatedLabel }}</span>
+            </span>
+          </template>
         </p>
       </div>
       <div class="text-right">

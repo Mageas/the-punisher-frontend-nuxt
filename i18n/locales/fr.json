@@ -86,7 +86,9 @@
     "pending": "En attente",
     "resolved": "Résolu",
     "resolvedAt": "Résolu le {date}",
-    "manualPunishment": "Punition manuelle"
+    "manualPunishment": "Punition manuelle",
+    "autoByRule": "Auto par {name}",
+    "deletedRule": "Règle supprimée"
   },
   "penalties": {
     "title": "Pénalités",
@@ -358,6 +360,8 @@
     "rule": {
       "title": "Nouvelle règle",
       "editTitle": "Modifier la règle",
+      "name": "Nom de la règle (optionnel)",
+      "namePlaceholder": "Laisser vide pour générer automatiquement",
       "penaltyType": "Déclencheur (type de pénalité)",
       "threshold": "Seuil",
       "mode": "Mode",

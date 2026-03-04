@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Scale } from 'lucide-vue-next'
 import type { StudentHistoryItem, StudentHistoryPunishmentItem } from '~/types/api'
 import { formatDate, formatDateTime } from '~/lib/utils'
 
@@ -35,10 +36,23 @@ function isPunishmentAutomated(item: StudentHistoryPunishmentItem): boolean {
   return item.automated === true
 }
 
-function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
-  if (item.triggering_rule_name) return item.triggering_rule_name
-  if (isPunishmentAutomated(item)) return t('common.auto')
-  return t('punishments.manualPunishment')
+function punishmentOrigin(item: StudentHistoryPunishmentItem): string {
+  if (!isPunishmentAutomated(item)) return ''
+  if (item.triggering_rule_name)
+    return t('punishments.autoByRule', { name: item.triggering_rule_name })
+  return t('punishments.deletedRule')
+}
+
+function hasRuleLink(item: StudentHistoryPunishmentItem): boolean {
+  return (
+    isPunishmentAutomated(item) &&
+    Boolean(item.triggering_rule_id) &&
+    Boolean(item.triggering_rule_name)
+  )
+}
+
+function ruleLink(item: StudentHistoryPunishmentItem): string {
+  return item.triggering_rule_id ? `/rules?ruleId=${item.triggering_rule_id}` : '/rules'
 }
 </script>
 
@@ -78,22 +92,11 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
             <div class="flex flex-wrap items-center gap-2">
               <p class="text-sm font-medium">
                 {{
-                  isPunishmentAutomated(item)
-                    ? t('studentProfile.history.punishmentAuto', {
-                        name: item.punishment_type_name,
-                      })
-                    : t('studentProfile.history.punishment', {
-                        name: item.punishment_type_name,
-                      })
+                  t('studentProfile.history.punishment', {
+                    name: item.punishment_type_name,
+                  })
                 }}
               </p>
-              <Badge
-                v-if="isPunishmentAutomated(item)"
-                variant="outline"
-                class="text-xs text-info border-info-border"
-              >
-                {{ t('common.auto') }}
-              </Badge>
               <Badge
                 variant="outline"
                 class="text-xs"
@@ -106,8 +109,21 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
                 {{ item.resolved_at ? t('punishments.resolved') : t('punishments.pending') }}
               </Badge>
             </div>
-            <p class="mt-1 text-xs text-muted-foreground">
-              {{ punishmentSubtitle(item) }}
+            <p
+              v-if="isPunishmentAutomated(item)"
+              class="mt-1 inline-flex items-center gap-1.5 text-xs text-info"
+            >
+              <Scale class="h-3 w-3 shrink-0" />
+              <NuxtLink
+                v-if="hasRuleLink(item)"
+                :to="ruleLink(item)"
+                class="transition-colors hover:text-primary hover:underline underline-offset-4"
+              >
+                {{ punishmentOrigin(item) }}
+              </NuxtLink>
+              <span v-else>
+                {{ punishmentOrigin(item) }}
+              </span>
             </p>
             <p v-if="item.due_at" class="text-xs text-muted-foreground">
               {{ t('common.dueAt', { date: formatDate(item.due_at) }) }}
