@@ -67,6 +67,12 @@
   --color-destructive-border: var(--destructive-border);
   --color-primary-border: var(--primary-border);
 
+  /* Used/Done status tokens */
+  --color-status-used-border: var(--status-used-border);
+  --color-status-used-icon: var(--status-used-icon);
+  --color-status-used-bonus: var(--status-used-bonus);
+  --color-status-used-punishment: var(--status-used-punishment);
+
   /* Interactive hover */
   --color-secondary-hover: var(--secondary-hover);
 }
@@ -130,6 +136,12 @@
   --destructive-border: oklch(0.577 0.245 27.325 / 30%);
   --primary-border: oklch(0.205 0 0 / 30%);
 
+  /* Used/Done status */
+  --status-used-border: var(--success-border);
+  --status-used-icon: var(--success);
+  --status-used-bonus: var(--success-bg-subtle);
+  --status-used-punishment: var(--success-bg-subtle);
+
   /* Interactive hover */
   --secondary-hover: oklch(0.97 0 0 / 40%);
 }
@@ -182,6 +194,12 @@
   /* Semantic borders (destructive/primary change in dark) */
   --destructive-border: oklch(0.704 0.191 22.216 / 30%);
   --primary-border: oklch(0.922 0 0 / 30%);
+
+  /* Used/Done status */
+  --status-used-border: var(--success-border);
+  --status-used-icon: var(--success);
+  --status-used-bonus: var(--success-bg-subtle);
+  --status-used-punishment: var(--success-bg-subtle);
 
   /* Interactive hover */
   --secondary-hover: oklch(0.269 0 0 / 40%);

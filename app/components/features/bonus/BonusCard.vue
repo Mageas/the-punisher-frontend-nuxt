@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CircleCheck } from 'lucide-vue-next'
 import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
@@ -14,6 +15,16 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
+const isUsed = computed(() => Boolean(props.usedAt))
+const cardClass = computed(() => (isUsed.value ? 'border-status-used-border' : 'border-border'))
+const pointsClass = computed(() =>
+  isUsed.value ? 'bg-status-used-bonus text-status-used-icon' : 'bg-warning-bg-subtle text-warning',
+)
+const statusBadgeClass = computed(() =>
+  isUsed.value
+    ? 'border-status-used-border text-status-used-icon'
+    : 'text-success border-success-border',
+)
 
 function formatPoints(points: number): string {
   return `+${points}`
@@ -21,12 +32,12 @@ function formatPoints(points: number): string {
 </script>
 
 <template>
-  <div class="rounded-lg border border-border p-4" :class="{ 'opacity-60': usedAt }">
+  <div class="rounded-lg border p-4" :class="cardClass">
     <!-- Mobile: vertical layout -->
     <div class="flex items-start gap-3 sm:hidden">
       <div
         class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
+        :class="pointsClass"
       >
         {{ formatPoints(points) }}
       </div>
@@ -57,13 +68,19 @@ function formatPoints(points: number): string {
         </p>
         <div class="mt-2 flex items-center justify-between">
           <div>
-            <Badge
-              variant="outline"
-              :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
-            >
-              {{ usedAt ? t('common.used') : t('common.available') }}
-            </Badge>
-            <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
+            <div class="flex items-center gap-2">
+              <span
+                v-if="isUsed"
+                class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-status-used-bonus text-status-used-icon"
+              >
+                <CircleCheck class="h-3.5 w-3.5" />
+                <span class="sr-only">{{ t('common.used') }}</span>
+              </span>
+              <Badge variant="outline" :class="statusBadgeClass">
+                {{ isUsed ? t('common.used') : t('common.available') }}
+              </Badge>
+            </div>
+            <p v-if="isUsed" class="mt-1 text-xs text-muted-foreground">
               {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}
             </p>
           </div>
@@ -78,7 +95,7 @@ function formatPoints(points: number): string {
     <div class="hidden items-center gap-4 sm:flex">
       <div
         class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
+        :class="pointsClass"
       >
         {{ formatPoints(points) }}
       </div>
@@ -109,13 +126,19 @@ function formatPoints(points: number): string {
         </p>
       </div>
       <div class="text-right">
-        <Badge
-          variant="outline"
-          :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
-        >
-          {{ usedAt ? t('common.used') : t('common.available') }}
-        </Badge>
-        <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
+        <div class="flex items-center justify-end gap-2">
+          <span
+            v-if="isUsed"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-status-used-bonus text-status-used-icon"
+          >
+            <CircleCheck class="h-3.5 w-3.5" />
+            <span class="sr-only">{{ t('common.used') }}</span>
+          </span>
+          <Badge variant="outline" :class="statusBadgeClass">
+            {{ isUsed ? t('common.used') : t('common.available') }}
+          </Badge>
+        </div>
+        <p v-if="isUsed" class="mt-1 text-xs text-muted-foreground">
           {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}
         </p>
       </div>

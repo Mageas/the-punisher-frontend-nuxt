@@ -152,12 +152,22 @@
     * **Icone :** `Star`.
     * **Contenu :** Nom de l'élève, Type de bonus, Date.
     * **Statut :** `Badge` "Disponible" (État par défaut) ou "Consommé" (État final).
+    * **État "consommé" :** indicateur explicite via icône `CircleCheck` + bordure dédiée de carte (pas de désaturation globale).
     * **Action :** Bouton "Cadeau/Box" pour consommer le bonus (Uniquement si disponible).
   * **Liste (Punitions) :**
     * **Icone :** `Gavel`.
     * **Contenu :** Nom, Type de punition, Badge "Auto" (si générée par règle).
     * **Statut :** "Échéance : [Date]" (si en attente) ou "Résolu le..." (si fait).
+    * **État "fait" :** indicateur explicite via icône `CircleCheck` + bordure dédiée de carte (pas de désaturation globale).
+    * **Logo punition résolue :** l'icône `Gavel` et son fond passent sur les couleurs `status-used-*`.
     * **Action :** Bouton `Check` (Cercle coché) pour valider la punition (Uniquement si en attente).
+
+### Tokens UI d'état "fait/utilisé"
+
+* `status-used-border` : bordure sémantique appliquée sur les cartes marquées faites/utilisées.
+* `status-used-icon` : couleur d'icône pour l'indicateur visuel.
+* `status-used-bonus` : fond de l'indicateur d'état pour les bonus.
+* `status-used-punishment` : fond de l'indicateur d'état pour les punitions.
 
 ---
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CircleCheck } from 'lucide-vue-next'
 import type { StudentHistoryItem, StudentHistoryPunishmentItem } from '~/types/api'
 import { formatDate, formatDateTime } from '~/lib/utils'
 
@@ -27,6 +28,22 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
   if (item.triggering_rule_name) return item.triggering_rule_name
   if (isPunishmentAutomated(item)) return t('common.auto')
   return t('punishments.manualPunishment')
+}
+
+function punishmentStatusClass(resolvedAt?: string | null): string {
+  return resolvedAt
+    ? 'text-status-used-icon border-status-used-border'
+    : 'text-warning border-warning-border'
+}
+
+function bonusPointsClass(usedAt?: string | null): string {
+  return usedAt ? 'bg-status-used-bonus text-status-used-icon' : 'bg-warning-bg-subtle text-warning'
+}
+
+function bonusStatusClass(usedAt?: string | null): string {
+  return usedAt
+    ? 'text-status-used-icon border-status-used-border'
+    : 'text-success border-success-border'
 }
 </script>
 
@@ -74,14 +91,17 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
               <Badge
                 variant="outline"
                 class="text-xs"
-                :class="
-                  item.resolved_at
-                    ? 'text-success border-success-border'
-                    : 'text-warning border-warning-border'
-                "
+                :class="punishmentStatusClass(item.resolved_at)"
               >
                 {{ item.resolved_at ? t('punishments.resolved') : t('punishments.pending') }}
               </Badge>
+              <span
+                v-if="item.resolved_at"
+                class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-status-used-punishment text-status-used-icon"
+              >
+                <CircleCheck class="h-3 w-3" />
+                <span class="sr-only">{{ t('punishments.resolved') }}</span>
+              </span>
             </div>
             <p class="mt-1 text-xs text-muted-foreground">
               {{ punishmentSubtitle(item) }}
@@ -112,21 +132,18 @@ function punishmentSubtitle(item: StudentHistoryPunishmentItem): string {
               </p>
               <span
                 class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold"
-                :class="
-                  item.used_at
-                    ? 'bg-secondary text-muted-foreground'
-                    : 'bg-warning-bg-subtle text-warning'
-                "
+                :class="bonusPointsClass(item.used_at)"
               >
                 +{{ item.points }}
               </span>
-              <Badge
-                variant="outline"
-                class="text-xs"
-                :class="
-                  item.used_at ? 'text-muted-foreground' : 'text-success border-success-border'
-                "
+              <span
+                v-if="item.used_at"
+                class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-status-used-bonus text-status-used-icon"
               >
+                <CircleCheck class="h-3 w-3" />
+                <span class="sr-only">{{ t('common.used') }}</span>
+              </span>
+              <Badge variant="outline" class="text-xs" :class="bonusStatusClass(item.used_at)">
                 {{ item.used_at ? t('common.used') : t('common.available') }}
               </Badge>
             </div>
