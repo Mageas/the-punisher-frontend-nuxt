@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertCircle, AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
+import { AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
 import { getInitials } from '~/lib/utils'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -26,6 +26,7 @@ const {
   punishments: pendingPunishments,
   loading: loadingPunishments,
   page: punishmentsPage,
+  previousPage: previousPunishmentsPage,
   totalCount: punishmentsTotal,
   itemPerPage: punishmentsPerPage,
   fetchPunishments,
@@ -37,6 +38,7 @@ const {
   bonuses: availableBonuses,
   loading: loadingBonuses,
   page: bonusesPage,
+  previousPage: previousBonusesPage,
   totalCount: bonusesTotal,
   itemPerPage: bonusesPerPage,
   fetchBonuses,
@@ -76,6 +78,11 @@ function formatRatio(current: number, total: number): string {
   return `${current} / ${total}`
 }
 
+function formatPunishmentsProgress(total: number, pending: number, overdue: number): string {
+  const resolved = Math.max(0, total - pending)
+  return `${resolved} / ${total} (${overdue})`
+}
+
 function computeTotalPages(total: number, itemsPerPage: number): number {
   if (itemsPerPage <= 0) return 1
   return Math.max(1, Math.ceil(total / itemsPerPage))
@@ -107,8 +114,8 @@ async function fetchStudentProfile() {
 async function loadAllData() {
   await Promise.all([
     fetchStudentProfile(),
-    fetchPunishments({ state: 'pending' }),
-    fetchBonuses({ state: 'unused' }),
+    fetchPunishments(),
+    fetchBonuses(),
     fetchPenalties(),
     fetchHistory(),
   ])
@@ -128,6 +135,22 @@ async function deleteStudent(id: string) {
 
 async function onActionConfirmed() {
   await loadAllData()
+}
+
+async function onPunishmentResolved() {
+  await loadAllData()
+
+  if (pendingPunishments.value.length === 0 && previousPunishmentsPage.value !== null) {
+    await gotoPunishmentsPage(previousPunishmentsPage.value)
+  }
+}
+
+async function onBonusUsed() {
+  await loadAllData()
+
+  if (availableBonuses.value.length === 0 && previousBonusesPage.value !== null) {
+    await gotoBonusesPage(previousBonusesPage.value)
+  }
 }
 
 async function onDeleteConfirmed() {
@@ -223,65 +246,23 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
         </div>
       </div>
 
-      <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-lg border border-border p-4 sm:p-6">
-          <div class="mb-2 flex items-center justify-between">
-            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-              {{ t('studentProfile.kpis.availableBonusPoints') }}
-            </p>
-            <Star class="w-4 h-4 text-warning" />
-          </div>
-          <p
-            class="text-xl sm:text-3xl font-bold text-warning tabular-nums whitespace-nowrap leading-none"
-          >
-            {{ formatRatio(kpis.available_bonus_points, kpis.total_bonus_points) }}
-          </p>
-          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
-            {{ t('studentProfile.kpis.activeBonusCount', kpis.active_bonus_count) }}
-          </p>
-        </div>
-
-        <div class="rounded-lg border border-border p-4 sm:p-6">
-          <div class="mb-2 flex items-center justify-between">
-            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-              {{ t('studentProfile.kpis.totalPenaltyCount') }}
-            </p>
-            <AlertCircle class="w-4 h-4 text-muted-foreground" />
-          </div>
-          <p class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none">
-            {{ formatRatio(kpis.penalty_count, kpis.total_penalty_count) }}
-          </p>
-          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
-            {{ t('common.currentPeriod') }}
-          </p>
-        </div>
-
-        <div class="rounded-lg border border-border p-4 sm:p-6">
-          <div class="mb-2 flex items-center justify-between">
-            <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-              {{ t('studentProfile.kpis.pendingPunishmentCount') }}
-            </p>
-            <Gavel class="w-4 h-4 text-danger" />
-          </div>
-          <p
-            class="text-xl sm:text-3xl font-bold text-danger tabular-nums whitespace-nowrap leading-none"
-          >
-            {{ formatRatio(kpis.pending_punishment_count, kpis.total_punishment_count) }}
-          </p>
-          <p class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
-            {{ t('common.overduePunishments', kpis.overdue_punishment_count) }}
-          </p>
-        </div>
-      </div>
-
       <div class="mb-8 space-y-4">
         <HistoryPendingPunishmentsSection
           :punishments="pendingPunishments"
+          :show-count="true"
+          :badge-text="
+            formatPunishmentsProgress(
+              kpis.total_punishment_count,
+              kpis.pending_punishment_count,
+              kpis.overdue_punishment_count,
+            )
+          "
+          :badge-help-text="t('common.kpiPopover.pendingPunishmentsProgress')"
           :page="punishmentsPage"
           :total-pages="punishmentsTotalPages"
           :loading="loadingPunishments"
           :resolve-fn="resolvePunishment"
-          @resolved="onActionConfirmed"
+          @resolved="onPunishmentResolved"
           @update:page="gotoPunishmentsPage($event)"
         />
       </div>
@@ -289,11 +270,13 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8 space-y-4">
         <HistoryAvailableBonusesSection
           :bonuses="availableBonuses"
+          :badge-text="formatRatio(kpis.available_bonus_points, kpis.total_bonus_points)"
+          :badge-help-text="t('common.kpiPopover.bonusAvailability')"
           :page="bonusesPage"
           :total-pages="bonusesTotalPages"
           :loading="loadingBonuses"
           :use-fn="useBonus"
-          @used="onActionConfirmed"
+          @used="onBonusUsed"
           @update:page="gotoBonusesPage($event)"
         />
       </div>
@@ -301,6 +284,8 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8 space-y-4">
         <HistoryPenaltiesSection
           :penalties="penalties"
+          :badge-text="formatRatio(kpis.penalty_count, kpis.total_penalty_count)"
+          :badge-help-text="t('common.kpiPopover.studentPenaltiesProgress')"
           :page="penaltiesPage"
           :total-pages="penaltiesTotalPages"
           :loading="loadingPenalties"

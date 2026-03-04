@@ -32,6 +32,12 @@
     "nToResolve": "{count} à résoudre",
     "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés",
     "overduePunishments": "{count} punition en retard | {count} punitions en retard",
+    "kpiPopover": {
+      "dashboardRecentPenalties": "Nombre de pénalités enregistrées sur la période en cours.",
+      "bonusAvailability": "Points bonus disponibles sur le total des points bonus attribués.",
+      "studentPenaltiesProgress": "Pénalités de la période en cours sur le total des pénalités enregistrées.",
+      "pendingPunishmentsProgress": "Punitions résolues sur le total des punitions; les punitions en retard sont affichées entre parenthèses."
+    },
     "new": "Nouveau",
     "actions": "Actions",
     "add": "Ajouter"

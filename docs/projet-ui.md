@@ -70,20 +70,30 @@
       * `Button` : "Nouvelle Pénalité" (Icone `AlertTriangle`).
       * `Button` : "Nouvelle Punition" (Icone `Gavel`).
       * *Note UX :* Cliquer sur un bouton ouvre une **Modale Shadcn**. Si une classe est sélectionnée dans le filtre à gauche, la modale s'ouvre avec cette classe pré-sélectionnée.
-  * **Cartes KPI (Stats Dynamiques) :**
+  * **KPI (Stats Dynamiques) :**
     * *Ces chiffres changent selon la classe choisie dans le Header.*
-    * **Carte 1 (Élèves) :** Total élèves (dans la sélection).
-    * **Carte 2 (Bonus) :** Bonus disponibles (non consommés).
-    * **Carte 3 (Pénalités) :** Total pénalités enregistrées (Période en cours).
-    * **Carte 4 (Punitions) :** Punitions "En attente" (Prioritaire).
+    * **Carte conservée (Élèves) :** Total élèves (dans la sélection).
+    * **Déplacés en badges de titres de sections :**
+      * "Dernières pénalités" → `penalty_count`.
+      * "Derniers bonus" → `available_bonus_points / total_bonus_points`.
+      * "Punitions en attente" → `punitions résolues / total (punitions en retard)`.
   * **Historique Récent (Split View) :**
     * *N'affiche que les événements liés à la sélection.*
     * **Colonne Gauche (Dernières Pénalités) :**
-      * Header : "Dernières pénalités".
+      * Header : "Dernières pénalités" + badge KPI.
+      * Plus de badge "Récent".
+      * Survol du badge : popover d'explication.
       * Liste : Cartes compactes (Nom, Motif, Heure).
     * **Colonne Droite (Derniers Bonus) :**
-      * Header : "Derniers bonus".
+      * Header : "Derniers bonus" + badge KPI.
+      * Plus de badge "Récent".
+      * Survol du badge : popover d'explication.
       * Liste : Cartes compactes (Nom, Type, Badge Statut).
+  * **Punitions en attente :**
+    * Header : "Punitions en attente" + badge KPI.
+    * Format du badge : `résolues / total (en retard)`.
+    * *Source de vérité du badge :* KPIs (`total_punishment_count`, `pending_punishment_count`, `overdue_punishment_count`) et non la taille de liste affichée.
+    * Survol du badge : popover d'explication.
 
 ---
 
@@ -111,6 +121,13 @@
     * Compteur Bonus : Indicateur visuel + Chiffre.
     * Compteur Pénalités : Indicateur visuel + Chiffre.
     * Icone `ChevronRight` pour accéder au profil.
+  * **Profil élève :**
+    * Les cartes KPI en haut de profil sont retirées.
+    * Les KPI sont affichés en badges des titres de sections :
+      * "Bonus disponibles" → `available_bonus_points / total_bonus_points`.
+      * "Pénalités" → `penalty_count / total_penalty_count`.
+      * "Punitions en attente" → `résolues / total (en retard)`.
+    * Chaque badge KPI affiche un popover explicatif au survol.
 
 ---
 

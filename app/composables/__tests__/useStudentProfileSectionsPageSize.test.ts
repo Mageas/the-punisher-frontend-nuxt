@@ -167,4 +167,34 @@ describe('student profile section page size', () => {
       }),
     )
   })
+
+  it('keeps default student profile states when reading section pages from route query', async () => {
+    mockRoute.query = {
+      punishments_page: '2',
+      bonuses_page: '3',
+    }
+
+    const { fetchPunishments } = useStudentPunishments('student-1')
+    const { fetchBonuses } = useStudentBonuses('student-1')
+
+    await fetchPunishments()
+    await fetchBonuses()
+
+    expect(mockStudentService.getStudentPunishments).toHaveBeenCalledWith(
+      'student-1',
+      expect.objectContaining({
+        page: 2,
+        state: 'pending',
+        item_per_page: 5,
+      }),
+    )
+    expect(mockStudentService.getStudentBonuses).toHaveBeenCalledWith(
+      'student-1',
+      expect.objectContaining({
+        page: 3,
+        state: 'unused',
+        item_per_page: 5,
+      }),
+    )
+  })
 })

@@ -22,6 +22,15 @@ const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
 
+function formatRatio(current: number, total: number): string {
+  return `${current} / ${total}`
+}
+
+function formatPunishmentsProgress(total: number, pending: number, overdue: number): string {
+  const resolved = Math.max(0, total - pending)
+  return `${resolved} / ${total} (${overdue})`
+}
+
 async function fetchDashboard() {
   loading.value = true
 
@@ -110,14 +119,32 @@ if (initialData.value) {
 
       <!-- Historique Récent (Split View) -->
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <DashboardRecentPenalties :penalties="dashboard.recent_penalties" />
-        <DashboardRecentBonuses :bonuses="dashboard.recent_bonuses" />
+        <DashboardRecentPenalties
+          :penalties="dashboard.recent_penalties"
+          :badge-text="`${dashboard.kpis.penalty_count}`"
+          :badge-help-text="t('common.kpiPopover.dashboardRecentPenalties')"
+        />
+        <DashboardRecentBonuses
+          :bonuses="dashboard.recent_bonuses"
+          :badge-text="
+            formatRatio(dashboard.kpis.available_bonus_points, dashboard.kpis.total_bonus_points)
+          "
+          :badge-help-text="t('common.kpiPopover.bonusAvailability')"
+        />
       </div>
 
       <!-- Punitions en attente -->
       <div class="mt-8">
         <DashboardPendingPunishments
           :punishments="dashboard.pending_punishments"
+          :badge-text="
+            formatPunishmentsProgress(
+              dashboard.kpis.total_punishment_count,
+              dashboard.kpis.pending_punishment_count,
+              dashboard.kpis.overdue_punishment_count,
+            )
+          "
+          :badge-help-text="t('common.kpiPopover.pendingPunishmentsProgress')"
           :resolve-fn="resolvePunishment"
           @resolved="onModalCreated"
         />

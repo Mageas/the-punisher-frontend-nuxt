@@ -23,6 +23,7 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
     {
       pageKey: 'bonuses_page',
       filterKeys: ['search', 'state'],
+      defaultFilters: { state: 'unused' },
       stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
     },
   )

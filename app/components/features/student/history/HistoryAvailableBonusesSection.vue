@@ -10,6 +10,8 @@ const props = defineProps<{
   bonuses: AvailableBonus[]
   title?: string
   emptyLabel?: string
+  badgeText?: string
+  badgeHelpText?: string
   useFn?: (id: string) => Promise<void>
   page?: number
   totalPages?: number
@@ -28,6 +30,8 @@ const emit = defineEmits<{
     :bonuses="props.bonuses"
     :title="props.title"
     :empty-label="props.emptyLabel"
+    :badge-text="props.badgeText"
+    :badge-help-text="props.badgeHelpText"
     :use-fn="props.useFn"
     :page="props.page"
     :total-pages="props.totalPages"

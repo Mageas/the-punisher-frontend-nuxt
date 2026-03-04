@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { DashboardPenalty } from '~/types/api'
 
-defineProps<{
+const props = defineProps<{
   penalties: DashboardPenalty[]
+  badgeText?: string
+  badgeHelpText?: string
 }>()
 
 const { t } = useI18n()
@@ -14,7 +16,12 @@ const { t } = useI18n()
       <h2 class="text-lg font-semibold">
         {{ t('dashboard.recentPenalties') }}
       </h2>
-      <Badge variant="outline" class="text-muted-foreground">{{ t('common.recent') }}</Badge>
+      <KpiInfoBadge
+        v-if="props.badgeText"
+        :text="props.badgeText"
+        :help-text="props.badgeHelpText"
+        badge-class="text-muted-foreground"
+      />
     </div>
     <div class="space-y-3">
       <PenaltyCard
