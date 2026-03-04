@@ -155,7 +155,11 @@
     * **Action :** Bouton "Cadeau/Box" pour consommer le bonus (Uniquement si disponible).
   * **Liste (Punitions) :**
     * **Icone :** `Gavel`.
-    * **Contenu :** Nom, Type de punition, Badge "Auto" (si générée par règle).
+    * **Contenu :**
+      * Punitions automatiques : origine prioritaire `Auto par {Nom de règle}` avec icône de règle et lien vers `/rules`.
+      * Fallback automatique sans règle exploitable : `Règle supprimée`.
+      * Punitions manuelles : pas de libellé `Punition manuelle`, seules les métadonnées utiles sont affichées.
+      * Type de punition et autres métadonnées affichés en zone secondaire.
     * **Statut :** "Échéance : [Date]" (si en attente) ou "Résolu le..." (si fait).
     * **Action :** Bouton `Check` (Cercle coché) pour valider la punition (Uniquement si en attente).
 
@@ -167,11 +171,10 @@
   * **Header :** Titre "Règles d'automatisation" + Bouton "Nouvelle règle" (ouvre Modale).
   * **Liste des Règles :** Cartes larges.
   * **Gauche :** `Switch` (Toggle) pour activer/désactiver instantanément.
-  * **Centre :** Phrase logique "Trigger (ex: Bavardage) ➝ Conséquence (ex: Retenue)".
-  * **Détails :**
-  * Badge Mode : "Au seuil exact" / "A chaque multiple".
-  * Texte : "Seuil: X".
+  * **Centre :** titre principal `rule.name`, puis ligne secondaire "Trigger (ex: Bavardage) ➝ Conséquence (ex: Retenue)".
+  * **Détails :** Badge Mode "Au seuil exact" / "A chaque multiple", puis texte "Seuil: X".
   * **Droite :** Actions Edit/Delete (ouvrent Modale).
+  * **Création :** champ optionnel `Nom de la règle`. Si vide, fallback auto `from -> to`.
 
 ---
 

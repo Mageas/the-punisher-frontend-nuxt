@@ -16,6 +16,12 @@ const ruleService = useRuleService()
 
 const schema = toTypedSchema(
   zod.object({
+    name: zod
+      .string()
+      .max(120, t('apiErrors.details.validation_max_length', { value: 120 }))
+      .refine((value) => value.trim().length === 0 || value.trim().length >= 2, {
+        message: t('apiErrors.details.validation_min_length', { value: 2 }),
+      }),
     penalty_type_id: zod.string().min(1, t('apiErrors.details.validation_field_required')),
     resulting_punishment_type_id: zod
       .string()
@@ -31,6 +37,7 @@ const schema = toTypedSchema(
 const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
+    name: '',
     penalty_type_id: '',
     resulting_punishment_type_id: '',
     threshold: 3,
@@ -66,9 +73,13 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
+    const customName = formValues.name?.trim() ?? ''
+    const resolvedName = (customName || generatedRuleName.value).substring(0, 120)
+    const { name: _unusedName, ...rest } = formValues
+
     await ruleService.createRule({
-      ...formValues,
-      name: generatedRuleName.value.substring(0, 120), // Max 120 per DTO
+      ...rest,
+      name: resolvedName,
       is_active: true,
     })
     open.value = false
@@ -90,6 +101,20 @@ const onSubmit = handleSubmit(async (formValues) => {
     prevent-auto-focus
     @submit="onSubmit"
   >
+    <FormField v-slot="{ componentField }" name="name">
+      <FormItem>
+        <FormLabel>{{ t('modals.rule.name') }}</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="text"
+            :placeholder="t('modals.rule.namePlaceholder')"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
     <FormField v-slot="{ value, handleChange }" name="penalty_type_id">
       <FormItem>
         <FormLabel>{{ t('modals.rule.penaltyType') }}</FormLabel>

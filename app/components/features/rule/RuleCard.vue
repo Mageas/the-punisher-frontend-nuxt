@@ -4,6 +4,7 @@ import type { RuleMode } from '~/types/api'
 
 const props = withDefaults(
   defineProps<{
+    name: string
     penaltyTypeName: string
     punishmentTypeName: string
     threshold: number
@@ -45,13 +46,17 @@ const onUpdateModelValue = (value: boolean) => {
     />
 
     <div class="min-w-0 flex-1">
-      <div class="mb-1 flex flex-wrap items-center gap-2">
-        <span class="text-sm font-medium">{{ props.penaltyTypeName }}</span>
+      <p class="text-sm font-semibold truncate">
+        {{ props.name }}
+      </p>
+
+      <div class="mt-1 flex flex-wrap items-center gap-2">
+        <span class="text-xs text-muted-foreground">{{ props.penaltyTypeName }}</span>
         <ArrowRight class="h-3.5 w-3.5 text-muted-foreground" />
-        <span class="text-sm font-medium">{{ props.punishmentTypeName }}</span>
+        <span class="text-xs text-muted-foreground">{{ props.punishmentTypeName }}</span>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="mt-1 flex flex-wrap items-center gap-2">
         <Badge variant="outline" class="text-xs text-muted-foreground">
           {{ modeLabel }}
         </Badge>
