@@ -8,6 +8,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Bulk Student Import:** Import students/classrooms from CSV/XLSX with translated row-level validation errors.
 - **Behavior Tracking:** Log penalties and assign punishments based on rules.
 - **Reward System:** Distribute and track bonus points for students.
+- **Student Profile Navigation:** Inline per-section pagination (`< page/total >`) for punishments, bonuses, penalties, and history (profile requests use `item_per_page=5` and respect section page query params like `punishments_page` and `history_page`).
 - **Type Management:** Customizable types for bonuses, penalties, and punishments.
 - **Authentication:** Secure teacher login/registration with token rotation, email confirmation, and forgot/reset password flows.
 - **User Security Settings:** Dedicated user settings page to change password and revoke all active sessions.
@@ -30,6 +31,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## 📁 Architecture
 
 - `app/components/features`: Domain-specific components grouped by feature.
+- `app/components/shared`: Reusable cross-feature building blocks (for example `SectionHeaderPagination`).
 - `app/components/ui`: Reusable UI primitives (Shadcn).
 - `app/services`: API communication layer. **All API calls must go through services.**
 - `app/composables`: Reusable business logic and state orchestration.

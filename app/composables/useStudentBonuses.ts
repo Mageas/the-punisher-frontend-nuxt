@@ -7,17 +7,25 @@ import type { Bonus } from '~/types/api'
 export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   const bonusService = useBonusService()
   const studentService = useStudentService()
+  const PROFILE_SECTION_PAGE_SIZE = 5
   const paginated = usePaginatedCollection<
     Bonus,
     {
       state?: 'used' | 'unused'
       search?: string
     }
-  >((options) => studentService.getStudentBonuses(toValue(studentId), options), {
-    pageKey: 'bonuses_page',
-    filterKeys: ['search', 'state'],
-    stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
-  })
+  >(
+    (options) =>
+      studentService.getStudentBonuses(toValue(studentId), {
+        ...options,
+        item_per_page: PROFILE_SECTION_PAGE_SIZE,
+      }),
+    {
+      pageKey: 'bonuses_page',
+      filterKeys: ['search', 'state'],
+      stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
+    },
+  )
 
   async function fetchBonuses(options?: {
     page?: number

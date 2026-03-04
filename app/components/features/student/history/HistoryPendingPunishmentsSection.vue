@@ -17,10 +17,15 @@ const props = defineProps<{
   showCount?: boolean
   compact?: boolean
   resolveFn?: (id: string) => Promise<void>
+  page?: number
+  totalPages?: number
+  loading?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
   resolved: []
+  'update:page': [value: number]
 }>()
 </script>
 
@@ -32,6 +37,11 @@ const emit = defineEmits<{
     :show-count="props.showCount"
     :compact="props.compact"
     :resolve-fn="props.resolveFn"
+    :page="props.page"
+    :total-pages="props.totalPages"
+    :loading="props.loading"
+    :disabled="props.disabled"
     @resolved="emit('resolved')"
+    @update:page="emit('update:page', $event)"
   />
 </template>

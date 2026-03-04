@@ -20,10 +20,15 @@ const props = defineProps<{
   showCount?: boolean
   compact?: boolean
   resolveFn?: (id: string) => Promise<void>
+  page?: number
+  totalPages?: number
+  loading?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
   resolved: []
+  'update:page': [value: number]
 }>()
 
 const { t } = useI18n()
@@ -38,6 +43,10 @@ const sectionEmptyLabel = computed(
 )
 const useCompactMode = computed(() => props.compact ?? false)
 const showCountBadge = computed(() => props.showCount ?? false)
+const currentPage = computed(() => props.page ?? 1)
+const currentTotalPages = computed(() => props.totalPages ?? 1)
+const paginationLoading = computed(() => props.loading ?? false)
+const paginationDisabled = computed(() => props.disabled ?? false)
 
 function openResolveModal(id: string) {
   if (!hasResolveAction.value) return
@@ -57,10 +66,19 @@ function onResolved() {
 
 <template>
   <div>
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold">
-        {{ sectionTitle }}
-      </h2>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex min-w-0 items-center gap-3">
+        <h2 class="text-lg font-semibold">
+          {{ sectionTitle }}
+        </h2>
+        <SectionHeaderPagination
+          :page="currentPage"
+          :total-pages="currentTotalPages"
+          :loading="paginationLoading"
+          :disabled="paginationDisabled"
+          @update:page="emit('update:page', $event)"
+        />
+      </div>
       <Badge v-if="showCountBadge" variant="outline" class="border-danger-border text-danger">
         {{ t('common.nToResolve', { count: punishments.length }) }}
       </Badge>

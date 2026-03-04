@@ -76,6 +76,20 @@ function formatRatio(current: number, total: number): string {
   return `${current} / ${total}`
 }
 
+function computeTotalPages(total: number, itemsPerPage: number): number {
+  if (itemsPerPage <= 0) return 1
+  return Math.max(1, Math.ceil(total / itemsPerPage))
+}
+
+const punishmentsTotalPages = computed(() =>
+  computeTotalPages(punishmentsTotal.value, punishmentsPerPage.value),
+)
+const bonusesTotalPages = computed(() => computeTotalPages(bonusesTotal.value, bonusesPerPage.value))
+const penaltiesTotalPages = computed(() =>
+  computeTotalPages(penaltiesTotal.value, penaltiesPerPage.value),
+)
+const historyTotalPages = computed(() => computeTotalPages(historyTotal.value, historyPerPage.value))
+
 async function fetchStudentProfile() {
   loadingProfile.value = true
   try {
@@ -93,10 +107,10 @@ async function fetchStudentProfile() {
 async function loadAllData() {
   await Promise.all([
     fetchStudentProfile(),
-    fetchPunishments({ state: 'pending', page: 1 }),
-    fetchBonuses({ state: 'unused', page: 1 }),
-    fetchPenalties({ page: 1 }),
-    fetchHistory({ page: 1 }),
+    fetchPunishments({ state: 'pending' }),
+    fetchBonuses({ state: 'unused' }),
+    fetchPenalties(),
+    fetchHistory(),
   ])
 }
 
@@ -263,15 +277,11 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8 space-y-4">
         <HistoryPendingPunishmentsSection
           :punishments="pendingPunishments"
+          :page="punishmentsPage"
+          :total-pages="punishmentsTotalPages"
+          :loading="loadingPunishments"
           :resolve-fn="resolvePunishment"
           @resolved="onActionConfirmed"
-        />
-        <CustomPagination
-          v-if="punishmentsTotal > punishmentsPerPage"
-          :page="punishmentsPage"
-          :total="punishmentsTotal"
-          :items-per-page="punishmentsPerPage"
-          :loading="loadingPunishments"
           @update:page="gotoPunishmentsPage($event)"
         />
       </div>
@@ -279,38 +289,30 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8 space-y-4">
         <HistoryAvailableBonusesSection
           :bonuses="availableBonuses"
+          :page="bonusesPage"
+          :total-pages="bonusesTotalPages"
+          :loading="loadingBonuses"
           :use-fn="useBonus"
           @used="onActionConfirmed"
-        />
-        <CustomPagination
-          v-if="bonusesTotal > bonusesPerPage"
-          :page="bonusesPage"
-          :total="bonusesTotal"
-          :items-per-page="bonusesPerPage"
-          :loading="loadingBonuses"
           @update:page="gotoBonusesPage($event)"
         />
       </div>
 
       <div class="mb-8 space-y-4">
-        <HistoryPenaltiesSection :penalties="penalties" />
-        <CustomPagination
-          v-if="penaltiesTotal > penaltiesPerPage"
+        <HistoryPenaltiesSection
+          :penalties="penalties"
           :page="penaltiesPage"
-          :total="penaltiesTotal"
-          :items-per-page="penaltiesPerPage"
+          :total-pages="penaltiesTotalPages"
           :loading="loadingPenalties"
           @update:page="gotoPenaltiesPage($event)"
         />
       </div>
 
       <div class="mb-8 space-y-4">
-        <HistoryTimelineSection :history="historyItems" />
-        <CustomPagination
-          v-if="historyTotal > historyPerPage"
+        <HistoryTimelineSection
+          :history="historyItems"
           :page="historyPage"
-          :total="historyTotal"
-          :items-per-page="historyPerPage"
+          :total-pages="historyTotalPages"
           :loading="loadingHistory"
           @update:page="gotoHistoryPage($event)"
         />
