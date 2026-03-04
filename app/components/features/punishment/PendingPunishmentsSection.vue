@@ -18,6 +18,9 @@ const props = defineProps<{
   title?: string
   emptyLabel?: string
   showCount?: boolean
+  countOverride?: number
+  badgeText?: string
+  badgeHelpText?: string
   compact?: boolean
   resolveFn?: (id: string) => Promise<void>
   page?: number
@@ -47,6 +50,9 @@ const currentPage = computed(() => props.page ?? 1)
 const currentTotalPages = computed(() => props.totalPages ?? 1)
 const paginationLoading = computed(() => props.loading ?? false)
 const paginationDisabled = computed(() => props.disabled ?? false)
+const displayedBadgeText = computed(
+  () => props.badgeText ?? props.countOverride ?? props.punishments.length,
+)
 
 function openResolveModal(id: string) {
   if (!hasResolveAction.value) return
@@ -79,9 +85,12 @@ function onResolved() {
           @update:page="emit('update:page', $event)"
         />
       </div>
-      <Badge v-if="showCountBadge" variant="outline" class="border-danger-border text-danger">
-        {{ t('common.nToResolve', { count: punishments.length }) }}
-      </Badge>
+      <KpiInfoBadge
+        v-if="showCountBadge"
+        :text="displayedBadgeText"
+        :help-text="props.badgeHelpText"
+        badge-class="border-danger-border text-danger"
+      />
     </div>
 
     <div

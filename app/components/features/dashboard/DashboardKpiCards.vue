@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DashboardKpis } from '~/types/api'
-import { Users, Star, AlertCircle, Gavel } from 'lucide-vue-next'
+import { Users } from 'lucide-vue-next'
 
 const props = defineProps<{
   kpis: DashboardKpis
@@ -8,62 +8,26 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-function formatRatio(current: number, total: number): string {
-  return `${current} / ${total}`
-}
-
-const cards = computed(() => [
-  {
-    label: t('dashboard.kpiStudents'),
-    value: props.kpis.student_count,
-    icon: Users,
-    iconClass: 'text-muted-foreground',
-    valueClass: '',
-    subtitle: t('common.inSelection'),
-  },
-  {
-    label: t('dashboard.kpiBonusPoints'),
-    value: formatRatio(props.kpis.available_bonus_points, props.kpis.total_bonus_points),
-    icon: Star,
-    iconClass: 'text-warning',
-    valueClass: 'text-warning',
-    subtitle: t('common.unusedBonus', props.kpis.unused_bonus_count),
-  },
-  {
-    label: t('dashboard.kpiPenalties'),
-    value: props.kpis.penalty_count,
-    icon: AlertCircle,
-    iconClass: 'text-muted-foreground',
-    valueClass: '',
-    subtitle: t('common.currentPeriod'),
-  },
-  {
-    label: t('dashboard.kpiPendingPunishments'),
-    value: formatRatio(props.kpis.pending_punishment_count, props.kpis.total_punishment_count),
-    icon: Gavel,
-    iconClass: 'text-muted-foreground',
-    valueClass: 'text-danger',
-    subtitle: t('common.overduePunishments', props.kpis.overdue_punishment_count),
-  },
-])
+const studentCard = computed(() => ({
+  label: t('dashboard.kpiStudents'),
+  value: props.kpis.student_count,
+  subtitle: t('common.inSelection'),
+}))
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-    <div v-for="card in cards" :key="card.label" class="border border-border rounded-lg p-4 sm:p-6">
+  <div class="grid grid-cols-1 gap-4 sm:max-w-sm">
+    <div class="border border-border rounded-lg p-4 sm:p-6">
       <div class="flex items-center justify-between mb-2">
         <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-          {{ card.label }}
+          {{ studentCard.label }}
         </p>
-        <component :is="card.icon" class="w-4 h-4" :class="card.iconClass" />
+        <Users class="w-4 h-4 text-muted-foreground" />
       </div>
-      <p
-        class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none"
-        :class="card.valueClass"
-      >
-        {{ card.value }}
+      <p class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none">
+        {{ studentCard.value }}
       </p>
-      <p class="text-[11px] sm:text-xs text-muted-foreground mt-1">{{ card.subtitle }}</p>
+      <p class="text-[11px] sm:text-xs text-muted-foreground mt-1">{{ studentCard.subtitle }}</p>
     </div>
   </div>
 </template>

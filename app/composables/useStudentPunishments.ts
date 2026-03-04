@@ -23,6 +23,7 @@ export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
     {
       pageKey: 'punishments_page',
       filterKeys: ['search', 'state'],
+      defaultFilters: { state: 'pending' },
       stateKey: `paginated:student:${toValue(studentId)}:punishments`,
     },
   )

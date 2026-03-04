@@ -5,6 +5,8 @@ const props = defineProps<{
   penalties: Penalty[]
   title?: string
   emptyLabel?: string
+  badgeText?: string
+  badgeHelpText?: string
   page?: number
   totalPages?: number
   loading?: boolean
@@ -28,7 +30,7 @@ const paginationDisabled = computed(() => props.disabled ?? false)
 <template>
   <div>
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex min-w-0 items-center gap-3">
+      <div class="flex min-w-0 items-center gap-2">
         <h2 class="text-lg font-semibold">
           {{ sectionTitle }}
         </h2>
@@ -40,6 +42,12 @@ const paginationDisabled = computed(() => props.disabled ?? false)
           @update:page="emit('update:page', $event)"
         />
       </div>
+      <KpiInfoBadge
+        v-if="props.badgeText"
+        :text="props.badgeText"
+        :help-text="props.badgeHelpText"
+        badge-class="text-muted-foreground"
+      />
     </div>
 
     <div

@@ -15,6 +15,9 @@ const props = defineProps<{
   title?: string
   emptyLabel?: string
   showCount?: boolean
+  countOverride?: number
+  badgeText?: string
+  badgeHelpText?: string
   compact?: boolean
   resolveFn?: (id: string) => Promise<void>
   page?: number
@@ -35,6 +38,9 @@ const emit = defineEmits<{
     :title="props.title"
     :empty-label="props.emptyLabel"
     :show-count="props.showCount"
+    :count-override="props.countOverride"
+    :badge-text="props.badgeText"
+    :badge-help-text="props.badgeHelpText"
     :compact="props.compact"
     :resolve-fn="props.resolveFn"
     :page="props.page"
