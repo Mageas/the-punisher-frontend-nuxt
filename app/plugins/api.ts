@@ -1,5 +1,6 @@
 import type { ApiRequestOptions, AuthResponse } from '~/types/api'
 import { getApiErrorStatus, isFatalApiError } from '~/lib/api-error'
+import { normalizeApiDateTimeFields } from '~/lib/date-time'
 
 /**
  * Nuxt plugin that provides a global `$api` fetch instance.
@@ -100,6 +101,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     credentials: 'include',
 
     onRequest({ options }) {
+      if (options.body !== undefined) {
+        options.body = normalizeApiDateTimeFields(options.body)
+      }
+
       if (accessToken.value) {
         if (accessTokenCookie.value !== accessToken.value) {
           accessTokenCookie.value = accessToken.value
@@ -115,6 +120,11 @@ export default defineNuxtPlugin((nuxtApp) => {
           ;(options.headers as Record<string, string>).Authorization = `Bearer ${accessToken.value}`
         }
       }
+    },
+
+    onResponse({ response }) {
+      const responseWithData = response as typeof response & { _data: unknown }
+      responseWithData._data = normalizeApiDateTimeFields(responseWithData._data)
     },
   })
 

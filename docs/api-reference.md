@@ -39,6 +39,11 @@ Notes cookie refresh:
 - DateTime body (punishments): `RFC3339` (ex: `2026-03-15T18:00:00Z`)
 - Bool query: `true` ou `false`
 
+Convention frontend appliquée:
+- Tous les champs de réponse `*_at` sont normalisés côté front en RFC3339 UTC (`.toISOString()`).
+- Les champs datetime `*_at` envoyés dans les bodies sont sérialisés en RFC3339 UTC (`.toISOString()`).
+- Les filtres date en query (`*_from`, `*_to`) restent strictement en `YYYY-MM-DD`.
+
 ### 1.4 Pagination
 - Paramètre: `page` (int > 0)
 - Taille fixe backend: `20`

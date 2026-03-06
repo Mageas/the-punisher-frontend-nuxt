@@ -36,6 +36,10 @@ describe('utils.ts', () => {
       expect(formatDate(null)).toBe('')
     })
 
+    it('returns empty string for invalid date', () => {
+      expect(formatDate('invalid-date')).toBe('')
+    })
+
     it('formats valid date correctly', () => {
       const date = '2026-02-19T14:30:00Z'
       // Note: toLocaleDateString might behave differently depending on environment locale
