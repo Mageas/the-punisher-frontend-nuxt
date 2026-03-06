@@ -42,7 +42,18 @@
   * **📄 Types de bonus**
     * *Icone :* `Trophy`
 
-### E. Menu utilisateur
+### E. Groupe : Gestion du planning
+
+*Les écrans de planification.*
+  * **📄 Emploi du temps**
+    * *Icone :* `CalendarDays`
+    * *Route :* `/schedule/slots`
+    * *Rôle :* Configurer les créneaux hebdomadaires récurrents et les classes associées.
+  * **📄 Vacances & jours fériés**
+    * *Route cible :* `/schedule/exceptions`
+    * *Rôle :* Section prévue pour gérer les exceptions globales du calendrier.
+
+### F. Menu utilisateur
 
 *Les actions liées au compte et aux opérations sensibles.*
   * **📄 Paramètres utilisateur**
@@ -106,6 +117,19 @@
   * **Header :** Nom de la classe (H3) + Icones Edit/Delete (Ghost buttons).
   * **Body :** Nombre d'élèves + Stack d'avatars (3-4 cercles avec initiales).
   * **Footer :** Bouton "Gérer les élèves" (Width full, Outline).
+
+---
+
+### 🗓️ Configuration : Emploi du temps
+
+*Vue hebdomadaire des créneaux récurrents.*
+  * **Route :** `/schedule/slots`.
+  * **Navigation :** section dédiée "Gestion du planning" dans la sidebar, entrée "Emploi du temps".
+  * **Header :** Titre "Emploi du temps" + Bouton "Ajouter un créneau".
+  * **Grille :** Colonnes du lundi au dimanche pour refléter l'ensemble des `weekday` supportés par l'API.
+  * **Création rapide :** Un clic sur une case vide ouvre la modale avec le jour et la plage horaire d'une seule case préremplis.
+  * **Création par sélection :** Un glisser sur plusieurs cases ouvre la modale avec la plage horaire sélectionnée préremplie.
+  * **Édition :** Un clic sur un créneau existant ouvre sa modale d'édition.
 
 ---
 

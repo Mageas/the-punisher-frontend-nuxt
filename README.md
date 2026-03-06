@@ -8,6 +8,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Bulk Student Import:** Import students/classrooms from CSV/XLSX with translated row-level validation errors.
 - **Behavior Tracking:** Log penalties and assign punishments based on rules.
 - **Reward System:** Distribute and track bonus points for students, including hundredth precision (`0.25`) during bonus entry.
+- **Schedule Management:** Configure a weekly timetable with recurring slots, weekday parity, and classroom assignments.
 - **Event Metadata Forms:** Create and edit bonus/penalty/punishment entries with optional event datetime (`occurred_at`) and evaluation label (`evaluation_label`).
 - **Business Date Display:** Lists, dashboard cards, and student history display the business event datetime (`occurred_at`) when available.
 - **Student Profile Navigation:** Inline per-section pagination (`< page/total >`) for punishments, bonuses, penalties, and history (profile requests use `item_per_page=5`, respect section page query params like `punishments_page` and `history_page`, keep default profile section states: punishments=`pending`, bonuses=`unused`, and automatically fallback to the previous section page after consume/resolve when the current page becomes empty).

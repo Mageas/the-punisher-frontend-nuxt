@@ -100,6 +100,9 @@
       "punishments": "Punitions",
       "recentBonuses": "Derniers bonus",
       "recentPenalties": "Dernières pénalités",
+      "schedule": {
+        "slot": "Emploi du temps"
+      },
       "rules": "Règles d'automatisation",
       "students": "Élèves",
       "userSettings": "Paramètres utilisateur"
@@ -143,6 +146,7 @@
     "general": "Général",
     "tracking": "Suivi",
     "management": "Gestion",
+    "schedule": "Gestion du planning",
     "configuration": "Configuration",
     "logout": "Se déconnecter"
   },
@@ -393,7 +397,11 @@
       "import_file_missing": "Aucun fichier n'a été fourni pour l'import.",
       "import_file_invalid": "Le fichier fourni est invalide ou dans un format non supporté.",
       "import_template_invalid": "Le modèle du fichier est invalide. Vérifiez les colonnes attendues.",
-      "import_validation_failed": "La validation du fichier a échoué. Consultez les détails ci-dessous."
+      "import_validation_failed": "La validation du fichier a échoué. Consultez les détails ci-dessous.",
+      "schedule_slot_not_found": "Créneau introuvable.",
+      "schedule_slot_conflict": "Ce créneau entre en conflit avec un créneau existant.",
+      "schedule_exception_not_found": "Exception d'emploi du temps introuvable.",
+      "schedule_exception_overlap": "Cette exception chevauche une exception existante."
     },
     "details": {
       "file_field_is_required": "Le champ de fichier est requis pour l'import.",
@@ -419,7 +427,8 @@
       "validation_email_already_exists": "Cette adresse email existe déjà.",
       "validation_unknown_field": "Champ inconnu.",
       "validation_password_confirmation_mismatch": "La confirmation du mot de passe ne correspond pas.",
-      "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}."
+      "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}.",
+      "validation_one_of": "Valeur invalide. Valeurs autorisées: {value}."
     },
     "importContext": {
       "field": {
@@ -495,5 +504,59 @@
   "classes": {
     "count": "{count} classe | {count} classes",
     "penaltyCount": "{count} pénalité | {count} pénalités"
+  },
+  "schedule": {
+    "subtitle": "Configurez votre semaine type de cours récurrents.",
+    "addSlot": "Ajouter un créneau",
+    "loading": "Chargement de l'emploi du temps...",
+    "empty": "Aucun créneau configuré. Cliquez sur « Ajouter un créneau » ou directement sur la grille pour commencer.",
+    "weekdays": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "weekdaysShort": {
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mer",
+      "thursday": "Jeu",
+      "friday": "Ven",
+      "saturday": "Sam",
+      "sunday": "Dim"
+    },
+    "weekPatterns": {
+      "every_week": "Toutes les semaines",
+      "even_weeks": "Semaines paires",
+      "odd_weeks": "Semaines impaires"
+    },
+    "weekPatternsShort": {
+      "every_week": "Chaque sem.",
+      "even_weeks": "Sem. paires",
+      "odd_weeks": "Sem. impaires"
+    },
+    "legend": "Légende",
+    "form": {
+      "createTitle": "Nouveau créneau",
+      "editTitle": "Modifier le créneau",
+      "weekday": "Jour",
+      "startTime": "Heure de début",
+      "endTime": "Heure de fin",
+      "weekPattern": "Fréquence",
+      "classrooms": "Classes",
+      "classroomPlaceholder": "Sélectionner les classes...",
+      "classroomSearch": "Rechercher une classe...",
+      "classroomEmpty": "Aucune classe trouvée.",
+      "selectWeekday": "Sélectionner un jour...",
+      "noClassroomSelected": "Aucune classe sélectionnée"
+    },
+    "delete": {
+      "title": "Supprimer le créneau",
+      "message": "Êtes-vous sûr de vouloir supprimer ce créneau ? Cette action est irréversible."
+    },
+    "noClassrooms": "Aucune classe"
   }
 }
