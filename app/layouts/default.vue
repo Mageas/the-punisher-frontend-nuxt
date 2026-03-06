@@ -108,7 +108,14 @@ const navGroups = computed<NavGroup[]>(() => [
   },
   {
     label: t('sidebar.schedule'),
-    links: [{ to: '/schedule/slots', icon: CalendarDays, label: t('common.titles.schedule.slot') }],
+    links: [
+      { to: '/schedule/slots', icon: CalendarDays, label: t('common.titles.schedule.slot') },
+      {
+        to: '/schedule/exceptions',
+        icon: CalendarDays,
+        label: t('common.titles.schedule.exception'),
+      },
+    ],
   },
 ])
 
