@@ -137,13 +137,13 @@ function getPositionedSlots(daySlots: ScheduleSlot[]): PositionedSlot[] {
 }
 
 const weekPatternColor: Record<string, string> = {
-  every_week: 'bg-primary/15 border-primary/40 hover:bg-primary/25 text-foreground',
+  every_week: 'bg-violet-500/15 border-violet-500/40 hover:bg-violet-500/25 text-foreground',
   even_weeks: 'bg-info/15 border-info/40 hover:bg-info/25 text-foreground',
   odd_weeks: 'bg-warning/15 border-warning/40 hover:bg-warning/25 text-foreground',
 }
 
 const weekPatternDot: Record<string, string> = {
-  every_week: 'bg-primary',
+  every_week: 'bg-violet-500',
   even_weeks: 'bg-info',
   odd_weeks: 'bg-warning',
 }
@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
                 : stepIndex < totalSteps - 1
                   ? 'border-b border-dashed border-b-border/15'
                   : '',
-            isDragHighlighted(day, stepIndex) ? 'bg-primary/20' : 'hover:bg-muted/40',
+            isDragHighlighted(day, stepIndex) ? 'bg-violet-500/20' : 'hover:bg-muted/40',
             isDragging ? 'select-none' : '',
           ]"
           @click="handleEmptyClick(day, stepIndex)"
@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
           :key="pos.slot.id"
           :class="
             cn(
-              'absolute z-10 cursor-pointer rounded-md border px-1.5 py-1 text-xs transition-all hover:shadow-md hover:z-20 focus:outline-none focus:ring-2 focus:ring-ring',
+              'absolute z-10 cursor-pointer rounded-md border px-1.5 py-1 text-xs transition-all hover:shadow-md hover:z-20 focus:outline-none focus-visible:outline-none',
               weekPatternColor[pos.slot.week_pattern],
             )
           "

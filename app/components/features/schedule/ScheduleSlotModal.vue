@@ -7,6 +7,7 @@ import {
   type WeekPattern,
 } from '~/types/api'
 import { Trash2 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const props = defineProps<{
   scheduleSlot?: ScheduleSlot | null
@@ -32,7 +33,7 @@ const submitting = ref(false)
 const weekdayOptions: readonly Weekday[] = SCHEDULE_WEEKDAYS
 
 const weekPatternOptions: { value: WeekPattern; dotClass: string }[] = [
-  { value: 'every_week', dotClass: 'bg-primary' },
+  { value: 'every_week', dotClass: 'bg-violet-500' },
   { value: 'even_weeks', dotClass: 'bg-info' },
   { value: 'odd_weeks', dotClass: 'bg-warning' },
 ]
@@ -133,6 +134,14 @@ async function handleSubmit() {
     emit('saved', savedSlot)
   } catch (err) {
     handleApiError(err)
+
+    if (globalError.value) {
+      toast.error(globalError.value, {
+        position: 'top-center',
+        richColors: true,
+      })
+      clearErrors()
+    }
   } finally {
     submitting.value = false
   }
@@ -154,7 +163,6 @@ function removeClassroom(id: string) {
   <BaseModal
     v-model:open="open"
     :title="isEditMode ? t('schedule.form.editTitle') : t('schedule.form.createTitle')"
-    :global-error="globalError"
     :submitting="submitting"
     :can-submit="canSubmit"
     :submit-text="isEditMode ? t('common.actions.save') : t('common.actions.create')"

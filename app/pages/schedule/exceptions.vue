@@ -3,10 +3,12 @@ import type { DateValue } from '@internationalized/date'
 import type { ScheduleException } from '~/types/api'
 import { parseDate } from '@internationalized/date'
 import { CalendarRange, Landmark, Palmtree, X } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const scheduleService = useScheduleService()
 const {
+  fieldErrors: exceptionFieldErrors,
   globalError: exceptionError,
   handleApiError: handleExceptionError,
   clearErrors: clearExceptionErrors,
@@ -71,6 +73,19 @@ function getSelectionDayCount(): number {
   return Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1
 }
 
+function notifyExceptionError(err: unknown) {
+  handleExceptionError(err)
+
+  const firstFieldError = Object.values(exceptionFieldErrors.value)[0]
+  const message = exceptionError.value || firstFieldError || t('apiErrors.messages.internal_error')
+
+  toast.error(message, {
+    position: 'top-center',
+    richColors: true,
+  })
+  clearExceptionErrors()
+}
+
 async function fetchScheduleExceptions() {
   loading.value = true
   clearExceptionErrors()
@@ -78,7 +93,7 @@ async function fetchScheduleExceptions() {
   try {
     exceptions.value = await scheduleService.getScheduleExceptions()
   } catch (err) {
-    handleExceptionError(err)
+    notifyExceptionError(err)
   } finally {
     loading.value = false
   }
@@ -115,7 +130,7 @@ async function saveException(type: 'vacation' | 'public_holiday') {
 
     clearSelection()
   } catch (err) {
-    handleExceptionError(err)
+    notifyExceptionError(err)
   }
 }
 
@@ -175,10 +190,6 @@ await fetchScheduleExceptions()
         </h1>
       </template>
     </PageHeaderBar>
-
-    <Alert v-if="exceptionError" variant="destructive" class="mb-4">
-      <AlertDescription>{{ exceptionError }}</AlertDescription>
-    </Alert>
 
     <div v-if="loading" class="py-16 text-center text-muted-foreground">
       {{ t('schedule.exceptions.loading') }}
@@ -317,6 +328,7 @@ await fetchScheduleExceptions()
       :cancel-label="t('common.actions.cancel')"
       :confirm-label="t('common.actions.delete')"
       confirm-variant="destructive"
+      error-mode="toast"
       @confirmed="onDeleteConfirmed"
     />
   </div>

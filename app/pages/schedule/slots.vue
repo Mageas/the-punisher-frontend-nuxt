@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import {
   SCHEDULE_WEEKDAYS,
   type ScheduleSlot,
@@ -18,6 +19,7 @@ const {
 const weekdays: Weekday[] = [...SCHEDULE_WEEKDAYS]
 const slots = ref<ScheduleSlot[]>([])
 const loading = ref(false)
+const hasFetchError = ref(false)
 
 const showSlotModal = ref(false)
 const showDeleteModal = ref(false)
@@ -45,12 +47,19 @@ function openEditModal(slot: ScheduleSlot) {
 
 async function fetchScheduleSlots() {
   loading.value = true
+  hasFetchError.value = false
   clearFetchErrors()
 
   try {
     slots.value = await scheduleService.getScheduleSlots()
   } catch (err) {
     handleFetchError(err)
+    toast.error(fetchError.value || t('apiErrors.messages.internal_error'), {
+      position: 'top-center',
+      richColors: true,
+    })
+    clearFetchErrors()
+    hasFetchError.value = true
   } finally {
     loading.value = false
   }
@@ -105,36 +114,30 @@ await fetchScheduleSlots()
       </template>
     </PageHeaderBar>
 
-    <div class="mb-4">
-      <ScheduleLegend />
-    </div>
-
-    <Alert v-if="fetchError" variant="destructive" class="mb-4">
-      <AlertDescription>{{ fetchError }}</AlertDescription>
-    </Alert>
-
     <div v-if="loading" class="py-16 text-center text-muted-foreground">
       {{ t('schedule.loading') }}
     </div>
 
-    <ScheduleTimetable
-      v-else
-      :slots="slots"
-      :weekdays="weekdays"
-      :start-hour="6"
-      :end-hour="20"
-      :step-minutes="15"
-      @click-slot="openEditModal"
-      @click-empty="(day, start, end) => openCreateModal(day, start, end)"
-      @drag-create="(day, start, end) => openCreateModal(day, start, end)"
-    />
+    <template v-else-if="!hasFetchError || slots.length > 0">
+      <div class="mb-6">
+        <ScheduleLegend />
+      </div>
 
-    <div
-      v-if="!loading && !fetchError && slots.length === 0"
-      class="py-16 text-center text-muted-foreground"
-    >
-      {{ t('schedule.empty') }}
-    </div>
+      <ScheduleTimetable
+        :slots="slots"
+        :weekdays="weekdays"
+        :start-hour="6"
+        :end-hour="20"
+        :step-minutes="15"
+        @click-slot="openEditModal"
+        @click-empty="(day, start, end) => openCreateModal(day, start, end)"
+        @drag-create="(day, start, end) => openCreateModal(day, start, end)"
+      />
+
+      <div v-if="slots.length === 0" class="py-16 text-center text-muted-foreground">
+        {{ t('schedule.empty') }}
+      </div>
+    </template>
 
     <ScheduleSlotModal
       v-model:open="showSlotModal"
