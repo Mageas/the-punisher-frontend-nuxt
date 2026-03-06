@@ -5,6 +5,7 @@ Only the files listed below were customized locally and must not be overwritten 
 ## Custom UI Files
 
 - `app/components/ui/dialog/DialogContent.vue`
+- `app/components/ui/dialog/DialogOverlay.vue`
 - `app/components/ui/dialog/DialogScrollContent.vue`
 - `app/components/ui/pagination/PaginationEllipsis.vue`
 - `app/components/ui/pagination/PaginationFirst.vue`
@@ -31,6 +32,10 @@ Each customized file keeps this header:
 // Local change summary:
 // - <local customization summary>
 ```
+
+## Local UI Notes
+
+- Dialog overlays use a low-radius `backdrop-filter` blur (`2px`) with a darker solid fallback when blur is unsupported, to keep the modal backdrop readable without adding a heavier full-screen effect.
 
 ## Safety Rules
 

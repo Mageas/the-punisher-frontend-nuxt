@@ -4,6 +4,7 @@
 // Local change summary:
 // - Added `cursor-pointer` on `DialogClose` for consistent clickable UX.
 // - Added translation for close button's screen reader text.
+// - Replaced the opaque dialog backdrop with a lightweight blur overlay and solid fallback.
 import type { DialogContentEmits, DialogContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
@@ -33,7 +34,7 @@ const { t } = useI18n()
 <template>
   <DialogPortal>
     <DialogOverlay
-      class="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+      class="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 supports-[backdrop-filter]:bg-black/30 supports-[backdrop-filter]:backdrop-blur-[2px]"
     >
       <DialogContent
         :class="
