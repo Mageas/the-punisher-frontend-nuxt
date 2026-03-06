@@ -30,6 +30,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 
 - Subtle semantic background tokens use the `*-bg-subtle` suffix (example: `bg-warning-bg-subtle`).
 - Hover variants use `*-bg-subtle-hover` (example: `bg-destructive-bg-subtle` with `hover:bg-destructive-bg-subtle-hover`).
+- Shared dialog overlays use a lightweight `backdrop-filter` blur (`2px`) with a solid dark fallback when the browser does not support blur, to keep modal rendering inexpensive.
 
 ## 📁 Architecture
 
