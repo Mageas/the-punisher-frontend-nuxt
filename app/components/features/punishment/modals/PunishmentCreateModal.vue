@@ -4,6 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
+import { toApiDateTimeString } from '~/lib/date-time'
 
 const emit = defineEmits<{
   created: []
@@ -96,11 +97,12 @@ const onSubmit = handleSubmit(async (formValues) => {
     const date = (formValues.due_at as DateValue).toDate(getLocalTimeZone())
     const [h, m] = formValues.due_at_time.split(':')
     date.setHours(Number(h), Number(m), 0, 0)
+    const dueAt = toApiDateTimeString(date) ?? undefined
 
     await punishmentService.createPunishment({
       student_id: formValues.student_id,
       punishment_type_id: formValues.punishment_type_id,
-      due_at: date.toISOString(),
+      due_at: dueAt,
     })
     open.value = false
     emit('created')
