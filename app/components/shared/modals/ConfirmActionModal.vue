@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
+
 const emit = defineEmits<{
   confirmed: []
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -15,16 +18,18 @@ const props = withDefaults(
     cancelLabel: string
     confirmLabel: string
     confirmVariant?: 'default' | 'destructive'
+    errorMode?: 'inline' | 'toast'
     lockDurationSeconds?: number
   }>(),
   {
     confirmVariant: 'default',
+    errorMode: 'inline',
     lockDurationSeconds: 0,
     warningMessage: undefined,
   },
 )
 
-const { globalError, handleApiError, clearErrors } = useApiErrors()
+const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
 const submitting = ref(false)
 const lockSecondsLeft = ref(0)
 let lockInterval: ReturnType<typeof setInterval> | null = null
@@ -77,6 +82,17 @@ async function confirm() {
     emit('confirmed')
   } catch (err) {
     handleApiError(err)
+
+    if (props.errorMode === 'toast') {
+      const firstFieldError = Object.values(fieldErrors.value)[0]
+      const message = globalError.value || firstFieldError || t('apiErrors.messages.internal_error')
+
+      toast.error(message, {
+        position: 'top-center',
+        richColors: true,
+      })
+      clearErrors()
+    }
   } finally {
     submitting.value = false
   }
@@ -95,7 +111,7 @@ onBeforeUnmount(() => {
         <DialogDescription class="sr-only">{{ title }}</DialogDescription>
       </DialogHeader>
 
-      <Alert v-if="globalError" variant="destructive">
+      <Alert v-if="globalError && props.errorMode === 'inline'" variant="destructive">
         <AlertDescription>{{ globalError }}</AlertDescription>
       </Alert>
 

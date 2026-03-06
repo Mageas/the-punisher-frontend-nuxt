@@ -23,6 +23,7 @@ const props = defineProps<{
     :cancel-label="t('common.actions.cancel')"
     :confirm-label="t('common.actions.delete')"
     confirm-variant="destructive"
+    error-mode="toast"
     @confirmed="emit('confirmed')"
   />
 </template>
