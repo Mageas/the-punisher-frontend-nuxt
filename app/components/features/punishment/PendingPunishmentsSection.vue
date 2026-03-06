@@ -40,7 +40,7 @@ const showResolveModal = ref(false)
 const punishmentToResolveId = ref<string | null>(null)
 
 const hasResolveAction = computed(() => typeof props.resolveFn === 'function')
-const sectionTitle = computed(() => props.title ?? t('studentProfile.pendingPunishments'))
+const sectionTitle = computed(() => props.title ?? t('common.titles.pendingPunishments'))
 const sectionEmptyLabel = computed(
   () => props.emptyLabel ?? t('studentProfile.empty.pendingPunishments'),
 )
@@ -119,8 +119,8 @@ function onResolved() {
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.resolve')"
-            :aria-label="t('common.resolve')"
+            :title="t('common.actions.resolve')"
+            :aria-label="t('common.actions.resolve')"
             @click="openResolveModal(punishment.id)"
           >
             <CircleCheck class="h-5 w-5 text-success" />

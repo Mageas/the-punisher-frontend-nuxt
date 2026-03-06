@@ -15,8 +15,8 @@ const penaltyTypeServices = {
 <template>
   <TypeManagementPage
     :service="penaltyTypeServices"
-    :title="t('penaltyTypes.title')"
-    :new-label="t('penaltyTypes.newType')"
+    :title="t('common.titles.penaltyTypes')"
+    :new-label="t('common.actions.addType')"
     :empty-label="t('penaltyTypes.noTypes')"
     :create-title="t('penaltyTypes.createTitle')"
     :create-placeholder="t('penaltyTypes.placeholder')"

@@ -9,7 +9,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const studentCard = computed(() => ({
-  label: t('dashboard.kpiStudents'),
+  label: t('common.titles.students'),
   value: props.kpis.student_count,
   subtitle: t('common.inSelection'),
 }))

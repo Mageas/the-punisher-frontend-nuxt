@@ -81,8 +81,12 @@ const hasDates = computed(() => !!fromDate.value || !!toDate.value)
       </Button>
     </div>
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <DatePicker v-model="fromDateValue" :placeholder="t('filters.from')" class="h-8 text-xs" />
-      <DatePicker v-model="toDateValue" :placeholder="t('filters.to')" class="h-8 text-xs" />
+      <DatePicker
+        v-model="fromDateValue"
+        :placeholder="t('common.labels.from')"
+        class="h-8 text-xs"
+      />
+      <DatePicker v-model="toDateValue" :placeholder="t('common.labels.to')" class="h-8 text-xs" />
     </div>
   </div>
 </template>

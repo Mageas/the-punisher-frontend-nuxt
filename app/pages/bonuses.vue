@@ -36,8 +36,8 @@ const showPagination = computed(() => totalCount.value > 0)
 const studentFilterScopeKey = computed(() => classroomId.value || '__all_students__')
 
 const stateOptions = computed(() => [
-  { value: 'unused', label: t('filters.stateUnused') },
-  { value: 'used', label: t('filters.stateUsed') },
+  { value: 'unused', label: t('common.states.unused') },
+  { value: 'used', label: t('common.states.used') },
 ])
 
 // Count active filters
@@ -187,7 +187,7 @@ await useAsyncData(
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('bonuses.title') }}
+          {{ t('common.titles.bonuses') }}
         </h1>
       </template>
 
@@ -197,7 +197,7 @@ await useAsyncData(
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('bonuses.newBonus') }}
+          {{ t('common.actions.addBonus') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -205,48 +205,48 @@ await useAsyncData(
     <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
       <FilterIdNameSelect
         v-model="classroomId"
-        :label="t('filters.classroom')"
-        :placeholder="t('filters.allClassrooms')"
-        :search-placeholder="t('common.searchClass')"
-        :empty-text="t('common.noClassFound')"
+        :label="t('common.labels.classroom')"
+        :placeholder="t('common.options.allClassrooms')"
+        :search-placeholder="t('common.placeholders.searchClassroom')"
+        :empty-text="t('common.empty.noClasses')"
         :fetch-options="fetchClassroomOptions"
       />
 
       <FilterIdNameSelect
         v-model="studentId"
-        :label="t('filters.student')"
-        :placeholder="t('filters.allStudents')"
-        :search-placeholder="t('filters.searchStudent')"
-        :empty-text="t('filters.noStudentFound')"
+        :label="t('common.labels.student')"
+        :placeholder="t('common.options.allStudents')"
+        :search-placeholder="t('common.placeholders.searchStudent')"
+        :empty-text="t('common.empty.noStudents')"
         :fetch-options="fetchStudentOptions"
         :options-scope-key="studentFilterScopeKey"
       />
 
       <FilterIdNameSelect
         v-model="bonusTypeId"
-        :label="t('filters.type')"
-        :placeholder="t('filters.allTypes')"
-        :search-placeholder="t('filters.searchType')"
-        :empty-text="t('filters.noTypeFound')"
+        :label="t('common.labels.type')"
+        :placeholder="t('common.options.allTypes')"
+        :search-placeholder="t('common.placeholders.searchType')"
+        :empty-text="t('common.empty.noTypeFound')"
         :fetch-options="fetchBonusTypeOptions"
       />
 
       <FilterSelect
         v-model="state"
-        :label="t('filters.state')"
-        :placeholder="t('filters.allStates')"
+        :label="t('common.labels.state')"
+        :placeholder="t('common.options.allStates')"
         :options="stateOptions"
       />
 
       <FilterDateRange
         v-model:from="createdFrom"
         v-model:to="createdTo"
-        :label="t('filters.dateRange')"
+        :label="t('common.labels.dateRange')"
       />
     </FilterBar>
 
     <div v-if="bonuses.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('bonuses.noBonuses') }}
+      {{ t('common.empty.noBonuses') }}
     </div>
 
     <div v-else class="space-y-3">
@@ -267,8 +267,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.edit')"
-            :aria-label="t('common.edit')"
+            :title="t('common.actions.edit')"
+            :aria-label="t('common.actions.edit')"
             @click="openEditModal(bonus)"
           >
             <Pencil class="w-4 h-4" />
@@ -279,8 +279,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.consume')"
-            :aria-label="t('common.consume')"
+            :title="t('common.actions.consume')"
+            :aria-label="t('common.actions.consume')"
             @click="openUseModal(bonus.id)"
           >
             <Gift class="w-5 h-5 text-warning" />
@@ -290,8 +290,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('modals.delete.confirm')"
-            :aria-label="t('modals.delete.confirm')"
+            :title="t('common.actions.delete')"
+            :aria-label="t('common.actions.delete')"
             @click="openDeleteModal(bonus.id)"
           >
             <Trash2 class="w-4 h-4 text-danger" />

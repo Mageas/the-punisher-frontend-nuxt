@@ -63,7 +63,7 @@ function formatPoints(points: number): string {
               variant="outline"
               :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
             >
-              {{ usedAt ? t('common.used') : t('common.available') }}
+              {{ usedAt ? t('common.states.used') : t('common.states.available') }}
             </Badge>
             <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
               {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}
@@ -115,7 +115,7 @@ function formatPoints(points: number): string {
           variant="outline"
           :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
         >
-          {{ usedAt ? t('common.used') : t('common.available') }}
+          {{ usedAt ? t('common.states.used') : t('common.states.available') }}
         </Badge>
         <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
           {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}

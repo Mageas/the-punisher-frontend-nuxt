@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const sectionTitle = computed(() => props.title ?? t('studentProfile.penalties'))
+const sectionTitle = computed(() => props.title ?? t('common.titles.penalties'))
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.penalties'))
 const currentPage = computed(() => props.page ?? 1)
 const currentTotalPages = computed(() => props.totalPages ?? 1)

@@ -132,7 +132,9 @@ await reload()
     <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <Label class="text-xs font-medium text-muted-foreground">{{ t('filters.type') }}</Label>
+          <Label class="text-xs font-medium text-muted-foreground">{{
+            t('common.labels.type')
+          }}</Label>
           <Button
             v-if="searchQuery"
             variant="ghost"
@@ -149,7 +151,7 @@ await reload()
           />
           <Input
             v-model="searchQuery"
-            :placeholder="t('filters.searchType')"
+            :placeholder="t('common.placeholders.searchType')"
             class="h-8 pl-8 text-xs"
           />
         </div>

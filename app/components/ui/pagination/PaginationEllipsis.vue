@@ -23,7 +23,7 @@ const { t } = useI18n()
   >
     <slot>
       <MoreHorizontal class="size-4" />
-      <span class="sr-only">{{ t('common.morePages') }}</span>
+      <span class="sr-only">{{ t('common.pagination.morePages') }}</span>
     </slot>
   </PaginationEllipsis>
 </template>

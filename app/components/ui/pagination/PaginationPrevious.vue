@@ -31,7 +31,7 @@ const { t } = useI18n()
   >
     <slot>
       <ChevronLeftIcon />
-      <span class="hidden sm:block">{{ t('common.previous') }}</span>
+      <span class="hidden sm:block">{{ t('common.pagination.previous') }}</span>
     </slot>
   </PaginationPrev>
 </template>

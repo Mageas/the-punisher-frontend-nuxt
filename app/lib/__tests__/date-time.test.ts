@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  normalizeApiDateTimeFields,
-  parseApiDateTime,
-  toApiDateTimeString,
-} from '../date-time'
+import { normalizeApiDateTimeFields, parseApiDateTime, toApiDateTimeString } from '../date-time'
 
 describe('date-time.ts', () => {
   describe('parseApiDateTime', () => {

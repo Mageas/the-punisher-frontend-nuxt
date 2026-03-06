@@ -89,10 +89,10 @@ const secondaryLine = computed(() => {
         <div class="mt-2 flex items-center justify-between">
           <div>
             <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
-              {{ t('punishments.pending') }}
+              {{ t('common.states.pending') }}
             </Badge>
             <Badge v-else variant="outline" class="text-success border-success-border">
-              {{ t('punishments.resolved') }}
+              {{ t('common.states.resolved') }}
             </Badge>
             <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
               {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
@@ -131,10 +131,7 @@ const secondaryLine = computed(() => {
             <span v-else>{{ punishmentTypeName }}</span>
           </p>
         </div>
-        <p
-          v-if="secondaryLine"
-          class="mt-0.5 flex items-center text-xs text-muted-foreground"
-        >
+        <p v-if="secondaryLine" class="mt-0.5 flex items-center text-xs text-muted-foreground">
           <span>{{ secondaryLine }}</span>
           <template v-if="isAutomated">
             <span class="mx-1.5">·</span>
@@ -154,10 +151,10 @@ const secondaryLine = computed(() => {
       </div>
       <div class="text-right">
         <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
-          {{ t('punishments.pending') }}
+          {{ t('common.states.pending') }}
         </Badge>
         <Badge v-else variant="outline" class="text-success border-success-border">
-          {{ t('punishments.resolved') }}
+          {{ t('common.states.resolved') }}
         </Badge>
         <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
           {{ t('common.dueAt', { date: formatDate(dueAt) }) }}

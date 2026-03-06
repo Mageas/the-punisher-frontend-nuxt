@@ -71,14 +71,14 @@ const onSubmit = handleSubmit(async (values) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('typeManagement.save')"
+    :submit-text="t('common.actions.save')"
     @submit="onSubmit"
   >
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
-        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormLabel>{{ t('common.labels.name') }}</FormLabel>
         <FormControl>
-          <Input type="text" :placeholder="t('typeManagement.name')" v-bind="componentField" />
+          <Input type="text" :placeholder="t('common.labels.name')" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>

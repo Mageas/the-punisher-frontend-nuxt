@@ -29,7 +29,7 @@ async function deleteAllClassrooms(_: string) {
             <ShieldAlert class="size-5 text-destructive" />
           </div>
           <div>
-            <h1 class="text-2xl font-bold tracking-tight">{{ t('dangerZone.title') }}</h1>
+            <h1 class="text-2xl font-bold tracking-tight">{{ t('common.titles.dangerZone') }}</h1>
             <p class="text-sm text-muted-foreground">{{ t('dangerZone.description') }}</p>
           </div>
         </div>
@@ -39,17 +39,17 @@ async function deleteAllClassrooms(_: string) {
     <div class="space-y-3">
       <DangerActionCard
         :icon="Users"
-        :title="t('dangerZone.deleteAllStudents.title')"
+        :title="t('dangerZone.deleteAllStudents.actionLabel')"
         :description="t('dangerZone.deleteAllStudents.description')"
-        :button-label="t('dangerZone.deleteAllStudents.button')"
+        :button-label="t('dangerZone.deleteAllStudents.actionLabel')"
         @action="showDeleteStudentsConfirm = true"
       />
 
       <DangerActionCard
         :icon="School"
-        :title="t('dangerZone.deleteAllClassrooms.title')"
+        :title="t('dangerZone.deleteAllClassrooms.actionLabel')"
         :description="t('dangerZone.deleteAllClassrooms.description')"
-        :button-label="t('dangerZone.deleteAllClassrooms.button')"
+        :button-label="t('dangerZone.deleteAllClassrooms.actionLabel')"
         @action="showDeleteClassroomsConfirm = true"
       />
     </div>
@@ -67,8 +67,8 @@ async function deleteAllClassrooms(_: string) {
       :title="t('dangerZone.deleteAllStudents.confirmTitle')"
       :message="t('dangerZone.deleteAllStudents.confirmMessage')"
       :warning-message="t('dangerZone.deleteAllStudents.confirmWarning')"
-      :cancel-label="t('common.cancel')"
-      :confirm-label="t('dangerZone.deleteAllStudents.confirmButton')"
+      :cancel-label="t('common.actions.cancel')"
+      :confirm-label="t('dangerZone.deleteAllStudents.actionLabel')"
       confirm-variant="destructive"
       :lock-duration-seconds="5"
     />
@@ -80,8 +80,8 @@ async function deleteAllClassrooms(_: string) {
       :title="t('dangerZone.deleteAllClassrooms.confirmTitle')"
       :message="t('dangerZone.deleteAllClassrooms.confirmMessage')"
       :warning-message="t('dangerZone.deleteAllClassrooms.confirmWarning')"
-      :cancel-label="t('common.cancel')"
-      :confirm-label="t('dangerZone.deleteAllClassrooms.confirmButton')"
+      :cancel-label="t('common.actions.cancel')"
+      :confirm-label="t('dangerZone.deleteAllClassrooms.actionLabel')"
       confirm-variant="destructive"
       :lock-duration-seconds="5"
     />

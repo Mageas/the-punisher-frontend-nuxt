@@ -3,19 +3,19 @@ import { mount } from '@vue/test-utils'
 import HistoryTimelineSection from '../HistoryTimelineSection.vue'
 
 const translations: Record<string, string | ((params?: Record<string, string>) => string)> = {
-  'studentProfile.historyTitle': 'Historique',
+  'common.titles.history': 'Historique',
   'studentProfile.empty.history': "Aucun événement dans l'historique.",
   'punishments.autoByRule': (params) => `Auto par ${params?.name ?? ''}`,
   'punishments.deletedRule': 'Règle supprimée',
-  'punishments.pending': 'En attente',
-  'punishments.resolved': 'Résolu',
+  'common.states.pending': 'En attente',
+  'common.states.resolved': 'Résolu',
   'common.dueAt': (params) => `Échéance : ${params?.date ?? ''}`,
   'punishments.resolvedAt': (params) => `Résolu le ${params?.date ?? ''}`,
   'studentProfile.history.punishment': (params) => `Punition : ${params?.name ?? ''}`,
   'studentProfile.history.bonus': (params) => `Bonus : ${params?.name ?? ''}`,
   'studentProfile.history.penalty': (params) => `Pénalité : ${params?.name ?? ''}`,
-  'common.used': 'Consommé',
-  'common.available': 'Disponible',
+  'common.states.used': 'Consommé',
+  'common.states.available': 'Disponible',
   'bonuses.usedAt': (params) => `Consommé le ${params?.date ?? ''}`,
 }
 

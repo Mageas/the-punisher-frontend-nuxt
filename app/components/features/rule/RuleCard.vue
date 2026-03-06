@@ -74,8 +74,8 @@ const onUpdateModelValue = (value: boolean) => {
         variant="ghost"
         size="icon-sm"
         class="cursor-pointer text-muted-foreground hover:text-foreground"
-        :title="t('rules.edit')"
-        :aria-label="t('rules.edit')"
+        :title="t('common.actions.edit')"
+        :aria-label="t('common.actions.edit')"
         @click="emit('edit')"
       >
         <Pencil class="h-4 w-4" />
@@ -84,8 +84,8 @@ const onUpdateModelValue = (value: boolean) => {
         variant="ghost"
         size="icon-sm"
         class="cursor-pointer text-muted-foreground hover:text-foreground"
-        :title="t('modals.delete.confirm')"
-        :aria-label="t('modals.delete.confirm')"
+        :title="t('common.actions.delete')"
+        :aria-label="t('common.actions.delete')"
         @click="emit('delete')"
       >
         <Trash2 class="h-4 w-4 text-danger" />

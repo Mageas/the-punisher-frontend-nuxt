@@ -111,7 +111,7 @@ async function onSubmit() {
 
           <!-- Submit -->
           <Button type="submit" class="w-full mt-2 cursor-pointer" :disabled="isLoading">
-            {{ t('auth.loginSubmit') }}
+            {{ t('common.actions.signIn') }}
           </Button>
         </form>
       </div>

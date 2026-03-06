@@ -3,33 +3,123 @@
     "title": "The Punisher"
   },
   "common": {
-    "cancel": "Annuler",
-    "submit": "Valider",
     "loading": "Chargement...",
-    "retry": "Réessayer",
-    "allStudents": "Tous les élèves",
-    "selectClassOptional": "Sélectionner une classe (optionnel)",
-    "searchClass": "Rechercher une classe...",
-    "noClassFound": "Aucune classe trouvée.",
-    "recent": "Récent",
-    "auto": "Auto",
-    "available": "Disponible",
-    "used": "Consommé",
-    "selectDate": "Sélectionner une date...",
-    "time": "Heure",
-    "resolve": "Marquer comme fait",
-    "consume": "Consommer",
-    "previous": "Précédent",
-    "next": "Suivant",
-    "first": "Premier",
-    "last": "Dernier",
-    "morePages": "Plus de pages",
+    "actions": {
+      "add": "Ajouter",
+      "addBonus": "Ajouter un bonus",
+      "addClassroom": "Ajouter une classe",
+      "addPenalty": "Ajouter une pénalité",
+      "addPunishment": "Ajouter une punition",
+      "addRule": "Ajouter une règle",
+      "addStudent": "Ajouter un élève",
+      "addType": "Ajouter un type",
+      "cancel": "Annuler",
+      "consume": "Consommer",
+      "create": "Créer",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "logoutAll": "Tout déconnecter",
+      "remove": "Retirer",
+      "resolve": "Marquer comme fait",
+      "save": "Enregistrer",
+      "signIn": "Se connecter",
+      "submit": "Valider"
+    },
+    "labels": {
+      "actions": "Actions",
+      "classroom": "Classe",
+      "dateRange": "Période de création",
+      "dueAt": "Échéance",
+      "dueDateRange": "Période d'échéance",
+      "evaluationLabel": "Libellé d'évaluation",
+      "firstName": "Prénom",
+      "from": "Du",
+      "mode": "Mode",
+      "name": "Nom",
+      "occurredAt": "Date de l'événement",
+      "points": "Points",
+      "state": "État",
+      "student": "Élève",
+      "threshold": "Seuil",
+      "time": "Heure",
+      "to": "Au",
+      "type": "Type"
+    },
+    "placeholders": {
+      "classroomName": "ex: 6ème A",
+      "evaluationLabel": "ex: Interrogation sur Baudelaire",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "points": "1.00",
+      "schoolYear": "ex: 2025-2026",
+      "searchClassroom": "Rechercher une classe...",
+      "searchStudent": "Rechercher un élève...",
+      "searchType": "Rechercher un type...",
+      "selectClassOptional": "Sélectionner une classe (optionnel)",
+      "selectDate": "Sélectionner une date...",
+      "selectOccurredDate": "Sélectionner la date de l'événement...",
+      "selectStudent": "Sélectionner un élève...",
+      "selectType": "Sélectionner un type..."
+    },
+    "options": {
+      "allClassrooms": "Toutes les classes",
+      "allStates": "Tous les états",
+      "allStudents": "Tous les élèves",
+      "allTypes": "Tous les types"
+    },
+    "empty": {
+      "noBonuses": "Aucun bonus trouvé.",
+      "noClasses": "Aucune classe trouvée.",
+      "noPenalties": "Aucune pénalité trouvée.",
+      "noPunishments": "Aucune punition trouvée.",
+      "noRules": "Aucune règle trouvée.",
+      "noStudents": "Aucun élève trouvé.",
+      "noTypeFound": "Aucun type trouvé."
+    },
+    "states": {
+      "automatedNo": "Non",
+      "automatedYes": "Oui",
+      "available": "Disponible",
+      "overdueOnly": "En retard uniquement",
+      "pending": "En attente",
+      "resolved": "Résolu",
+      "unused": "Non consommé",
+      "used": "Consommé"
+    },
+    "titles": {
+      "bonusTypes": "Types de bonus",
+      "bonuses": "Bonus",
+      "classes": "Classes",
+      "dangerZone": "Zone de danger",
+      "dashboard": "Tableau de bord",
+      "history": "Historique",
+      "penalties": "Pénalités",
+      "penaltyTypes": "Types de pénalités",
+      "pendingPunishments": "Punitions en attente",
+      "punishmentTypes": "Types de punitions",
+      "punishments": "Punitions",
+      "recentBonuses": "Derniers bonus",
+      "recentPenalties": "Dernières pénalités",
+      "rules": "Règles d'automatisation",
+      "students": "Élèves",
+      "userSettings": "Paramètres utilisateur"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "first": "Premier",
+      "last": "Dernier",
+      "morePages": "Plus de pages"
+    },
+    "counts": {
+      "student": "{count} élève | {count} élèves"
+    },
+    "kpis": {
+      "availableBonusPoints": "Points bonus dispo."
+    },
     "dueAt": "Échéance : {date}",
     "inSelection": "dans la sélection",
     "currentPeriod": "période en cours",
-    "toResolve": "à résoudre",
-    "pt": "+{points} pt | +{points} pts",
-    "nToResolve": "{count} à résoudre",
     "unusedBonus": "{count} bonus non consommé | {count} bonus non consommés",
     "overduePunishments": "{count} punition en retard | {count} punitions en retard",
     "kpiPopover": {
@@ -37,11 +127,7 @@
       "bonusAvailability": "Points bonus disponibles sur le total des points bonus attribués.",
       "studentPenaltiesProgress": "Pénalités de la période en cours sur le total des pénalités enregistrées.",
       "pendingPunishmentsProgress": "Punitions résolues sur le total des punitions; les punitions en retard sont affichées entre parenthèses."
-    },
-    "new": "Nouveau",
-    "actions": "Actions",
-    "add": "Ajouter",
-    "edit": "Modifier"
+    }
   },
   "ui": {
     "close": "Fermer",
@@ -55,139 +141,15 @@
   },
   "sidebar": {
     "general": "Général",
-    "dashboard": "Tableau de bord",
     "tracking": "Suivi",
-    "penalties": "Pénalités",
-    "punishments": "Punitions",
-    "bonuses": "Bonus",
     "management": "Gestion",
-    "students": "Élèves",
-    "classes": "Classes",
     "configuration": "Configuration",
-    "rules": "Règles",
-    "penaltyTypes": "Types de pénalités",
-    "punishmentTypes": "Types de punitions",
-    "bonusTypes": "Types de bonus",
-    "settings": "Paramètres utilisateur",
-    "logout": "Se déconnecter",
-    "logoutAll": "Déconnecter tous les appareils",
-    "danger": "Zone de danger"
-  },
-  "dashboard": {
-    "title": "Tableau de bord",
-    "newBonus": "Ajouter un bonus",
-    "newPenalty": "Ajouter une pénalité",
-    "newPunishment": "Ajouter une punition",
-    "kpiStudents": "Élèves",
-    "kpiBonusPoints": "Points bonus dispo.",
-    "kpiPenalties": "Pénalités",
-    "kpiPendingPunishments": "Punitions en attente",
-    "recentPenalties": "Dernières pénalités",
-    "recentBonuses": "Derniers bonus",
-    "pendingPunishments": "Punitions en attente"
-  },
-  "punishments": {
-    "title": "Punitions",
-    "newPunishment": "Ajouter une punition",
-    "noPunishments": "Aucune punition trouvée.",
-    "pending": "En attente",
-    "resolved": "Résolu",
-    "resolvedAt": "Résolu le {date}",
-    "manualPunishment": "Punition manuelle",
-    "autoByRule": "Auto par {name}",
-    "deletedRule": "Règle supprimée"
-  },
-  "penalties": {
-    "title": "Pénalités",
-    "newPenalty": "Ajouter une pénalité",
-    "noPenalties": "Aucune pénalité trouvée."
-  },
-  "bonuses": {
-    "title": "Bonus",
-    "newBonus": "Ajouter un bonus",
-    "noBonuses": "Aucun bonus trouvé.",
-    "usedAt": "Consommé le {date}"
-  },
-  "rules": {
-    "title": "Règles d'automatisation",
-    "newRule": "Ajouter une règle",
-    "noRules": "Aucune règle trouvée.",
-    "edit": "Modifier",
-    "defaultName": "Règle automatique",
-    "threshold": "Seuil : {count}",
-    "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
-    "modes": {
-      "at": "Au seuil exact",
-      "every": "À chaque multiple",
-      "after": "À partir de"
-    }
-  },
-  "typeManagement": {
-    "name": "Nom",
-    "edit": "Modifier",
-    "create": "Créer",
-    "save": "Enregistrer",
-    "createdAt": "Créé le {date}"
-  },
-  "penaltyTypes": {
-    "title": "Types de pénalités",
-    "newType": "Ajouter un type",
-    "createTitle": "Nouveau type de pénalité",
-    "editTitle": "Modifier le type de pénalité",
-    "placeholder": "ex: Bavardage",
-    "noTypes": "Aucun type de pénalité trouvé.",
-    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de pénalité ? Cette action est irréversible."
-  },
-  "punishmentTypes": {
-    "title": "Types de punitions",
-    "newType": "Ajouter un type",
-    "createTitle": "Nouveau type de punition",
-    "editTitle": "Modifier le type de punition",
-    "placeholder": "ex: Retenue",
-    "noTypes": "Aucun type de punition trouvé.",
-    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de punition ? Cette action est irréversible."
-  },
-  "bonusTypes": {
-    "title": "Types de bonus",
-    "newType": "Ajouter un type",
-    "createTitle": "Nouveau type de bonus",
-    "editTitle": "Modifier le type de bonus",
-    "placeholder": "ex: Participation",
-    "noTypes": "Aucun type de bonus trouvé.",
-    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de bonus ? Cette action est irréversible."
-  },
-  "students": {
-    "title": "Élèves",
-    "newStudent": "Ajouter un élève",
-    "searchPlaceholder": "Rechercher un élève...",
-    "noStudents": "Aucun élève trouvé.",
-    "noClassroom": "Aucune classe",
-    "listOnlyHint": "La création sera ajoutée dans une prochaine étape.",
-    "count": "{count} élève | {count} élèves"
-  },
-  "classes": {
-    "title": "Classes",
-    "newClassroom": "Ajouter une classe",
-    "noClasses": "Aucune classe trouvée.",
-    "count": "{count} classe | {count} classes",
-    "studentCount": "{count} élève | {count} élèves",
-    "penaltyCount": "{count} pénalité | {count} pénalités"
+    "logout": "Se déconnecter"
   },
   "classProfile": {
-    "backToClasses": "Classes",
     "loading": "Chargement de la classe...",
     "actions": {
-      "edit": "Modifier",
-      "delete": "Supprimer",
-      "addStudent": "Ajouter un élève",
       "removeStudent": "Retirer de la classe"
-    },
-    "kpis": {
-      "studentCount": "Élèves",
-      "availableBonusPoints": "Points bonus dispo.",
-      "penaltyCount": "Pénalités",
-      "pendingPunishmentCount": "Punitions en attente",
-      "classTotal": "Total de la classe"
     },
     "students": {
       "title": "Élèves de la classe",
@@ -196,26 +158,12 @@
     }
   },
   "studentProfile": {
-    "backToStudents": "Élèves",
     "loading": "Chargement du profil élève...",
-    "pendingPunishments": "Punitions en attente",
     "availableBonuses": "Bonus disponibles",
-    "penalties": "Pénalités",
-    "historyTitle": "Historique",
     "actions": {
-      "edit": "Modifier",
       "addBonus": "Ajouter bonus",
       "addPenalty": "Ajouter pénalité",
-      "addPunishment": "Ajouter punition",
-      "delete": "Supprimer",
-      "resolve": "Résoudre",
-      "consume": "Consommer"
-    },
-    "kpis": {
-      "availableBonusPoints": "Points bonus dispo.",
-      "activeBonusCount": "{count} bonus actif | {count} bonus actifs",
-      "totalPenaltyCount": "Pénalités totales",
-      "pendingPunishmentCount": "Punitions en attente"
+      "addPunishment": "Ajouter punition"
     },
     "empty": {
       "pendingPunishments": "Aucune punition en attente.",
@@ -225,35 +173,27 @@
     },
     "history": {
       "punishment": "Punition : {name}",
-      "punishmentAuto": "Punition déclenchée : {name}",
       "bonus": "Bonus : {name}",
       "penalty": "Pénalité : {name}"
     }
   },
   "dangerZone": {
-    "title": "Zone de danger",
     "description": "Actions irréversibles affectant l'ensemble de votre tenant. Procédez avec précaution.",
     "deleteAllStudents": {
-      "title": "Supprimer tous les élèves",
+      "actionLabel": "Supprimer tous les élèves",
       "description": "Supprime définitivement tous les élèves du tenant ainsi que leurs bonus, pénalités et punitions associés.",
-      "button": "Supprimer tous les élèves",
       "confirmTitle": "Confirmer la suppression des élèves",
       "confirmMessage": "Êtes-vous sûr de vouloir supprimer tous les élèves ? Cette action est irréversible.",
       "confirmWarning": "Tous les élèves, ainsi que leurs bonus, pénalités et punitions seront définitivement supprimés.",
-      "confirmButton": "Supprimer tous les élèves",
-      "success": "Tous les élèves ont été supprimés.",
-      "unavailable": "Cette fonctionnalité n'est pas encore disponible."
+      "success": "Tous les élèves ont été supprimés."
     },
     "deleteAllClassrooms": {
-      "title": "Supprimer toutes les classes",
+      "actionLabel": "Supprimer toutes les classes",
       "description": "Supprime définitivement toutes les classes du tenant. Les élèves ne seront pas supprimés mais retirés de leurs classes.",
-      "button": "Supprimer toutes les classes",
       "confirmTitle": "Confirmer la suppression des classes",
       "confirmMessage": "Êtes-vous sûr de vouloir supprimer toutes les classes ? Cette action est irréversible.",
       "confirmWarning": "Toutes les classes seront supprimées. Les élèves seront retirés de leurs classes mais ne seront pas supprimés.",
-      "confirmButton": "Supprimer toutes les classes",
-      "success": "Toutes les classes ont été supprimées.",
-      "unavailable": "Cette fonctionnalité n'est pas encore disponible."
+      "success": "Toutes les classes ont été supprimées."
     },
     "importStudents": {
       "title": "Importer des élèves et classes",
@@ -268,15 +208,11 @@
       "uploading": "Importation en cours...",
       "successTitle": "Import réussi",
       "summaryProcessed": "{processed} importées sur {total} lignes",
-      "summaryStudents": "Élèves",
       "summaryStudentsCreated": "créés",
       "summaryStudentsExisting": "existants",
-      "summaryClassrooms": "Classes",
       "summaryClassroomsCreated": "créées",
       "summaryClassroomsExisting": "existantes",
       "summaryLinks": "Liens",
-      "summaryLinksCreated": "créés",
-      "summaryLinksExisting": "existants",
       "rowsTotal": "Lignes traitées",
       "rowsProcessed": "Lignes importées",
       "classroomsCreated": "Classes créées",
@@ -297,9 +233,7 @@
     }
   },
   "userSettings": {
-    "title": "Paramètres utilisateur",
     "description": "Gérez la sécurité de votre compte.",
-    "securityTitle": "Sécurité",
     "securityDescription": "Modifiez votre mot de passe et gérez vos sessions actives.",
     "changePasswordTitle": "Modifier le mot de passe",
     "currentPassword": "Mot de passe actuel",
@@ -308,79 +242,27 @@
     "savePassword": "Mettre à jour le mot de passe",
     "passwordUpdated": "Le mot de passe a bien été mis à jour.",
     "logoutAll": {
-      "title": "Déconnecter tous les appareils",
       "description": "Révoque toutes les sessions actives. Tous les appareils connectés seront déconnectés, y compris celui-ci.",
-      "button": "Tout déconnecter",
       "confirmTitle": "Confirmer la déconnexion globale",
       "confirmMessage": "Êtes-vous sûr de vouloir vous déconnecter de tous les appareils ?",
-      "confirmWarning": "Cette action révoque toutes vos sessions actives. Vous serez redirigé vers la page de connexion.",
-      "confirmButton": "Tout déconnecter"
+      "confirmWarning": "Cette action révoque toutes vos sessions actives. Vous serez redirigé vers la page de connexion."
     }
   },
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
       "editTitle": "Modifier la pénalité",
-      "class": "Classe",
-      "student": "Élève",
-      "penaltyType": "Type de pénalité",
-      "selectStudent": "Sélectionner un élève...",
-      "searchStudent": "Rechercher un élève...",
-      "noStudentFound": "Aucun élève trouvé.",
-      "selectPenaltyType": "Sélectionner un type...",
-      "searchPenaltyType": "Rechercher un type...",
-      "noPenaltyTypeFound": "Aucun type trouvé.",
-      "occurredAt": "Date de l'événement",
-      "selectOccurredDate": "Sélectionner la date de l'événement...",
-      "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
-      "cancel": "Annuler",
-      "submit": "Valider",
-      "save": "Enregistrer"
+      "penaltyType": "Type de pénalité"
     },
     "bonus": {
       "title": "Nouveau bonus",
       "editTitle": "Modifier le bonus",
-      "class": "Classe",
-      "student": "Élève",
-      "bonusType": "Type de bonus",
-      "selectStudent": "Sélectionner un élève...",
-      "searchStudent": "Rechercher un élève...",
-      "noStudentFound": "Aucun élève trouvé.",
-      "selectBonusType": "Sélectionner un type...",
-      "searchBonusType": "Rechercher un type...",
-      "noBonusTypeFound": "Aucun type trouvé.",
-      "points": "Points",
-      "pointsPlaceholder": "1.00",
-      "occurredAt": "Date de l'événement",
-      "selectOccurredDate": "Sélectionner la date de l'événement...",
-      "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
-      "cancel": "Annuler",
-      "submit": "Valider",
-      "save": "Enregistrer"
+      "bonusType": "Type de bonus"
     },
     "punishment": {
       "title": "Nouvelle punition",
       "editTitle": "Modifier la punition",
-      "class": "Classe",
-      "student": "Élève",
-      "punishmentType": "Type de punition",
-      "dueAt": "Échéance",
-      "selectDate": "Sélectionner une date...",
-      "occurredAt": "Date de l'événement",
-      "selectOccurredDate": "Sélectionner la date de l'événement...",
-      "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
-      "selectStudent": "Sélectionner un élève....",
-      "searchStudent": "Rechercher un élève...",
-      "noStudentFound": "Aucun élève trouvé.",
-      "selectPunishmentType": "Sélectionner un type...",
-      "searchPunishmentType": "Rechercher un type...",
-      "noPunishmentTypeFound": "Aucun type trouvé.",
-      "cancel": "Annuler",
-      "submit": "Valider",
-      "save": "Enregistrer"
+      "punishmentType": "Type de punition"
     },
     "rule": {
       "title": "Nouvelle règle",
@@ -388,42 +270,20 @@
       "name": "Nom de la règle (optionnel)",
       "namePlaceholder": "Laisser vide pour générer automatiquement",
       "penaltyType": "Déclencheur (type de pénalité)",
-      "threshold": "Seuil",
-      "mode": "Mode",
       "punishmentType": "Conséquence (type de punition)",
-      "dueAtAfterDays": "Délai (jours pour effectuer)",
-      "selectPenaltyType": "Sélectionner un type...",
-      "noPenaltyTypeFound": "Aucun type trouvé.",
-      "selectPunishmentType": "Sélectionner un type...",
-      "noPunishmentTypeFound": "Aucun type trouvé.",
-      "cancel": "Annuler",
-      "create": "Créer",
-      "save": "Enregistrer"
+      "dueAtAfterDays": "Délai (jours pour effectuer)"
     },
     "student": {
       "title": "Nouvel élève",
-      "editTitle": "Modifier l'élève",
-      "firstName": "Prénom",
-      "firstNamePlaceholder": "Jean",
-      "lastName": "Nom",
-      "lastNamePlaceholder": "Dupont",
-      "cancel": "Annuler",
-      "submit": "Valider",
-      "save": "Enregistrer"
+      "editTitle": "Modifier l'élève"
     },
     "classroom": {
       "title": "Nouvelle classe",
       "editTitle": "Modifier la classe",
       "name": "Nom de la classe",
-      "namePlaceholder": "ex: 6ème A",
       "year": "Année scolaire",
-      "yearPlaceholder": "ex: 2025-2026",
-      "cancel": "Annuler",
-      "submit": "Créer",
-      "save": "Enregistrer",
       "removeTitle": "Retirer l'élève",
-      "removeMessage": "Êtes-vous sûr de vouloir retirer {student} de la classe {classroom} ? L'élève ne sera pas supprimé, seulement retiré de cette classe.",
-      "removeConfirm": "Retirer"
+      "removeMessage": "Êtes-vous sûr de vouloir retirer {student} de la classe {classroom} ? L'élève ne sera pas supprimé, seulement retiré de cette classe."
     },
     "delete": {
       "title": "Confirmer la suppression",
@@ -433,46 +293,25 @@
       "ruleMessage": "Êtes-vous sûr de vouloir supprimer cette règle ? Cette action est irréversible.",
       "studentMessage": "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible et supprimera ses bonus, pénalités et punitions.",
       "classroomMessage": "Êtes-vous sûr de vouloir supprimer la classe {name} ? Les élèves ne seront pas supprimés mais retirés de la classe. Cette action est irréversible.",
-      "typeChildrenWarning": "Attention : la suppression entraîne aussi la suppression de tous les éléments enfants.",
-      "cancel": "Annuler",
-      "confirm": "Supprimer"
+      "typeChildrenWarning": "Attention : la suppression entraîne aussi la suppression de tous les éléments enfants."
     },
     "resolve": {
       "title": "Confirmer la résolution",
-      "punishmentMessage": "Êtes-vous sûr de vouloir marquer cette punition comme faite ?",
-      "cancel": "Annuler",
-      "confirm": "Marquer comme fait"
+      "punishmentMessage": "Êtes-vous sûr de vouloir marquer cette punition comme faite ?"
     },
     "use": {
       "title": "Confirmer la consommation",
-      "bonusMessage": "Êtes-vous sûr de vouloir consommer ce bonus ?",
-      "cancel": "Annuler",
-      "confirm": "Consommer"
-    },
-    "logoutAll": {
-      "title": "Confirmer la déconnexion globale",
-      "message": "Êtes-vous sûr de vouloir vous déconnecter de tous les appareils ?",
-      "warning": "Cette action révoque toutes vos sessions actives.",
-      "cancel": "Annuler",
-      "confirm": "Tout déconnecter"
+      "bonusMessage": "Êtes-vous sûr de vouloir consommer ce bonus ?"
     }
   },
   "auth": {
-    "login": "Connexion",
     "loginSubtitle": "Connectez-vous à votre compte",
-    "loginSubmit": "Se connecter",
-    "register": "Inscription",
     "registerSubtitle": "Créez votre compte professeur",
     "registerClosedSubtitle": "Inscriptions temporairement fermées",
     "registerSubmit": "Créer mon compte",
     "noAccount": "Pas encore de compte ?",
     "createAccount": "Créer un compte",
     "hasAccount": "Déjà un compte ?",
-    "signIn": "Se connecter",
-    "firstName": "Prénom",
-    "firstNamePlaceholder": "Jean",
-    "lastName": "Nom",
-    "lastNamePlaceholder": "Dupont",
     "email": "Email",
     "emailPlaceholder": "professeur{'@'}ecole.fr",
     "password": "Mot de passe",
@@ -597,36 +436,9 @@
   },
   "filters": {
     "title": "Filtres",
-    "classroom": "Classe",
-    "student": "Élève",
-    "type": "Type",
-    "state": "État",
-    "dateRange": "Période de création",
-    "dueDateRange": "Période d'échéance",
     "automated": "Automatique",
     "overdue": "En retard",
-    "allClassrooms": "Toutes les classes",
-    "allStudents": "Tous les élèves",
-    "allTypes": "Tous les types",
-    "allStates": "Tous les états",
-    "from": "Du",
-    "to": "Au",
-    "reset": "Réinitialiser",
-    "apply": "Appliquer",
-    "activeFilters": "Aucun filtre actif | {count} filtre actif | {count} filtres actifs",
-    "stateUsed": "Consommé",
-    "stateUnused": "Non consommé",
-    "statePending": "En attente",
-    "stateResolved": "Résolu",
-    "automatedYes": "Oui",
-    "automatedNo": "Non",
-    "overdueOnly": "En retard uniquement",
-    "showFilters": "Afficher les filtres",
-    "hideFilters": "Masquer les filtres",
-    "searchStudent": "Rechercher un élève...",
-    "noStudentFound": "Aucun élève trouvé.",
-    "searchType": "Rechercher un type...",
-    "noTypeFound": "Aucun type trouvé."
+    "reset": "Réinitialiser"
   },
   "errors": {
     "pageNotFound": "Page non trouvée",
@@ -634,5 +446,54 @@
     "defaultMessage": "Une erreur inattendue est survenue. Notre équipe a été prévenue.",
     "backHome": "Retour à l'accueil",
     "goBack": "Page précédente"
+  },
+  "bonuses": {
+    "usedAt": "Consommé le {date}"
+  },
+  "punishments": {
+    "autoByRule": "Auto par {name}",
+    "deletedRule": "Règle supprimée",
+    "resolvedAt": "Résolu le {date}"
+  },
+  "rules": {
+    "defaultName": "Règle automatique",
+    "threshold": "Seuil : {count}",
+    "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
+    "modes": {
+      "at": "Au seuil exact",
+      "every": "À chaque multiple",
+      "after": "À partir de"
+    }
+  },
+  "typeManagement": {
+    "createdAt": "Créé le {date}"
+  },
+  "penaltyTypes": {
+    "createTitle": "Nouveau type de pénalité",
+    "editTitle": "Modifier le type de pénalité",
+    "placeholder": "ex: Bavardage",
+    "noTypes": "Aucun type de pénalité trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de pénalité ? Cette action est irréversible."
+  },
+  "punishmentTypes": {
+    "createTitle": "Nouveau type de punition",
+    "editTitle": "Modifier le type de punition",
+    "placeholder": "ex: Retenue",
+    "noTypes": "Aucun type de punition trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de punition ? Cette action est irréversible."
+  },
+  "bonusTypes": {
+    "createTitle": "Nouveau type de bonus",
+    "editTitle": "Modifier le type de bonus",
+    "placeholder": "ex: Participation",
+    "noTypes": "Aucun type de bonus trouvé.",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce type de bonus ? Cette action est irréversible."
+  },
+  "students": {
+    "noClassroom": "Aucune classe"
+  },
+  "classes": {
+    "count": "{count} classe | {count} classes",
+    "penaltyCount": "{count} pénalité | {count} pénalités"
   }
 }

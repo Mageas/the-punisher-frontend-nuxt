@@ -6,8 +6,8 @@ const translations: Record<string, string | ((params?: Record<string, number>) =
   'rules.modes.at': 'Au seuil exact',
   'rules.threshold': (params) => `Seuil : ${params?.count ?? 0}`,
   'rules.dueAfterDays': (params) => `Délai : ${params?.count ?? 0} jours`,
-  'rules.edit': 'Modifier',
-  'modals.delete.confirm': 'Supprimer',
+  'common.actions.edit': 'Modifier',
+  'common.actions.delete': 'Supprimer',
 }
 
 const mockI18n = {

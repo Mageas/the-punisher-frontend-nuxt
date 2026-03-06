@@ -71,38 +71,38 @@ interface NavGroup {
 const navGroups = computed<NavGroup[]>(() => [
   {
     label: t('sidebar.general'),
-    links: [{ to: '/', icon: LayoutDashboard, label: t('sidebar.dashboard') }],
+    links: [{ to: '/', icon: LayoutDashboard, label: t('common.titles.dashboard') }],
   },
   {
     label: t('sidebar.tracking'),
     links: [
-      { to: '/penalties', icon: AlertTriangle, label: t('sidebar.penalties') },
-      { to: '/punishments', icon: Gavel, label: t('sidebar.punishments') },
-      { to: '/bonuses', icon: Star, label: t('sidebar.bonuses') },
+      { to: '/penalties', icon: AlertTriangle, label: t('common.titles.penalties') },
+      { to: '/punishments', icon: Gavel, label: t('common.titles.punishments') },
+      { to: '/bonuses', icon: Star, label: t('common.titles.bonuses') },
     ],
   },
   {
     label: t('sidebar.management'),
     links: [
-      { to: '/students', icon: Users, label: t('sidebar.students') },
-      { to: '/classes', icon: School, label: t('sidebar.classes') },
+      { to: '/students', icon: Users, label: t('common.titles.students') },
+      { to: '/classes', icon: School, label: t('common.titles.classes') },
     ],
   },
   {
     label: t('sidebar.configuration'),
     links: [
-      { to: '/rules', icon: Scale, label: t('sidebar.rules') },
+      { to: '/rules', icon: Scale, label: t('common.titles.rules') },
       {
         to: '/penalty-types',
         icon: AlertCircle,
-        label: t('sidebar.penaltyTypes'),
+        label: t('common.titles.penaltyTypes'),
       },
       {
         to: '/punishment-types',
         icon: FileWarning,
-        label: t('sidebar.punishmentTypes'),
+        label: t('common.titles.punishmentTypes'),
       },
-      { to: '/bonus-types', icon: Trophy, label: t('sidebar.bonusTypes') },
+      { to: '/bonus-types', icon: Trophy, label: t('common.titles.bonusTypes') },
     ],
   },
 ])
@@ -194,13 +194,13 @@ function isActive(to: string): boolean {
                 <DropdownMenuItem as-child class="cursor-pointer gap-2">
                   <NuxtLink to="/settings">
                     <Settings class="size-4" />
-                    {{ t('sidebar.settings') }}
+                    {{ t('common.titles.userSettings') }}
                   </NuxtLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem as-child class="cursor-pointer gap-2">
                   <NuxtLink to="/management/danger">
                     <ShieldAlert class="size-4" />
-                    {{ t('sidebar.danger') }}
+                    {{ t('common.titles.dangerZone') }}
                   </NuxtLink>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

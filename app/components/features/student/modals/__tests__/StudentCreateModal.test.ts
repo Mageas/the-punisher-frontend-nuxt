@@ -100,7 +100,7 @@ describe('StudentCreateModal', () => {
       },
     })
 
-    expect(wrapper.find('label').text()).toContain('modals.student.lastName')
+    expect(wrapper.find('label').text()).toContain('common.labels.name')
   })
 
   it('calls createStudent on submit', async () => {

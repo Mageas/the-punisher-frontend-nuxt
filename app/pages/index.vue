@@ -81,7 +81,7 @@ if (initialData.value) {
     <PageHeaderBar align="start">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight whitespace-nowrap">
-          {{ t('dashboard.title') }}
+          {{ t('common.titles.dashboard') }}
         </h1>
         <ClassroomSelect v-model="selectedClassroomId" class="hidden lg:inline-flex" />
       </template>
@@ -92,19 +92,19 @@ if (initialData.value) {
             <ClassroomSelect v-model="selectedClassroomId" />
           </div>
           <div class="shrink-0">
-            <PageActionsMenu :create-label="t('common.add')">
+            <PageActionsMenu :create-label="t('common.actions.add')">
               <template #create>
                 <DropdownMenuItem class="cursor-pointer" @click="showBonusModal = true">
                   <Star class="w-4 h-4 text-warning" />
-                  {{ t('dashboard.newBonus') }}
+                  {{ t('common.actions.addBonus') }}
                 </DropdownMenuItem>
                 <DropdownMenuItem class="cursor-pointer" @click="showPenaltyModal = true">
                   <AlertTriangle class="w-4 h-4 text-warning" />
-                  {{ t('dashboard.newPenalty') }}
+                  {{ t('common.actions.addPenalty') }}
                 </DropdownMenuItem>
                 <DropdownMenuItem class="cursor-pointer" @click="showPunishmentModal = true">
                   <Gavel class="w-4 h-4 text-danger" />
-                  {{ t('dashboard.newPunishment') }}
+                  {{ t('common.actions.addPunishment') }}
                 </DropdownMenuItem>
               </template>
             </PageActionsMenu>

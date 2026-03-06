@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const sectionTitle = computed(() => props.title ?? t('studentProfile.historyTitle'))
+const sectionTitle = computed(() => props.title ?? t('common.titles.history'))
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.history'))
 const currentPage = computed(() => props.page ?? 1)
 const currentTotalPages = computed(() => props.totalPages ?? 1)
@@ -110,7 +110,7 @@ function eventDateTime(item: StudentHistoryItem): string {
                     : 'text-warning border-warning-border'
                 "
               >
-                {{ item.resolved_at ? t('punishments.resolved') : t('punishments.pending') }}
+                {{ item.resolved_at ? t('common.states.resolved') : t('common.states.pending') }}
               </Badge>
             </div>
             <p
@@ -170,7 +170,7 @@ function eventDateTime(item: StudentHistoryItem): string {
                   item.used_at ? 'text-muted-foreground' : 'text-success border-success-border'
                 "
               >
-                {{ item.used_at ? t('common.used') : t('common.available') }}
+                {{ item.used_at ? t('common.states.used') : t('common.states.available') }}
               </Badge>
             </div>
             <p v-if="item.used_at" class="mt-1 text-xs text-muted-foreground">

@@ -56,7 +56,7 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
         {{ t('classProfile.students.title') }}
       </h2>
       <p class="text-sm text-muted-foreground">
-        {{ t('classes.studentCount', studentCount) }}
+        {{ t('common.counts.student', studentCount) }}
       </p>
     </div>
 
@@ -70,14 +70,14 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
           v-model="modelValue"
           :exclude-ids="existingStudentIds"
           :placeholder="t('classProfile.students.searchPlaceholder')"
-          :empty-text="t('students.noStudents')"
+          :empty-text="t('common.empty.noStudents')"
           :keep-focus-on-select="props.keepFocusOnStudentSelect"
         />
       </div>
 
       <Button type="submit" class="cursor-pointer" :disabled="!canAddStudent">
         <Plus class="w-4 h-4" />
-        {{ t('classProfile.actions.addStudent') }}
+        {{ t('common.actions.addStudent') }}
       </Button>
     </form>
   </div>

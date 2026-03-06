@@ -228,7 +228,7 @@ function onResendEmailInput() {
       <p class="text-center text-sm text-muted-foreground mt-4">
         {{ t('auth.hasAccount') }}
         <NuxtLink to="/login" class="underline underline-offset-4 hover:text-foreground">
-          {{ t('auth.signIn') }}
+          {{ t('common.actions.signIn') }}
         </NuxtLink>
       </p>
     </div>

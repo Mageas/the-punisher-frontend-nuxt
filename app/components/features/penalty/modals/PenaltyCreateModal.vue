@@ -128,14 +128,14 @@ const onSubmit = handleSubmit(async (formValues) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('modals.penalty.submit')"
+    :submit-text="t('common.actions.submit')"
     prevent-auto-focus
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
       <FormField v-if="!hasPreselectedClassroom" v-slot="{ value }" name="classroom_id">
         <FormItem>
-          <FormLabel>{{ t('modals.penalty.class') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.classroom') }}</FormLabel>
           <FormControl>
             <ClassroomSelect
               :model-value="value"
@@ -149,15 +149,15 @@ const onSubmit = handleSubmit(async (formValues) => {
 
       <FormField v-slot="{ value, handleChange }" name="student_id">
         <FormItem>
-          <FormLabel>{{ t('modals.penalty.student') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.student') }}</FormLabel>
           <FormControl>
             <StudentSelect
               :key="values.classroom_id || '__all_students__'"
               :model-value="value"
               :classroom-id="values.classroom_id || null"
               :options-scope-key="values.classroom_id || '__all_students__'"
-              :placeholder="t('modals.penalty.selectStudent')"
-              :empty-text="t('modals.penalty.noStudentFound')"
+              :placeholder="t('common.placeholders.selectStudent')"
+              :empty-text="t('common.empty.noStudents')"
               @update:model-value="handleChange"
             />
           </FormControl>
@@ -182,12 +182,12 @@ const onSubmit = handleSubmit(async (formValues) => {
         name="occurred_at_time"
       >
         <FormItem>
-          <FormLabel>{{ t('modals.penalty.occurredAt') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.occurredAt') }}</FormLabel>
           <FormControl>
             <DatePicker
               :model-value="dateValue"
               :time="timeValue"
-              :placeholder="t('modals.penalty.selectOccurredDate')"
+              :placeholder="t('common.placeholders.selectOccurredDate')"
               show-time
               @update:model-value="handleChangeDate"
               @update:time="handleChangeTime"
@@ -200,12 +200,12 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     <FormField v-slot="{ componentField }" name="evaluation_label">
       <FormItem>
-        <FormLabel>{{ t('modals.penalty.evaluationLabel') }}</FormLabel>
+        <FormLabel>{{ t('common.labels.evaluationLabel') }}</FormLabel>
         <FormControl>
           <Input
             v-bind="componentField"
             type="text"
-            :placeholder="t('modals.penalty.evaluationLabelPlaceholder')"
+            :placeholder="t('common.placeholders.evaluationLabel')"
           />
         </FormControl>
         <FormMessage />

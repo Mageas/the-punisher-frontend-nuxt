@@ -64,7 +64,7 @@ function onOpenAutoFocus(event: Event) {
 
         <DialogFooter v-if="!hideFooter">
           <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
-            {{ cancelText || t('common.cancel') }}
+            {{ cancelText || t('common.actions.cancel') }}
           </Button>
           <Button
             type="submit"
@@ -76,7 +76,7 @@ function onOpenAutoFocus(event: Event) {
               v-if="submitting"
               class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
             />
-            {{ submitText || t('common.submit') }}
+            {{ submitText || t('common.actions.submit') }}
           </Button>
         </DialogFooter>
       </form>
