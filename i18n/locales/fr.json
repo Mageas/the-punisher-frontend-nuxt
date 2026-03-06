@@ -343,7 +343,7 @@
       "searchBonusType": "Rechercher un type...",
       "noBonusTypeFound": "Aucun type trouvé.",
       "points": "Points",
-      "pointsPlaceholder": "1.0",
+      "pointsPlaceholder": "1.00",
       "cancel": "Annuler",
       "submit": "Valider"
     },
