@@ -40,7 +40,8 @@
     },
     "new": "Nouveau",
     "actions": "Actions",
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "edit": "Modifier"
   },
   "ui": {
     "close": "Fermer",
@@ -319,6 +320,7 @@
   "modals": {
     "penalty": {
       "title": "Nouvelle pénalité",
+      "editTitle": "Modifier la pénalité",
       "class": "Classe",
       "student": "Élève",
       "penaltyType": "Type de pénalité",
@@ -328,11 +330,17 @@
       "selectPenaltyType": "Sélectionner un type...",
       "searchPenaltyType": "Rechercher un type...",
       "noPenaltyTypeFound": "Aucun type trouvé.",
+      "occurredAt": "Date de l'événement",
+      "selectOccurredDate": "Sélectionner la date de l'événement...",
+      "evaluationLabel": "Libellé d'évaluation",
+      "evaluationLabelPlaceholder": "ex: Retard",
       "cancel": "Annuler",
-      "submit": "Valider"
+      "submit": "Valider",
+      "save": "Enregistrer"
     },
     "bonus": {
       "title": "Nouveau bonus",
+      "editTitle": "Modifier le bonus",
       "class": "Classe",
       "student": "Élève",
       "bonusType": "Type de bonus",
@@ -344,16 +352,26 @@
       "noBonusTypeFound": "Aucun type trouvé.",
       "points": "Points",
       "pointsPlaceholder": "1.00",
+      "occurredAt": "Date de l'événement",
+      "selectOccurredDate": "Sélectionner la date de l'événement...",
+      "evaluationLabel": "Libellé d'évaluation",
+      "evaluationLabelPlaceholder": "ex: Participation",
       "cancel": "Annuler",
-      "submit": "Valider"
+      "submit": "Valider",
+      "save": "Enregistrer"
     },
     "punishment": {
       "title": "Nouvelle punition",
+      "editTitle": "Modifier la punition",
       "class": "Classe",
       "student": "Élève",
       "punishmentType": "Type de punition",
       "dueAt": "Échéance",
       "selectDate": "Sélectionner une date...",
+      "occurredAt": "Date de l'événement",
+      "selectOccurredDate": "Sélectionner la date de l'événement...",
+      "evaluationLabel": "Libellé d'évaluation",
+      "evaluationLabelPlaceholder": "ex: Travail non rendu",
       "selectStudent": "Sélectionner un élève....",
       "searchStudent": "Rechercher un élève...",
       "noStudentFound": "Aucun élève trouvé.",
@@ -361,7 +379,8 @@
       "searchPunishmentType": "Rechercher un type...",
       "noPunishmentTypeFound": "Aucun type trouvé.",
       "cancel": "Annuler",
-      "submit": "Valider"
+      "submit": "Valider",
+      "save": "Enregistrer"
     },
     "rule": {
       "title": "Nouvelle règle",

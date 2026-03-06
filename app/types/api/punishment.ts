@@ -22,6 +22,8 @@ export interface Punishment {
   triggering_rule_id: string | null
   triggering_rule_name: string | null
   created_at: string
+  occurred_at?: string
+  evaluation_label?: string
   due_at: string | null
   resolved_at: string | null
 }
@@ -33,6 +35,16 @@ export interface PunishmentCreateData {
   student_id: string
   punishment_type_id: string
   due_at?: string
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
+ * Data accepted to update a punishment.
+ */
+export interface PunishmentUpdateData {
+  occurred_at?: string
+  evaluation_label?: string
 }
 
 /**

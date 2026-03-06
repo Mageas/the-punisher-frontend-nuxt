@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   BonusCreateData,
   BonusUseData,
+  BonusUpdateData,
 } from '~/types/api'
 
 export function useBonusService() {
@@ -48,9 +49,9 @@ export function useBonusService() {
   /**
    * Update an existing bonus.
    */
-  async function updateBonus(bonusId: string, data: Partial<BonusCreateData>) {
+  async function updateBonus(bonusId: string, data: BonusUpdateData) {
     return $api<Bonus>(`/bonuses/${bonusId}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: data,
     })
   }

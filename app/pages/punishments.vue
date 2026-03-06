@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CircleCheck, Plus, Trash2 } from 'lucide-vue-next'
+import { CircleCheck, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import type { Punishment } from '~/types/api'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -68,10 +69,12 @@ const activeFilterCount = computed(() => {
 
 // Modals
 const showCreateModal = ref(false)
+const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showResolveModal = ref(false)
 const punishmentToDeleteId = ref<string | null>(null)
 const punishmentToResolveId = ref<string | null>(null)
+const punishmentToEdit = ref<Punishment | null>(null)
 
 // Fetch with current filters
 async function reload(pageToLoad = page.value || 1) {
@@ -106,6 +109,12 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
+// Open edit modal
+function openEditModal(punishment: Punishment) {
+  punishmentToEdit.value = punishment
+  showEditModal.value = true
+}
+
 // Open resolve modal
 function openResolveModal(id: string) {
   punishmentToResolveId.value = id
@@ -125,6 +134,10 @@ async function onResolveConfirmed() {
 // After creation
 async function onCreated() {
   await reload(1)
+}
+
+async function onUpdated() {
+  await reload(page.value)
 }
 
 function resetFilters() {
@@ -326,6 +339,17 @@ await useAsyncData(
       >
         <template #actions>
           <Button
+            variant="ghost"
+            size="icon-sm"
+            class="cursor-pointer text-muted-foreground hover:text-foreground"
+            :title="t('common.edit')"
+            :aria-label="t('common.edit')"
+            @click="openEditModal(punishment)"
+          >
+            <Pencil class="w-4 h-4" />
+          </Button>
+
+          <Button
             v-if="!punishment.resolved_at"
             variant="ghost"
             size="icon-sm"
@@ -362,6 +386,11 @@ await useAsyncData(
     />
 
     <PunishmentCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <PunishmentEditModal
+      v-model:open="showEditModal"
+      :punishment="punishmentToEdit"
+      @updated="onUpdated"
+    />
     <PunishmentDeleteModal
       v-model:open="showDeleteModal"
       :punishment-id="punishmentToDeleteId"

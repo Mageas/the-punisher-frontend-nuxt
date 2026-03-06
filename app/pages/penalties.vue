@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from 'lucide-vue-next'
+import { Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import type { Penalty } from '~/types/api'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -45,8 +46,10 @@ const activeFilterCount = computed(() => {
 
 // Modals
 const showCreateModal = ref(false)
+const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const penaltyToDeleteId = ref<string | null>(null)
+const penaltyToEdit = ref<Penalty | null>(null)
 
 // Fetch with current filters
 async function reload(pageToLoad = page.value || 1) {
@@ -70,12 +73,21 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
+function openEditModal(penalty: Penalty) {
+  penaltyToEdit.value = penalty
+  showEditModal.value = true
+}
+
 async function onDeleteConfirmed() {
   await reload(page.value)
 }
 
 async function onCreated() {
   await reload(1)
+}
+
+async function onUpdated() {
+  await reload(page.value)
 }
 
 function resetFilters() {
@@ -219,6 +231,17 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
+            :title="t('common.edit')"
+            :aria-label="t('common.edit')"
+            @click="openEditModal(penalty)"
+          >
+            <Pencil class="w-4 h-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            class="cursor-pointer text-muted-foreground hover:text-foreground"
             :title="t('modals.delete.confirm')"
             :aria-label="t('modals.delete.confirm')"
             @click="openDeleteModal(penalty.id)"
@@ -240,6 +263,7 @@ await useAsyncData(
     />
 
     <PenaltyCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <PenaltyEditModal v-model:open="showEditModal" :penalty="penaltyToEdit" @updated="onUpdated" />
     <PenaltyDeleteModal
       v-model:open="showDeleteModal"
       :penalty-id="penaltyToDeleteId"
