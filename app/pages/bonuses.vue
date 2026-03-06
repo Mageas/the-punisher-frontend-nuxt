@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Gift, Plus, Trash2 } from 'lucide-vue-next'
+import { Gift, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import type { Bonus } from '~/types/api'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -53,10 +54,12 @@ const activeFilterCount = computed(() => {
 
 // Modals
 const showCreateModal = ref(false)
+const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showUseModal = ref(false)
 const bonusToDeleteId = ref<string | null>(null)
 const bonusToUseId = ref<string | null>(null)
+const bonusToEdit = ref<Bonus | null>(null)
 
 // Fetch with current filters
 async function reload(pageToLoad = page.value || 1) {
@@ -85,6 +88,11 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
+function openEditModal(bonus: Bonus) {
+  bonusToEdit.value = bonus
+  showEditModal.value = true
+}
+
 function openUseModal(id: string) {
   bonusToUseId.value = id
   showUseModal.value = true
@@ -100,6 +108,10 @@ async function onUseConfirmed() {
 
 async function onCreated() {
   await reload(1)
+}
+
+async function onUpdated() {
+  await reload(page.value)
 }
 
 function resetFilters() {
@@ -251,6 +263,17 @@ await useAsyncData(
       >
         <template #actions>
           <Button
+            variant="ghost"
+            size="icon-sm"
+            class="cursor-pointer text-muted-foreground hover:text-foreground"
+            :title="t('common.edit')"
+            :aria-label="t('common.edit')"
+            @click="openEditModal(bonus)"
+          >
+            <Pencil class="w-4 h-4" />
+          </Button>
+
+          <Button
             v-if="!bonus.used_at"
             variant="ghost"
             size="icon-sm"
@@ -287,6 +310,7 @@ await useAsyncData(
     />
 
     <BonusCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <BonusEditModal v-model:open="showEditModal" :bonus="bonusToEdit" @updated="onUpdated" />
     <BonusDeleteModal
       v-model:open="showDeleteModal"
       :bonus-id="bonusToDeleteId"

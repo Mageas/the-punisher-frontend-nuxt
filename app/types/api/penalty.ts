@@ -19,6 +19,8 @@ export interface Penalty {
   penalty_type_id: string
   penalty_type_name: string
   created_at: string
+  occurred_at?: string
+  evaluation_label?: string
 }
 
 /**
@@ -27,4 +29,14 @@ export interface Penalty {
 export interface PenaltyCreateData {
   student_id: string
   penalty_type_id: string
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
+ * Data accepted to update a penalty.
+ */
+export interface PenaltyUpdateData {
+  occurred_at?: string
+  evaluation_label?: string
 }

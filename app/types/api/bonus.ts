@@ -20,6 +20,8 @@ export interface Bonus {
   bonus_type_name: string
   points: number
   created_at: string
+  occurred_at?: string
+  evaluation_label?: string
   used_at: string | null
 }
 
@@ -30,6 +32,17 @@ export interface BonusCreateData {
   student_id: string
   bonus_type_id: string
   points: number
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
+ * Data accepted to update a bonus.
+ */
+export interface BonusUpdateData {
+  points?: number
+  occurred_at?: string
+  evaluation_label?: string
 }
 
 /**

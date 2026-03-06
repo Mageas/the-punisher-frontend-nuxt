@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   PunishmentCreateData,
   PunishmentResolveData,
+  PunishmentUpdateData,
 } from '~/types/api'
 
 export function usePunishmentService() {
@@ -47,9 +48,9 @@ export function usePunishmentService() {
     })
   }
 
-  async function updatePunishment(punishmentId: string, data: Partial<PunishmentCreateData>) {
+  async function updatePunishment(punishmentId: string, data: PunishmentUpdateData) {
     return $api<Punishment>(`/punishments/${punishmentId}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: data,
     })
   }

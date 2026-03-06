@@ -1,4 +1,10 @@
-import type { ApiRequestOptions, Penalty, PaginatedResponse, PenaltyCreateData } from '~/types/api'
+import type {
+  ApiRequestOptions,
+  Penalty,
+  PaginatedResponse,
+  PenaltyCreateData,
+  PenaltyUpdateData,
+} from '~/types/api'
 
 export function usePenaltyService() {
   const { $api } = useNuxtApp()
@@ -31,9 +37,9 @@ export function usePenaltyService() {
     })
   }
 
-  async function updatePenalty(penaltyId: string, data: Partial<PenaltyCreateData>) {
+  async function updatePenalty(penaltyId: string, data: PenaltyUpdateData) {
     return $api<Penalty>(`/penalties/${penaltyId}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: data,
     })
   }

@@ -2,6 +2,9 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import type { DateValue } from '@internationalized/date'
+import { getLocalTimeZone } from '@internationalized/date'
+import { toApiDateTimeString } from '~/lib/date-time'
 
 const emit = defineEmits<{
   created: []
@@ -45,6 +48,9 @@ const schema = toTypedSchema(
           value: 'UUID',
         }),
       ),
+    occurred_at: zod.any().optional(),
+    occurred_at_time: zod.string().optional(),
+    evaluation_label: zod.string().optional(),
   }),
 )
 
@@ -55,6 +61,9 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldVa
       classroom_id: props.preselectedClassroomId ?? '',
       student_id: props.preselectedStudentId ?? '',
       penalty_type_id: '',
+      occurred_at: undefined as DateValue | undefined,
+      occurred_at_time: '08:00',
+      evaluation_label: '',
     },
   })
 
@@ -77,6 +86,9 @@ watch(open, (isOpen) => {
         classroom_id: props.preselectedClassroomId ?? '',
         student_id: props.preselectedStudentId ?? '',
         penalty_type_id: '',
+        occurred_at: undefined,
+        occurred_at_time: '08:00',
+        evaluation_label: '',
       },
     })
   }
@@ -85,9 +97,21 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
+    let occurredAt: string | undefined
+    if (formValues.occurred_at) {
+      const date = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
+      const [h = '08', m = '00'] = (formValues.occurred_at_time || '08:00').split(':')
+      date.setHours(Number(h), Number(m), 0, 0)
+      occurredAt = toApiDateTimeString(date) ?? undefined
+    }
+
+    const evaluationLabel = formValues.evaluation_label?.trim()
+
     await penaltyService.createPenalty({
       student_id: formValues.student_id,
       penalty_type_id: formValues.penalty_type_id,
+      ...(occurredAt ? { occurred_at: occurredAt } : {}),
+      ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
     })
     open.value = false
     emit('created')
@@ -147,6 +171,42 @@ const onSubmit = handleSubmit(async (formValues) => {
         <FormLabel>{{ t('modals.penalty.penaltyType') }}</FormLabel>
         <FormControl>
           <PenaltyTypeSelect :model-value="value" @update:model-value="handleChange" />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
+    <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="occurred_at">
+      <FormField
+        v-slot="{ value: timeValue, handleChange: handleChangeTime }"
+        name="occurred_at_time"
+      >
+        <FormItem>
+          <FormLabel>{{ t('modals.penalty.occurredAt') }}</FormLabel>
+          <FormControl>
+            <DatePicker
+              :model-value="dateValue"
+              :time="timeValue"
+              :placeholder="t('modals.penalty.selectOccurredDate')"
+              show-time
+              @update:model-value="handleChangeDate"
+              @update:time="handleChangeTime"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </FormField>
+
+    <FormField v-slot="{ componentField }" name="evaluation_label">
+      <FormItem>
+        <FormLabel>{{ t('modals.penalty.evaluationLabel') }}</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="text"
+            :placeholder="t('modals.penalty.evaluationLabelPlaceholder')"
+          />
         </FormControl>
         <FormMessage />
       </FormItem>

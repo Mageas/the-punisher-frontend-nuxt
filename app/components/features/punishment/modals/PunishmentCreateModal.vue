@@ -50,6 +50,9 @@ const schema = toTypedSchema(
       ),
     due_at: zod.any().refine((val) => !!val, t('apiErrors.details.validation_field_required')),
     due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+    occurred_at: zod.any().optional(),
+    occurred_at_time: zod.string().optional(),
+    evaluation_label: zod.string().optional(),
   }),
 )
 
@@ -62,6 +65,9 @@ const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldVa
       punishment_type_id: '',
       due_at: undefined as DateValue | undefined,
       due_at_time: '08:00',
+      occurred_at: undefined as DateValue | undefined,
+      occurred_at_time: '08:00',
+      evaluation_label: '',
     },
   })
 
@@ -86,6 +92,9 @@ watch(open, (isOpen) => {
         punishment_type_id: '',
         due_at: undefined,
         due_at_time: '08:00',
+        occurred_at: undefined,
+        occurred_at_time: '08:00',
+        evaluation_label: '',
       },
     })
   }
@@ -99,10 +108,24 @@ const onSubmit = handleSubmit(async (formValues) => {
     date.setHours(Number(h), Number(m), 0, 0)
     const dueAt = toApiDateTimeString(date) ?? undefined
 
+    let occurredAt: string | undefined
+    if (formValues.occurred_at) {
+      const occurredDate = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
+      const [occurredH = '08', occurredM = '00'] = (formValues.occurred_at_time || '08:00').split(
+        ':',
+      )
+      occurredDate.setHours(Number(occurredH), Number(occurredM), 0, 0)
+      occurredAt = toApiDateTimeString(occurredDate) ?? undefined
+    }
+
+    const evaluationLabel = formValues.evaluation_label?.trim()
+
     await punishmentService.createPunishment({
       student_id: formValues.student_id,
       punishment_type_id: formValues.punishment_type_id,
       due_at: dueAt,
+      ...(occurredAt ? { occurred_at: occurredAt } : {}),
+      ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
     })
     open.value = false
     emit('created')
@@ -184,6 +207,42 @@ const onSubmit = handleSubmit(async (formValues) => {
           <FormMessage />
         </FormItem>
       </FormField>
+    </FormField>
+
+    <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="occurred_at">
+      <FormField
+        v-slot="{ value: timeValue, handleChange: handleChangeTime }"
+        name="occurred_at_time"
+      >
+        <FormItem>
+          <FormLabel>{{ t('modals.punishment.occurredAt') }}</FormLabel>
+          <FormControl>
+            <DatePicker
+              :model-value="dateValue"
+              :time="timeValue"
+              :placeholder="t('modals.punishment.selectOccurredDate')"
+              show-time
+              @update:model-value="handleChangeDate"
+              @update:time="handleChangeTime"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </FormField>
+
+    <FormField v-slot="{ componentField }" name="evaluation_label">
+      <FormItem>
+        <FormLabel>{{ t('modals.punishment.evaluationLabel') }}</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="text"
+            :placeholder="t('modals.punishment.evaluationLabelPlaceholder')"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
     </FormField>
   </BaseModal>
 </template>
