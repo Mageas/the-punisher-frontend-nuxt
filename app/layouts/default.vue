@@ -2,6 +2,7 @@
 import {
   AlertCircle,
   AlertTriangle,
+  CalendarDays,
   ChevronsUpDown,
   FileWarning,
   Gavel,
@@ -104,6 +105,10 @@ const navGroups = computed<NavGroup[]>(() => [
       },
       { to: '/bonus-types', icon: Trophy, label: t('common.titles.bonusTypes') },
     ],
+  },
+  {
+    label: t('sidebar.schedule'),
+    links: [{ to: '/schedule/slots', icon: CalendarDays, label: t('common.titles.schedule.slot') }],
   },
 ])
 
