@@ -163,8 +163,8 @@ const onSubmit = handleSubmit(async (formValues) => {
           <Input
             v-bind="componentField"
             type="number"
-            step="0.1"
-            min="0"
+            step="0.01"
+            min="0.01"
             :placeholder="t('modals.bonus.pointsPlaceholder')"
           />
         </FormControl>

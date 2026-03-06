@@ -169,6 +169,7 @@
     * **Icone :** `Star`.
     * **Contenu :** Nom de l'élève, Type de bonus, Date.
     * **Statut :** `Badge` "Disponible" (État par défaut) ou "Consommé" (État final).
+    * **Saisie de points :** Le champ `Points` accepte les valeurs positives au centième (pas de `0.01`, ex: `0.25`).
     * **Action :** Bouton "Cadeau/Box" pour consommer le bonus (Uniquement si disponible).
   * **Liste (Punitions) :**
     * **Icone :** `Gavel`.
