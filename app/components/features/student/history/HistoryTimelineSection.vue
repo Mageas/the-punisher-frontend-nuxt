@@ -54,6 +54,10 @@ function hasRuleLink(item: StudentHistoryPunishmentItem): boolean {
 function ruleLink(item: StudentHistoryPunishmentItem): string {
   return item.triggering_rule_id ? `/rules?ruleId=${item.triggering_rule_id}` : '/rules'
 }
+
+function eventDateTime(item: StudentHistoryItem): string {
+  return item.occurred_at ?? item.created_at
+}
 </script>
 
 <template>
@@ -136,7 +140,7 @@ function ruleLink(item: StudentHistoryPunishmentItem): string {
               }}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
-              {{ formatDateTime(item.created_at) }}
+              {{ formatDateTime(eventDateTime(item)) }}
             </p>
           </template>
 
@@ -173,7 +177,7 @@ function ruleLink(item: StudentHistoryPunishmentItem): string {
               {{ t('bonuses.usedAt', { date: formatDate(item.used_at) }) }}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
-              {{ formatDateTime(item.created_at) }}
+              {{ formatDateTime(eventDateTime(item)) }}
             </p>
           </template>
 
@@ -186,7 +190,7 @@ function ruleLink(item: StudentHistoryPunishmentItem): string {
               }}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
-              {{ formatDateTime(item.created_at) }}
+              {{ formatDateTime(eventDateTime(item)) }}
             </p>
           </template>
         </div>

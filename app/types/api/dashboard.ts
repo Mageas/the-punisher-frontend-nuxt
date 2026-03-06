@@ -22,6 +22,7 @@ export interface DashboardPenalty {
   student_last_name: string
   penalty_type_id: string
   penalty_type_name: string
+  occurred_at?: string
   created_at: string
 }
 
@@ -36,6 +37,7 @@ export interface DashboardBonus {
   bonus_type_id: string
   bonus_type_name: string
   points: number
+  occurred_at?: string
   created_at: string
   used_at: string | null
 }
@@ -53,6 +55,7 @@ export interface DashboardPunishment {
   automated: boolean
   triggering_rule_id: string | null
   triggering_rule_name: string | null
+  occurred_at?: string
   created_at: string
   due_at: string | null
   resolved_at: string | null

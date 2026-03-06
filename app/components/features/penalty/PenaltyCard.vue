@@ -4,6 +4,7 @@ import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
   penaltyTypeName: string
+  occurredAt?: string
   createdAt: string
   studentId?: string
   studentFirstName?: string
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
+const displayedDate = computed(() => props.occurredAt ?? props.createdAt)
 </script>
 
 <template>
@@ -41,7 +43,7 @@ const hasStudentName = computed(() => Boolean(props.studentFirstName && props.st
     </div>
 
     <span class="text-xs text-muted-foreground shrink-0">
-      {{ formatDate(createdAt) }}
+      {{ formatDate(displayedDate) }}
     </span>
 
     <div v-if="$slots.actions" class="flex items-center gap-1">
