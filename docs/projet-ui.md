@@ -50,8 +50,8 @@
     * *Route :* `/schedule/slots`
     * *Rôle :* Configurer les créneaux hebdomadaires récurrents et les classes associées.
   * **📄 Vacances & jours fériés**
-    * *Route cible :* `/schedule/exceptions`
-    * *Rôle :* Section prévue pour gérer les exceptions globales du calendrier.
+    * *Route :* `/schedule/exceptions`
+    * *Rôle :* Gérer les exceptions globales du calendrier.
 
 ### F. Menu utilisateur
 
@@ -130,6 +130,22 @@
   * **Création rapide :** Un clic sur une case vide ouvre la modale avec le jour et la plage horaire d'une seule case préremplis.
   * **Création par sélection :** Un glisser sur plusieurs cases ouvre la modale avec la plage horaire sélectionnée préremplie.
   * **Édition :** Un clic sur un créneau existant ouvre sa modale d'édition.
+
+---
+
+### 🏖️ Configuration : Vacances & jours fériés
+
+*Page de gestion des exceptions calendrier.*
+  * **Route :** `/schedule/exceptions`.
+  * **Navigation :** section dédiée "Gestion du planning" dans la sidebar, entrée "Vacances et jours fériés".
+  * **Header :** Titre "Vacances et jours fériés".
+  * **Vue :** affichage annuel unique pour visualiser les exceptions configurées.
+  * **Sélection :** une plage de dates peut être sélectionnée au clic dans la vue annuelle, puis convertie en vacances ou jour férié.
+  * **Édition :** un clic sur une période existante charge sa plage dans la barre d'action pour la modifier.
+  * **Repère visuel :** la bordure de la barre d'action est bleue en création et orange en édition.
+  * **Aide d'édition :** pendant une sélection complète ou une modification, le hint sous le calendrier rappelle la redéfinition en deux clics et indique qu'`Échap` ou la croix quittent le mode édition.
+  * **Raccourci :** `Échap` réinitialise la sélection en cours.
+  * **Liste :** les exceptions créées sont affichées, sélectionnables pour réédition, et supprimables depuis la liste récapitulative.
 
 ---
 

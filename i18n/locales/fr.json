@@ -101,6 +101,7 @@
       "recentBonuses": "Derniers bonus",
       "recentPenalties": "Dernières pénalités",
       "schedule": {
+        "exception": "Vacances et jours fériés",
         "slot": "Emploi du temps"
       },
       "rules": "Règles d'automatisation",
@@ -557,6 +558,27 @@
       "title": "Supprimer le créneau",
       "message": "Êtes-vous sûr de vouloir supprimer ce créneau ? Cette action est irréversible."
     },
-    "noClassrooms": "Aucune classe"
+    "noClassrooms": "Aucune classe",
+    "exceptions": {
+      "loading": "Chargement des vacances et jours fériés...",
+      "editing": "Modification",
+      "editingHint": "Cliquez deux dates pour redéfinir la plage.",
+      "editingExitHint": "Pour quitter le mode édition, appuyez sur Échap ou cliquez sur la croix.",
+      "empty": "Aucune exception configurée.",
+      "emptyHint": "Sélectionnez une plage de dates sur le calendrier pour ajouter une exception.",
+      "vacation": "Vacances",
+      "publicHoliday": "Jour férié",
+      "selectedRange": "Plage sélectionnée",
+      "selectRange": "Sélectionner la plage",
+      "addAsVacation": "Vacances",
+      "addAsHoliday": "Jour férié",
+      "cancelSelection": "Annuler",
+      "dayCount": "{count} jour | {count} jours",
+      "selectHint": "Cliquez sur deux dates dans la vue annuelle pour sélectionner une plage. Cliquez sur une période colorée pour la modifier.",
+      "legend": "Légende",
+      "listTitle": "Exceptions configurées",
+      "deleteTitle": "Supprimer l'exception",
+      "deleteMessage": "Êtes-vous sûr de vouloir supprimer cette exception ?"
+    }
   }
 }

@@ -62,7 +62,8 @@ watch(open, (isOpen) => {
   } else {
     form.weekday = props.prefillWeekday || ''
     form.start_time = props.prefillStartTime || ''
-    form.end_time = props.prefillEndTime || (props.prefillStartTime ? addMinutes(props.prefillStartTime, 55) : '')
+    form.end_time =
+      props.prefillEndTime || (props.prefillStartTime ? addMinutes(props.prefillStartTime, 55) : '')
     form.week_pattern = 'every_week'
     form.classroom_ids = []
     selectedClassrooms.value = []
@@ -95,10 +96,10 @@ const endTimeOptions = computed(() => {
 
 const canSubmit = computed(() => {
   return (
-    form.weekday !== ''
-    && form.start_time !== ''
-    && form.end_time !== ''
-    && form.start_time < form.end_time
+    form.weekday !== '' &&
+    form.start_time !== '' &&
+    form.end_time !== '' &&
+    form.start_time < form.end_time
   )
 })
 
@@ -181,9 +182,7 @@ function removeClassroom(id: string) {
         <div class="space-y-2">
           <Label>{{ t('schedule.form.startTime') }}</Label>
           <NativeSelect v-model="form.start_time" class="w-full">
-            <NativeSelectOption value="" disabled>
-              --:--
-            </NativeSelectOption>
+            <NativeSelectOption value="" disabled> --:-- </NativeSelectOption>
             <NativeSelectOption v-for="time in timeOptions" :key="time" :value="time">
               {{ time }}
             </NativeSelectOption>
@@ -195,9 +194,7 @@ function removeClassroom(id: string) {
         <div class="space-y-2">
           <Label>{{ t('schedule.form.endTime') }}</Label>
           <NativeSelect v-model="form.end_time" class="w-full">
-            <NativeSelectOption value="" disabled>
-              --:--
-            </NativeSelectOption>
+            <NativeSelectOption value="" disabled> --:-- </NativeSelectOption>
             <NativeSelectOption v-for="time in endTimeOptions" :key="time" :value="time">
               {{ time }}
             </NativeSelectOption>
@@ -235,10 +232,7 @@ function removeClassroom(id: string) {
       <div class="space-y-2">
         <Label>{{ t('schedule.form.classrooms') }}</Label>
 
-        <div
-          v-if="selectedClassrooms.length > 0"
-          class="flex flex-wrap gap-1.5"
-        >
+        <div v-if="selectedClassrooms.length > 0" class="flex flex-wrap gap-1.5">
           <Badge
             v-for="classroom in selectedClassrooms"
             :key="classroom.id"
@@ -252,7 +246,13 @@ function removeClassroom(id: string) {
               @click="removeClassroom(classroom.id)"
             >
               <span class="sr-only">{{ t('common.actions.remove') }}</span>
-              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="h-3 w-3"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M3 3l6 6M9 3l-6 6" />
               </svg>
             </button>
@@ -270,12 +270,14 @@ function removeClassroom(id: string) {
           :search-placeholder="t('schedule.form.classroomSearch')"
           :empty-text="t('schedule.form.classroomEmpty')"
           keep-focus-on-select
-          @selected-option="(opt: { id: string; name: string } | null) => {
-            if (opt && !form.classroom_ids.includes(opt.id)) {
-              form.classroom_ids.push(opt.id)
-              selectedClassrooms.push({ id: opt.id, name: opt.name })
+          @selected-option="
+            (opt: { id: string; name: string } | null) => {
+              if (opt && !form.classroom_ids.includes(opt.id)) {
+                form.classroom_ids.push(opt.id)
+                selectedClassrooms.push({ id: opt.id, name: opt.name })
+              }
             }
-          }"
+          "
         />
         <p v-if="fieldErrors.classroom_ids" class="text-sm text-destructive">
           {{ fieldErrors.classroom_ids }}

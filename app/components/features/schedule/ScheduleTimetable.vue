@@ -213,7 +213,12 @@ function handleCellMouseDown(event: MouseEvent, weekday: Weekday, stepIndex: num
   function onMouseUp() {
     cleanupDocumentDragListeners()
 
-    if (isDragging.value && dragDay.value !== null && dragStartStep.value !== null && dragEndStep.value !== null) {
+    if (
+      isDragging.value &&
+      dragDay.value !== null &&
+      dragStartStep.value !== null &&
+      dragEndStep.value !== null
+    ) {
       if (dragDidMove.value) {
         const minStep = Math.min(dragStartStep.value, dragEndStep.value)
         const maxStep = Math.max(dragStartStep.value, dragEndStep.value) + 1
@@ -296,10 +301,9 @@ onBeforeUnmount(() => {
                   : '',
           ]"
         >
-          <span
-            v-if="isHourBoundary(stepIndex)"
-            class="absolute -top-2.5 right-1.5"
-          >{{ time }}</span>
+          <span v-if="isHourBoundary(stepIndex)" class="absolute -top-2.5 right-1.5">{{
+            time
+          }}</span>
         </div>
       </div>
 
@@ -356,7 +360,9 @@ onBeforeUnmount(() => {
         >
           <div class="flex items-start gap-1 overflow-hidden">
             <span
-              :class="cn('mt-0.5 h-2 w-2 shrink-0 rounded-full', weekPatternDot[pos.slot.week_pattern])"
+              :class="
+                cn('mt-0.5 h-2 w-2 shrink-0 rounded-full', weekPatternDot[pos.slot.week_pattern])
+              "
             />
             <div class="min-w-0 flex-1 overflow-hidden">
               <p class="truncate font-semibold leading-tight">

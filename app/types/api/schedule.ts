@@ -1,4 +1,11 @@
-export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+export type Weekday =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
 export type WeekPattern = 'every_week' | 'even_weeks' | 'odd_weeks'
 
 export const SCHEDULE_WEEKDAYS = [
