@@ -51,7 +51,7 @@ async function logoutAllDevices(_: string) {
             <ShieldCheck class="size-5 text-primary" />
           </div>
           <div>
-            <h1 class="text-2xl font-bold tracking-tight">{{ t('userSettings.title') }}</h1>
+            <h1 class="text-2xl font-bold tracking-tight">{{ t('common.titles.userSettings') }}</h1>
             <p class="text-sm text-muted-foreground">{{ t('userSettings.description') }}</p>
           </div>
         </div>
@@ -127,7 +127,7 @@ async function logoutAllDevices(_: string) {
       </ActionPanelCard>
 
       <ActionPanelCard
-        :title="t('userSettings.logoutAll.title')"
+        :title="t('common.actions.logoutAll')"
         :description="t('userSettings.logoutAll.description')"
         :icon="Monitor"
       >
@@ -137,7 +137,7 @@ async function logoutAllDevices(_: string) {
           type="button"
           @click="showLogoutAllConfirm = true"
         >
-          {{ t('userSettings.logoutAll.button') }}
+          {{ t('common.actions.logoutAll') }}
         </Button>
       </ActionPanelCard>
     </div>
@@ -149,8 +149,8 @@ async function logoutAllDevices(_: string) {
       :title="t('userSettings.logoutAll.confirmTitle')"
       :message="t('userSettings.logoutAll.confirmMessage')"
       :warning-message="t('userSettings.logoutAll.confirmWarning')"
-      :cancel-label="t('common.cancel')"
-      :confirm-label="t('userSettings.logoutAll.confirmButton')"
+      :cancel-label="t('common.actions.cancel')"
+      :confirm-label="t('common.actions.logoutAll')"
       confirm-variant="destructive"
       :lock-duration-seconds="3"
     />

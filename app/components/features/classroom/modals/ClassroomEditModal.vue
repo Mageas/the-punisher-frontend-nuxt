@@ -87,7 +87,7 @@ const onSubmit = handleSubmit(async (values) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('modals.classroom.save')"
+    :submit-text="t('common.actions.save')"
     @submit="onSubmit"
   >
     <FormField v-slot="{ componentField }" name="name">
@@ -96,7 +96,7 @@ const onSubmit = handleSubmit(async (values) => {
         <FormControl>
           <Input
             type="text"
-            :placeholder="t('modals.classroom.namePlaceholder')"
+            :placeholder="t('common.placeholders.classroomName')"
             v-bind="componentField"
           />
         </FormControl>
@@ -110,7 +110,7 @@ const onSubmit = handleSubmit(async (values) => {
         <FormControl>
           <Input
             type="text"
-            :placeholder="t('modals.classroom.yearPlaceholder')"
+            :placeholder="t('common.placeholders.schoolYear')"
             v-bind="componentField"
           />
         </FormControl>

@@ -13,7 +13,7 @@ const { t } = useI18n()
 <template>
   <div>
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">{{ t('dashboard.recentBonuses') }}</h2>
+      <h2 class="text-lg font-semibold">{{ t('common.titles.recentBonuses') }}</h2>
       <KpiInfoBadge
         v-if="props.badgeText"
         :text="props.badgeText"

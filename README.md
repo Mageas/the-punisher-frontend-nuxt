@@ -38,6 +38,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - `app/services`: API communication layer. **All API calls must go through services.**
 - `app/composables`: Reusable business logic and state orchestration.
 - `app/types/api`: TypeScript definitions for API responses and payloads.
+- `i18n/locales/fr.json`: Locale messages with shared keys centralized under `common.*` (`actions`, `labels`, `placeholders`, `states`, `titles`, etc.) and feature-specific keys kept only for domain wording.
 
 ## ⚙️ Setup
 

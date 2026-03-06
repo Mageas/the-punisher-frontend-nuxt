@@ -60,12 +60,12 @@ const onSubmit = handleSubmit(async (values) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('typeManagement.create')"
+    :submit-text="t('common.actions.create')"
     @submit="onSubmit"
   >
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
-        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormLabel>{{ t('common.labels.name') }}</FormLabel>
         <FormControl>
           <Input type="text" :placeholder="props.placeholder" v-bind="componentField" />
         </FormControl>

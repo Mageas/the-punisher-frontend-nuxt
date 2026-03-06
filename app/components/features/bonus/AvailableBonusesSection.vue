@@ -102,8 +102,8 @@ function onUsed() {
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.consume')"
-            :aria-label="t('common.consume')"
+            :title="t('common.actions.consume')"
+            :aria-label="t('common.actions.consume')"
             @click="openUseBonusModal(bonus.id)"
           >
             <Gift class="h-5 w-5 text-warning" />

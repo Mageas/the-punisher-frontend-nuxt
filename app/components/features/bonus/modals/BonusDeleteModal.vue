@@ -20,8 +20,8 @@ const props = defineProps<{
     :action-fn="props.deleteFn"
     :title="t('modals.delete.title')"
     :message="t('modals.delete.bonusMessage')"
-    :cancel-label="t('modals.delete.cancel')"
-    :confirm-label="t('modals.delete.confirm')"
+    :cancel-label="t('common.actions.cancel')"
+    :confirm-label="t('common.actions.delete')"
     confirm-variant="destructive"
     @confirmed="emit('confirmed')"
   />

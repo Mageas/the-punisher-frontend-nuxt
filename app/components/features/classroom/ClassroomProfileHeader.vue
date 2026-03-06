@@ -36,11 +36,11 @@ const { t } = useI18n()
         <template #manage>
           <DropdownMenuItem class="cursor-pointer" @click="emit('edit')">
             <Pencil class="w-4 h-4" />
-            {{ t('classProfile.actions.edit') }}
+            {{ t('common.actions.edit') }}
           </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" class="cursor-pointer" @click="emit('delete')">
             <Trash2 class="w-4 h-4" />
-            {{ t('classProfile.actions.delete') }}
+            {{ t('common.actions.delete') }}
           </DropdownMenuItem>
         </template>
       </PageActionsMenu>

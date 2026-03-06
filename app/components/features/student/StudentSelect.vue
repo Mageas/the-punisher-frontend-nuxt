@@ -61,9 +61,9 @@ async function fetchStudentOptions(options: { page: number; search?: string }) {
     :fetch-options="shouldUseRemoteOptions ? fetchStudentOptions : undefined"
     :options-scope-key="resolvedOptionsScopeKey"
     :selected-label="props.selectedName"
-    :placeholder="props.placeholder ?? t('modals.penalty.selectStudent')"
-    :search-placeholder="props.placeholder ?? t('modals.penalty.selectStudent')"
-    :empty-text="props.emptyText ?? t('modals.penalty.noStudentFound')"
+    :placeholder="props.placeholder ?? t('common.placeholders.selectStudent')"
+    :search-placeholder="props.placeholder ?? t('common.placeholders.selectStudent')"
+    :empty-text="props.emptyText ?? t('common.empty.noStudents')"
     :keep-focus-on-select="props.keepFocusOnSelect"
   />
 </template>

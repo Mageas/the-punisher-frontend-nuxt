@@ -31,7 +31,7 @@ const { t } = useI18n()
   >
     <slot>
       <ChevronLeftIcon />
-      <span class="hidden sm:block">{{ t('common.first') }}</span>
+      <span class="hidden sm:block">{{ t('common.pagination.first') }}</span>
     </slot>
   </PaginationFirst>
 </template>

@@ -19,8 +19,8 @@ const { t } = useI18n()
 <template>
   <PendingPunishmentsSection
     :punishments="props.punishments"
-    :title="t('dashboard.pendingPunishments')"
-    :empty-label="t('punishments.noPunishments')"
+    :title="t('common.titles.pendingPunishments')"
+    :empty-label="t('common.empty.noPunishments')"
     :show-count="true"
     :count-override="props.countOverride"
     :badge-text="props.badgeText"

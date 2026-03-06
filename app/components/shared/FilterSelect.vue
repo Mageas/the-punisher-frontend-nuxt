@@ -31,7 +31,7 @@ const mappedOptions = computed(() =>
 )
 
 const resolvedSearchPlaceholder = computed(() => props.searchPlaceholder ?? props.placeholder)
-const resolvedEmptyText = computed(() => props.emptyText ?? t('filters.noTypeFound'))
+const resolvedEmptyText = computed(() => props.emptyText ?? t('common.empty.noTypeFound'))
 </script>
 
 <template>

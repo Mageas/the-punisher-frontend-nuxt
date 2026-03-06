@@ -83,7 +83,7 @@ await reload()
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('rules.title') }}
+          {{ t('common.titles.rules') }}
         </h1>
       </template>
 
@@ -93,7 +93,7 @@ await reload()
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('rules.newRule') }}
+          {{ t('common.actions.addRule') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -103,7 +103,7 @@ await reload()
     </Alert>
 
     <div v-if="rules.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('rules.noRules') }}
+      {{ t('common.empty.noRules') }}
     </div>
 
     <div v-else class="space-y-3">

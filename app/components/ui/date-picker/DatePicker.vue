@@ -68,7 +68,7 @@ function onDateSelect(value: DateValue | undefined) {
         )"
       >
         <CalendarIcon class="mr-2 h-4 w-4 shrink-0" />
-        {{ modelValue ? formatDisplay() : (placeholder ?? $t('common.selectDate')) }}
+        {{ modelValue ? formatDisplay() : (placeholder ?? $t('common.placeholders.selectDate')) }}
       </Button>
     </PopoverTrigger>
     <PopoverContent class="w-auto p-0" align="start">
@@ -81,7 +81,7 @@ function onDateSelect(value: DateValue | undefined) {
       />
       <div v-if="showTime" class="border-t border-border px-3 py-2">
         <div class="flex items-center gap-2">
-          <label class="text-sm text-muted-foreground whitespace-nowrap">{{ $t('common.time') }}</label>
+          <label class="text-sm text-muted-foreground whitespace-nowrap">{{ $t('common.labels.time') }}</label>
           <div
             :class="cn(
               'dark:bg-input/30 border-input flex h-9 items-center rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] md:text-sm',

@@ -23,7 +23,7 @@ const props = withDefaults(
 
 const { t } = useI18n()
 
-const buttonLabel = computed(() => props.label ?? t('common.actions'))
+const buttonLabel = computed(() => props.label ?? t('common.labels.actions'))
 const hasCreate = computed(() => !!useSlots().create)
 const hasManage = computed(() => !!useSlots().manage)
 </script>

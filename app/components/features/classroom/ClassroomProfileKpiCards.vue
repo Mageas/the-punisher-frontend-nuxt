@@ -15,7 +15,7 @@ function formatRatio(current: number, total: number): string {
 const cards = computed(() => [
   {
     key: 'studentCount',
-    label: t('classProfile.kpis.studentCount'),
+    label: t('common.titles.students'),
     value: props.kpis.student_count,
     icon: Users,
     iconClass: 'text-muted-foreground',
@@ -24,7 +24,7 @@ const cards = computed(() => [
   },
   {
     key: 'availableBonusPoints',
-    label: t('classProfile.kpis.availableBonusPoints'),
+    label: t('common.kpis.availableBonusPoints'),
     value: formatRatio(props.kpis.available_bonus_points, props.kpis.total_bonus_points),
     icon: Star,
     iconClass: 'text-warning',
@@ -33,7 +33,7 @@ const cards = computed(() => [
   },
   {
     key: 'penaltyCount',
-    label: t('classProfile.kpis.penaltyCount'),
+    label: t('common.titles.penalties'),
     value: props.kpis.penalty_count,
     icon: AlertCircle,
     iconClass: 'text-muted-foreground',
@@ -42,7 +42,7 @@ const cards = computed(() => [
   },
   {
     key: 'pendingPunishmentCount',
-    label: t('classProfile.kpis.pendingPunishmentCount'),
+    label: t('common.titles.pendingPunishments'),
     value: formatRatio(props.kpis.pending_punishment_count, props.kpis.total_punishment_count),
     icon: Gavel,
     iconClass: 'text-danger',

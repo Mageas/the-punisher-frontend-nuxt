@@ -30,7 +30,7 @@ const { t } = useI18n()
     v-bind="forwarded"
   >
     <slot>
-      <span class="hidden sm:block">{{ t('common.next') }}</span>
+      <span class="hidden sm:block">{{ t('common.pagination.next') }}</span>
       <ChevronRightIcon />
     </slot>
   </PaginationNext>

@@ -127,7 +127,7 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
   <div>
     <AppBreadcrumb
       :items="[
-        { label: t('classes.title'), to: '/classes' },
+        { label: t('common.titles.classes'), to: '/classes' },
         { label: classroom?.name ?? t('common.loading') },
       ]"
     />

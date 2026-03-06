@@ -161,7 +161,7 @@ await useAsyncData(
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('penalties.title') }}
+          {{ t('common.titles.penalties') }}
         </h1>
       </template>
 
@@ -171,7 +171,7 @@ await useAsyncData(
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('penalties.newPenalty') }}
+          {{ t('common.actions.addPenalty') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -179,41 +179,41 @@ await useAsyncData(
     <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
       <FilterIdNameSelect
         v-model="classroomId"
-        :label="t('filters.classroom')"
-        :placeholder="t('filters.allClassrooms')"
-        :search-placeholder="t('common.searchClass')"
-        :empty-text="t('common.noClassFound')"
+        :label="t('common.labels.classroom')"
+        :placeholder="t('common.options.allClassrooms')"
+        :search-placeholder="t('common.placeholders.searchClassroom')"
+        :empty-text="t('common.empty.noClasses')"
         :fetch-options="fetchClassroomOptions"
       />
 
       <FilterIdNameSelect
         v-model="studentId"
-        :label="t('filters.student')"
-        :placeholder="t('filters.allStudents')"
-        :search-placeholder="t('filters.searchStudent')"
-        :empty-text="t('filters.noStudentFound')"
+        :label="t('common.labels.student')"
+        :placeholder="t('common.options.allStudents')"
+        :search-placeholder="t('common.placeholders.searchStudent')"
+        :empty-text="t('common.empty.noStudents')"
         :fetch-options="fetchStudentOptions"
         :options-scope-key="studentFilterScopeKey"
       />
 
       <FilterIdNameSelect
         v-model="penaltyTypeId"
-        :label="t('filters.type')"
-        :placeholder="t('filters.allTypes')"
-        :search-placeholder="t('filters.searchType')"
-        :empty-text="t('filters.noTypeFound')"
+        :label="t('common.labels.type')"
+        :placeholder="t('common.options.allTypes')"
+        :search-placeholder="t('common.placeholders.searchType')"
+        :empty-text="t('common.empty.noTypeFound')"
         :fetch-options="fetchPenaltyTypeOptions"
       />
 
       <FilterDateRange
         v-model:from="createdFrom"
         v-model:to="createdTo"
-        :label="t('filters.dateRange')"
+        :label="t('common.labels.dateRange')"
       />
     </FilterBar>
 
     <div v-if="penalties.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('penalties.noPenalties') }}
+      {{ t('common.empty.noPenalties') }}
     </div>
 
     <div v-else class="space-y-3">
@@ -232,8 +232,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.edit')"
-            :aria-label="t('common.edit')"
+            :title="t('common.actions.edit')"
+            :aria-label="t('common.actions.edit')"
             @click="openEditModal(penalty)"
           >
             <Pencil class="w-4 h-4" />
@@ -243,8 +243,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('modals.delete.confirm')"
-            :aria-label="t('modals.delete.confirm')"
+            :title="t('common.actions.delete')"
+            :aria-label="t('common.actions.delete')"
             @click="openDeleteModal(penalty.id)"
           >
             <Trash2 class="w-4 h-4 text-danger" />

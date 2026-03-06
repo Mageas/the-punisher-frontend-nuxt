@@ -91,11 +91,15 @@ function computeTotalPages(total: number, itemsPerPage: number): number {
 const punishmentsTotalPages = computed(() =>
   computeTotalPages(punishmentsTotal.value, punishmentsPerPage.value),
 )
-const bonusesTotalPages = computed(() => computeTotalPages(bonusesTotal.value, bonusesPerPage.value))
+const bonusesTotalPages = computed(() =>
+  computeTotalPages(bonusesTotal.value, bonusesPerPage.value),
+)
 const penaltiesTotalPages = computed(() =>
   computeTotalPages(penaltiesTotal.value, penaltiesPerPage.value),
 )
-const historyTotalPages = computed(() => computeTotalPages(historyTotal.value, historyPerPage.value))
+const historyTotalPages = computed(() =>
+  computeTotalPages(historyTotal.value, historyPerPage.value),
+)
 
 async function fetchStudentProfile() {
   loadingProfile.value = true
@@ -173,7 +177,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
   <div>
     <AppBreadcrumb
       :items="[
-        { label: t('students.title'), to: '/students' },
+        { label: t('common.titles.students'), to: '/students' },
         {
           label: student ? `${student.first_name} ${student.last_name}` : '...',
         },
@@ -213,7 +217,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
             </div>
           </div>
 
-          <PageActionsMenu :create-label="t('common.add')" align="end">
+          <PageActionsMenu :create-label="t('common.actions.add')" align="end">
             <template #create>
               <DropdownMenuItem class="cursor-pointer" @click="showBonusCreateModal = true">
                 <Star class="w-4 h-4 text-warning" />
@@ -231,7 +235,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
             <template #manage>
               <DropdownMenuItem class="cursor-pointer" @click="showEditModal = true">
                 <Pencil class="w-4 h-4" />
-                {{ t('studentProfile.actions.edit') }}
+                {{ t('common.actions.edit') }}
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
@@ -239,7 +243,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
                 @click="showDeleteModal = true"
               >
                 <Trash2 class="w-4 h-4" />
-                {{ t('studentProfile.actions.delete') }}
+                {{ t('common.actions.delete') }}
               </DropdownMenuItem>
             </template>
           </PageActionsMenu>

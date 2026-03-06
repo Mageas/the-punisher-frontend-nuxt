@@ -40,16 +40,16 @@ const showPagination = computed(() => totalCount.value > 0)
 const studentFilterScopeKey = computed(() => classroomId.value || '__all_students__')
 
 const stateOptions = computed(() => [
-  { value: 'pending', label: t('filters.statePending') },
-  { value: 'resolved', label: t('filters.stateResolved') },
+  { value: 'pending', label: t('common.states.pending') },
+  { value: 'resolved', label: t('common.states.resolved') },
 ])
 
 const automatedOptions = computed(() => [
-  { value: 'true', label: t('filters.automatedYes') },
-  { value: 'false', label: t('filters.automatedNo') },
+  { value: 'true', label: t('common.states.automatedYes') },
+  { value: 'false', label: t('common.states.automatedNo') },
 ])
 
-const overdueOptions = computed(() => [{ value: 'true', label: t('filters.overdueOnly') }])
+const overdueOptions = computed(() => [{ value: 'true', label: t('common.states.overdueOnly') }])
 
 // Count active filters
 const activeFilterCount = computed(() => {
@@ -238,7 +238,7 @@ await useAsyncData(
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('punishments.title') }}
+          {{ t('common.titles.punishments') }}
         </h1>
       </template>
 
@@ -248,7 +248,7 @@ await useAsyncData(
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('punishments.newPunishment') }}
+          {{ t('common.actions.addPunishment') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -256,63 +256,63 @@ await useAsyncData(
     <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
       <FilterIdNameSelect
         v-model="classroomId"
-        :label="t('filters.classroom')"
-        :placeholder="t('filters.allClassrooms')"
-        :search-placeholder="t('common.searchClass')"
-        :empty-text="t('common.noClassFound')"
+        :label="t('common.labels.classroom')"
+        :placeholder="t('common.options.allClassrooms')"
+        :search-placeholder="t('common.placeholders.searchClassroom')"
+        :empty-text="t('common.empty.noClasses')"
         :fetch-options="fetchClassroomOptions"
       />
 
       <FilterIdNameSelect
         v-model="studentId"
-        :label="t('filters.student')"
-        :placeholder="t('filters.allStudents')"
-        :search-placeholder="t('filters.searchStudent')"
-        :empty-text="t('filters.noStudentFound')"
+        :label="t('common.labels.student')"
+        :placeholder="t('common.options.allStudents')"
+        :search-placeholder="t('common.placeholders.searchStudent')"
+        :empty-text="t('common.empty.noStudents')"
         :fetch-options="fetchStudentOptions"
         :options-scope-key="studentFilterScopeKey"
       />
 
       <FilterIdNameSelect
         v-model="punishmentTypeId"
-        :label="t('filters.type')"
-        :placeholder="t('filters.allTypes')"
-        :search-placeholder="t('filters.searchType')"
-        :empty-text="t('filters.noTypeFound')"
+        :label="t('common.labels.type')"
+        :placeholder="t('common.options.allTypes')"
+        :search-placeholder="t('common.placeholders.searchType')"
+        :empty-text="t('common.empty.noTypeFound')"
         :fetch-options="fetchPunishmentTypeOptions"
       />
 
       <FilterSelect
         v-model="state"
-        :label="t('filters.state')"
-        :placeholder="t('filters.allStates')"
+        :label="t('common.labels.state')"
+        :placeholder="t('common.options.allStates')"
         :options="stateOptions"
       />
 
       <FilterSelect
         v-model="automated"
         :label="t('filters.automated')"
-        :placeholder="t('filters.allStates')"
+        :placeholder="t('common.options.allStates')"
         :options="automatedOptions"
       />
 
       <FilterSelect
         v-model="overdue"
         :label="t('filters.overdue')"
-        :placeholder="t('filters.allStates')"
+        :placeholder="t('common.options.allStates')"
         :options="overdueOptions"
       />
 
       <FilterDateRange
         v-model:from="createdFrom"
         v-model:to="createdTo"
-        :label="t('filters.dateRange')"
+        :label="t('common.labels.dateRange')"
       />
 
       <FilterDateRange
         v-model:from="dueFrom"
         v-model:to="dueTo"
-        :label="t('filters.dueDateRange')"
+        :label="t('common.labels.dueDateRange')"
       />
     </FilterBar>
 
@@ -320,7 +320,7 @@ await useAsyncData(
       v-if="punishments.length === 0 && !loading"
       class="py-16 text-center text-muted-foreground"
     >
-      {{ t('punishments.noPunishments') }}
+      {{ t('common.empty.noPunishments') }}
     </div>
 
     <div v-else class="space-y-3">
@@ -342,8 +342,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.edit')"
-            :aria-label="t('common.edit')"
+            :title="t('common.actions.edit')"
+            :aria-label="t('common.actions.edit')"
             @click="openEditModal(punishment)"
           >
             <Pencil class="w-4 h-4" />
@@ -354,8 +354,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.resolve')"
-            :aria-label="t('common.resolve')"
+            :title="t('common.actions.resolve')"
+            :aria-label="t('common.actions.resolve')"
             @click="openResolveModal(punishment.id)"
           >
             <CircleCheck class="w-5 h-5 text-success" />
@@ -365,8 +365,8 @@ await useAsyncData(
             variant="ghost"
             size="icon-sm"
             class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('modals.delete.confirm')"
-            :aria-label="t('modals.delete.confirm')"
+            :title="t('common.actions.delete')"
+            :aria-label="t('common.actions.delete')"
             @click="openDeleteModal(punishment.id)"
           >
             <Trash2 class="w-4 h-4 text-danger" />

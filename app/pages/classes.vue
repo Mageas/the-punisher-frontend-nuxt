@@ -114,7 +114,7 @@ await reload()
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('classes.title') }}
+          {{ t('common.titles.classes') }}
         </h1>
         <Badge variant="outline" class="text-muted-foreground">
           {{ t('classes.count', totalCount) }}
@@ -127,7 +127,7 @@ await reload()
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('classes.newClassroom') }}
+          {{ t('common.actions.addClassroom') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -136,7 +136,7 @@ await reload()
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
           <Label class="text-xs font-medium text-muted-foreground">{{
-            t('filters.classroom')
+            t('common.labels.classroom')
           }}</Label>
           <Button
             v-if="searchQuery"
@@ -154,7 +154,7 @@ await reload()
           />
           <Input
             v-model="searchQuery"
-            :placeholder="t('common.searchClass')"
+            :placeholder="t('common.placeholders.searchClassroom')"
             class="h-8 pl-8 text-xs"
           />
         </div>
@@ -162,7 +162,7 @@ await reload()
     </FilterBar>
 
     <div v-if="classrooms.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('classes.noClasses') }}
+      {{ t('common.empty.noClasses') }}
     </div>
 
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -183,7 +183,7 @@ await reload()
 
         <div class="mb-4 flex items-center gap-3">
           <p class="text-sm text-muted-foreground">
-            {{ t('classes.studentCount', classroom.student_count) }}
+            {{ t('common.counts.student', classroom.student_count) }}
           </p>
 
           <div v-if="classroom.students_preview.length > 0" class="flex -space-x-2">

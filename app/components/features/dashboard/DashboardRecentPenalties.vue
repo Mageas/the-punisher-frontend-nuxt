@@ -14,7 +14,7 @@ const { t } = useI18n()
   <div>
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold">
-        {{ t('dashboard.recentPenalties') }}
+        {{ t('common.titles.recentPenalties') }}
       </h2>
       <KpiInfoBadge
         v-if="props.badgeText"

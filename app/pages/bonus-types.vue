@@ -15,8 +15,8 @@ const bonusTypeServices = {
 <template>
   <TypeManagementPage
     :service="bonusTypeServices"
-    :title="t('bonusTypes.title')"
-    :new-label="t('bonusTypes.newType')"
+    :title="t('common.titles.bonusTypes')"
+    :new-label="t('common.actions.addType')"
     :empty-label="t('bonusTypes.noTypes')"
     :create-title="t('bonusTypes.createTitle')"
     :create-placeholder="t('bonusTypes.placeholder')"

@@ -109,13 +109,13 @@ const onSubmit = handleSubmit(async (formValues) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('modals.rule.save')"
+    :submit-text="t('common.actions.save')"
     prevent-auto-focus
     @submit="onSubmit"
   >
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
-        <FormLabel>{{ t('typeManagement.name') }}</FormLabel>
+        <FormLabel>{{ t('common.labels.name') }}</FormLabel>
         <FormControl>
           <Input v-bind="componentField" type="text" />
         </FormControl>
@@ -130,8 +130,8 @@ const onSubmit = handleSubmit(async (formValues) => {
           <PenaltyTypeSelect
             :model-value="value"
             :selected-name="props.rule?.penalty_type_name"
-            :placeholder="t('modals.rule.selectPenaltyType')"
-            :empty-text="t('modals.rule.noPenaltyTypeFound')"
+            :placeholder="t('common.placeholders.selectType')"
+            :empty-text="t('common.empty.noTypeFound')"
             @update:model-value="handleChange"
           />
         </FormControl>
@@ -142,7 +142,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <FormField v-slot="{ componentField }" name="threshold">
         <FormItem>
-          <FormLabel>{{ t('modals.rule.threshold') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.threshold') }}</FormLabel>
           <FormControl>
             <Input v-bind="componentField" type="number" min="1" />
           </FormControl>
@@ -152,14 +152,14 @@ const onSubmit = handleSubmit(async (formValues) => {
 
       <FormField v-slot="{ value, handleChange }" name="mode">
         <FormItem>
-          <FormLabel>{{ t('modals.rule.mode') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.mode') }}</FormLabel>
           <FormControl>
             <FilterIdNameSelect
               :model-value="value"
               :options="modeOptions"
-              :placeholder="t('modals.rule.mode')"
-              :search-placeholder="t('modals.rule.mode')"
-              :empty-text="t('filters.noTypeFound')"
+              :placeholder="t('common.labels.mode')"
+              :search-placeholder="t('common.labels.mode')"
+              :empty-text="t('common.empty.noTypeFound')"
               @update:model-value="handleChange"
             />
           </FormControl>
@@ -175,8 +175,8 @@ const onSubmit = handleSubmit(async (formValues) => {
           <PunishmentTypeSelect
             :model-value="value"
             :selected-name="props.rule?.resulting_punishment_type_name"
-            :placeholder="t('modals.rule.selectPunishmentType')"
-            :empty-text="t('modals.rule.noPunishmentTypeFound')"
+            :placeholder="t('common.placeholders.selectType')"
+            :empty-text="t('common.empty.noTypeFound')"
             @update:model-value="handleChange"
           />
         </FormControl>

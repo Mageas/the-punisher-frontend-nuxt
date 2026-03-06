@@ -20,8 +20,8 @@ const props = defineProps<{
     :action-fn="props.useFn"
     :title="t('modals.use.title')"
     :message="t('modals.use.bonusMessage')"
-    :cancel-label="t('modals.use.cancel')"
-    :confirm-label="t('modals.use.confirm')"
+    :cancel-label="t('common.actions.cancel')"
+    :confirm-label="t('common.actions.consume')"
     @confirmed="emit('confirmed')"
   />
 </template>

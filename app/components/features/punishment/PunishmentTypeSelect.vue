@@ -38,9 +38,9 @@ async function fetchPunishmentTypeOptions(options: { page: number; search?: stri
     :options="props.punishmentTypes"
     :fetch-options="shouldUseRemoteOptions ? fetchPunishmentTypeOptions : undefined"
     :selected-label="props.selectedName"
-    :placeholder="props.placeholder ?? t('modals.punishment.selectPunishmentType')"
-    :search-placeholder="props.placeholder ?? t('modals.punishment.selectPunishmentType')"
-    :empty-text="props.emptyText ?? t('modals.punishment.noPunishmentTypeFound')"
+    :placeholder="props.placeholder ?? t('common.placeholders.selectType')"
+    :search-placeholder="props.placeholder ?? t('common.placeholders.selectType')"
+    :empty-text="props.emptyText ?? t('common.empty.noTypeFound')"
     @selected-option="emit('selectedOption', $event)"
   />
 </template>

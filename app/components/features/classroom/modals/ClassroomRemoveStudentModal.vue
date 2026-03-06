@@ -29,8 +29,8 @@ const message = computed(() =>
     :action-fn="props.removeFn"
     :title="t('modals.classroom.removeTitle')"
     :message="message"
-    :cancel-label="t('modals.classroom.cancel')"
-    :confirm-label="t('modals.classroom.removeConfirm')"
+    :cancel-label="t('common.actions.cancel')"
+    :confirm-label="t('common.actions.remove')"
     confirm-variant="destructive"
     @confirmed="emit('confirmed')"
   />

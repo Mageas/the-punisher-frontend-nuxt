@@ -63,10 +63,10 @@ if (students.value.length === 0 && !loading.value) {
     <PageHeaderBar align="center">
       <template #left>
         <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('students.title') }}
+          {{ t('common.titles.students') }}
         </h1>
         <Badge variant="outline" class="text-muted-foreground">
-          {{ t('students.count', totalCount) }}
+          {{ t('common.counts.student', totalCount) }}
         </Badge>
       </template>
 
@@ -76,7 +76,7 @@ if (students.value.length === 0 && !loading.value) {
           @click="showCreateModal = true"
         >
           <Plus class="w-4 h-4" />
-          {{ t('students.newStudent') }}
+          {{ t('common.actions.addStudent') }}
         </Button>
       </template>
     </PageHeaderBar>
@@ -85,7 +85,7 @@ if (students.value.length === 0 && !loading.value) {
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
           <Label class="text-xs font-medium text-muted-foreground">{{
-            t('filters.student')
+            t('common.labels.student')
           }}</Label>
           <Button
             v-if="searchQuery"
@@ -103,7 +103,7 @@ if (students.value.length === 0 && !loading.value) {
           />
           <Input
             v-model="searchQuery"
-            :placeholder="t('students.searchPlaceholder')"
+            :placeholder="t('common.placeholders.searchStudent')"
             class="h-8 pl-8 text-xs"
           />
         </div>
@@ -111,7 +111,7 @@ if (students.value.length === 0 && !loading.value) {
     </FilterBar>
 
     <div v-if="students.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('students.noStudents') }}
+      {{ t('common.empty.noStudents') }}
     </div>
 
     <div v-else class="space-y-3">

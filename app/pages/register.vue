@@ -101,12 +101,12 @@ const registerSubtitle = computed(() =>
         <form class="space-y-4" @submit.prevent="onSubmit">
           <!-- Nom / Prénom -->
           <div class="space-y-2">
-            <Label for="lastname">{{ t('auth.lastName') }}</Label>
+            <Label for="lastname">{{ t('common.labels.name') }}</Label>
             <Input
               id="lastname"
               v-model="form.lastName"
               type="text"
-              :placeholder="t('auth.lastNamePlaceholder')"
+              :placeholder="t('common.placeholders.lastName')"
               :aria-invalid="!!fieldErrors.last_name"
               @input="clearFieldError('last_name')"
             />
@@ -115,12 +115,12 @@ const registerSubtitle = computed(() =>
             </p>
           </div>
           <div class="space-y-2">
-            <Label for="firstname">{{ t('auth.firstName') }}</Label>
+            <Label for="firstname">{{ t('common.labels.firstName') }}</Label>
             <Input
               id="firstname"
               v-model="form.firstName"
               type="text"
-              :placeholder="t('auth.firstNamePlaceholder')"
+              :placeholder="t('common.placeholders.firstName')"
               :aria-invalid="!!fieldErrors.first_name"
               @input="clearFieldError('first_name')"
             />
@@ -205,7 +205,7 @@ const registerSubtitle = computed(() =>
       <p class="text-center text-sm text-muted-foreground mt-4">
         {{ t('auth.hasAccount') }}
         <NuxtLink to="/login" class="underline underline-offset-4 hover:text-foreground">
-          {{ t('auth.signIn') }}
+          {{ t('common.actions.signIn') }}
         </NuxtLink>
       </p>
     </div>

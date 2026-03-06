@@ -5,8 +5,8 @@ import PunishmentCard from '../PunishmentCard.vue'
 const translations: Record<string, string | ((params?: Record<string, string>) => string)> = {
   'punishments.autoByRule': (params) => `Auto par ${params?.name ?? ''}`,
   'punishments.deletedRule': 'Règle supprimée',
-  'punishments.pending': 'En attente',
-  'punishments.resolved': 'Résolu',
+  'common.states.pending': 'En attente',
+  'common.states.resolved': 'Résolu',
   'common.dueAt': (params) => `Échéance : ${params?.date ?? ''}`,
   'punishments.resolvedAt': (params) => `Résolu le ${params?.date ?? ''}`,
 }

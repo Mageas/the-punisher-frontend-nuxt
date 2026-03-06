@@ -50,7 +50,9 @@ function emitNextPage() {
       <ChevronLeft class="h-3.5 w-3.5" />
     </button>
 
-    <span class="min-w-[2.5rem] select-none text-center text-xs font-semibold tabular-nums text-foreground">
+    <span
+      class="min-w-[2.5rem] select-none text-center text-xs font-semibold tabular-nums text-foreground"
+    >
       {{ page }}/{{ totalPages }}
     </span>
 

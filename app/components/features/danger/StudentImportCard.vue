@@ -278,7 +278,7 @@ const displayedImportErrors = computed(() =>
         <div class="p-3.5 space-y-1">
           <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <Users class="size-3.5" />
-            {{ t('dangerZone.importStudents.summaryStudents') }}
+            {{ t('common.titles.students') }}
           </div>
           <div class="flex items-baseline gap-1.5">
             <span
@@ -303,7 +303,7 @@ const displayedImportErrors = computed(() =>
         <div class="p-3.5 space-y-1">
           <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <School class="size-3.5" />
-            {{ t('dangerZone.importStudents.summaryClassrooms') }}
+            {{ t('common.titles.classes') }}
           </div>
           <div class="flex items-baseline gap-1.5">
             <span
@@ -340,12 +340,12 @@ const displayedImportErrors = computed(() =>
               {{ importSummary.links_created }}
             </span>
             <span class="text-xs text-muted-foreground">
-              {{ t('dangerZone.importStudents.summaryLinksCreated') }}
+              {{ t('dangerZone.importStudents.summaryStudentsCreated') }}
             </span>
           </div>
           <p class="text-xs text-muted-foreground">
             {{ importSummary.links_existing }}
-            {{ t('dangerZone.importStudents.summaryLinksExisting') }}
+            {{ t('dangerZone.importStudents.summaryStudentsExisting') }}
           </p>
         </div>
       </div>

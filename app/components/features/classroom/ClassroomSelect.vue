@@ -42,11 +42,11 @@ async function fetchClassroomOptions(options: { page: number; search?: string })
       :options="options"
       :fetch-options="shouldUseRemoteOptions ? fetchClassroomOptions : undefined"
       :selected-label="props.selectedName"
-      :placeholder="t('common.selectClassOptional')"
-      :search-placeholder="t('common.searchClass')"
-      :empty-text="t('common.noClassFound')"
-      :none-option-label="t('filters.allClassrooms')"
-      :none-value-label="t('common.selectClassOptional')"
+      :placeholder="t('common.placeholders.selectClassOptional')"
+      :search-placeholder="t('common.placeholders.searchClassroom')"
+      :empty-text="t('common.empty.noClasses')"
+      :none-option-label="t('common.options.allClassrooms')"
+      :none-value-label="t('common.placeholders.selectClassOptional')"
     />
   </div>
 </template>

@@ -38,9 +38,9 @@ async function fetchBonusTypeOptions(options: { page: number; search?: string })
     :options="props.bonusTypes"
     :fetch-options="shouldUseRemoteOptions ? fetchBonusTypeOptions : undefined"
     :selected-label="props.selectedName"
-    :placeholder="props.placeholder ?? t('modals.bonus.selectBonusType')"
-    :search-placeholder="props.placeholder ?? t('modals.bonus.selectBonusType')"
-    :empty-text="props.emptyText ?? t('modals.bonus.noBonusTypeFound')"
+    :placeholder="props.placeholder ?? t('common.placeholders.selectType')"
+    :search-placeholder="props.placeholder ?? t('common.placeholders.selectType')"
+    :empty-text="props.emptyText ?? t('common.empty.noTypeFound')"
     @selected-option="emit('selectedOption', $event)"
   />
 </template>

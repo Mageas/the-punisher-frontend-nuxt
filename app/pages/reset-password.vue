@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { KeyRound, Skull } from 'lucide-vue-next'
+import { Skull } from 'lucide-vue-next'
 
 definePageMeta({
   layout: false,
@@ -208,7 +208,7 @@ function onConfirmPasswordInput() {
       <p class="text-center text-sm text-muted-foreground mt-4">
         {{ t('auth.hasAccount') }}
         <NuxtLink to="/login" class="underline underline-offset-4 hover:text-foreground">
-          {{ t('auth.signIn') }}
+          {{ t('common.actions.signIn') }}
         </NuxtLink>
       </p>
     </div>

@@ -123,7 +123,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     :global-error="globalError"
     :submitting="isSubmitting"
     :can-submit="meta.valid"
-    :submit-text="t('modals.penalty.save')"
+    :submit-text="t('common.actions.save')"
     prevent-auto-focus
     @submit="onSubmit"
   >
@@ -133,12 +133,12 @@ const onSubmit = handleSubmit(async (formValues) => {
         name="occurred_at_time"
       >
         <FormItem>
-          <FormLabel>{{ t('modals.penalty.occurredAt') }}</FormLabel>
+          <FormLabel>{{ t('common.labels.occurredAt') }}</FormLabel>
           <FormControl>
             <DatePicker
               :model-value="dateValue"
               :time="timeValue"
-              :placeholder="t('modals.penalty.selectOccurredDate')"
+              :placeholder="t('common.placeholders.selectOccurredDate')"
               show-time
               @update:model-value="handleChangeDate"
               @update:time="handleChangeTime"
@@ -151,12 +151,12 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     <FormField v-slot="{ componentField }" name="evaluation_label">
       <FormItem>
-        <FormLabel>{{ t('modals.penalty.evaluationLabel') }}</FormLabel>
+        <FormLabel>{{ t('common.labels.evaluationLabel') }}</FormLabel>
         <FormControl>
           <Input
             v-bind="componentField"
             type="text"
-            :placeholder="t('modals.penalty.evaluationLabelPlaceholder')"
+            :placeholder="t('common.placeholders.evaluationLabel')"
           />
         </FormControl>
         <FormMessage />
