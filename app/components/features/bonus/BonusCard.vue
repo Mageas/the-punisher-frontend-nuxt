@@ -5,6 +5,7 @@ const props = defineProps<{
   bonusTypeName: string
   points: number
   usedAt?: string | null
+  occurredAt?: string | null
   createdAt?: string | null
   studentId?: string
   studentFirstName?: string
@@ -14,6 +15,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
+const displayedDate = computed(() => props.occurredAt ?? props.createdAt)
 
 function formatPoints(points: number): string {
   return `+${points}`
@@ -49,10 +51,10 @@ function formatPoints(points: number): string {
         <p class="mt-0.5 text-xs text-muted-foreground">
           <template v-if="hasStudentName">
             {{ bonusTypeName }}
-            <template v-if="createdAt"> — {{ formatDate(createdAt) }}</template>
+            <template v-if="displayedDate"> — {{ formatDate(displayedDate) }}</template>
           </template>
-          <template v-else-if="createdAt">
-            {{ formatDate(createdAt) }}
+          <template v-else-if="displayedDate">
+            {{ formatDate(displayedDate) }}
           </template>
         </p>
         <div class="mt-2 flex items-center justify-between">
@@ -101,10 +103,10 @@ function formatPoints(points: number): string {
         <p class="mt-0.5 text-xs text-muted-foreground">
           <template v-if="hasStudentName">
             {{ bonusTypeName }}
-            <template v-if="createdAt"> — {{ formatDate(createdAt) }}</template>
+            <template v-if="displayedDate"> — {{ formatDate(displayedDate) }}</template>
           </template>
-          <template v-else-if="createdAt">
-            {{ formatDate(createdAt) }}
+          <template v-else-if="displayedDate">
+            {{ formatDate(displayedDate) }}
           </template>
         </p>
       </div>

@@ -333,7 +333,7 @@
       "occurredAt": "Date de l'événement",
       "selectOccurredDate": "Sélectionner la date de l'événement...",
       "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Retard",
+      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
       "cancel": "Annuler",
       "submit": "Valider",
       "save": "Enregistrer"
@@ -355,7 +355,7 @@
       "occurredAt": "Date de l'événement",
       "selectOccurredDate": "Sélectionner la date de l'événement...",
       "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Participation",
+      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
       "cancel": "Annuler",
       "submit": "Valider",
       "save": "Enregistrer"
@@ -371,7 +371,7 @@
       "occurredAt": "Date de l'événement",
       "selectOccurredDate": "Sélectionner la date de l'événement...",
       "evaluationLabel": "Libellé d'évaluation",
-      "evaluationLabelPlaceholder": "ex: Travail non rendu",
+      "evaluationLabelPlaceholder": "ex: Interrogation sur Baudelaire",
       "selectStudent": "Sélectionner un élève....",
       "searchStudent": "Rechercher un élève...",
       "noStudentFound": "Aucun élève trouvé.",

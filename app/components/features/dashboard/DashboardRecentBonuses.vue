@@ -28,6 +28,7 @@ const { t } = useI18n()
         :bonus-type-name="bonus.bonus_type_name"
         :points="bonus.points"
         :used-at="bonus.used_at"
+        :occurred-at="bonus.occurred_at ?? bonus.created_at"
         :created-at="bonus.created_at"
         :student-id="bonus.student_id"
         :student-first-name="bonus.student_first_name"

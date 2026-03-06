@@ -41,6 +41,7 @@ export interface StudentHistoryBonusItem {
   bonus_type_name: string
   points: number
   used_at?: string | null
+  occurred_at?: string
   created_at: string
 }
 
@@ -52,6 +53,7 @@ export interface StudentHistoryPenaltyItem {
   id: string
   penalty_type_id: string
   penalty_type_name: string
+  occurred_at?: string
   created_at: string
 }
 
@@ -68,6 +70,7 @@ export interface StudentHistoryPunishmentItem {
   triggering_rule_name?: string | null
   due_at?: string | null
   resolved_at?: string | null
+  occurred_at?: string
   created_at: string
 }
 

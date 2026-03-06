@@ -3,6 +3,7 @@ interface AvailableBonus {
   id: string
   bonus_type_name: string
   points: number
+  occurred_at?: string
   created_at: string
 }
 

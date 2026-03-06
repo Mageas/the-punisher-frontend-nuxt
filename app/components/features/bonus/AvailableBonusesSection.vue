@@ -5,6 +5,7 @@ interface AvailableBonus {
   id: string
   bonus_type_name: string
   points: number
+  occurred_at?: string
   created_at: string
 }
 
@@ -93,6 +94,7 @@ function onUsed() {
         :key="bonus.id"
         :bonus-type-name="bonus.bonus_type_name"
         :points="bonus.points"
+        :occurred-at="bonus.occurred_at ?? bonus.created_at"
         :created-at="bonus.created_at"
       >
         <template v-if="hasConsumeAction" #actions>

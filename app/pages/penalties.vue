@@ -221,6 +221,7 @@ await useAsyncData(
         v-for="penalty in penalties"
         :key="penalty.id"
         :penalty-type-name="penalty.penalty_type_name"
+        :occurred-at="penalty.occurred_at ?? penalty.created_at"
         :created-at="penalty.created_at"
         :student-id="penalty.student_id"
         :student-first-name="penalty.student_first_name"
