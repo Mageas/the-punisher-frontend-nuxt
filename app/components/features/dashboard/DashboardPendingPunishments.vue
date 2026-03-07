@@ -14,19 +14,16 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const sectionProps = computed(() => ({
+  ...props,
+  title: t('common.titles.pendingPunishments'),
+  emptyLabel: t('common.empty.noPunishments'),
+  showCount: true,
+  compact: true,
+}))
 </script>
 
 <template>
-  <PendingPunishmentsSection
-    :punishments="props.punishments"
-    :title="t('common.titles.pendingPunishments')"
-    :empty-label="t('common.empty.noPunishments')"
-    :show-count="true"
-    :count-override="props.countOverride"
-    :badge-text="props.badgeText"
-    :badge-help-text="props.badgeHelpText"
-    compact
-    :resolve-fn="props.resolveFn"
-    @resolved="emit('resolved')"
-  />
+  <PendingPunishmentsSection v-bind="sectionProps" @resolved="emit('resolved')" />
 </template>

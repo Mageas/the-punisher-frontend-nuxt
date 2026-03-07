@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { Check, ChevronDown, Info } from 'lucide-vue-next'
+import { Check, Info } from 'lucide-vue-next'
+import ChoicePillsList from '~/components/shared/ChoicePillsList.vue'
+import CollapsedChoiceSummary from '~/components/shared/CollapsedChoiceSummary.vue'
+import ExpandableChoicePanel from '~/components/shared/ExpandableChoicePanel.vue'
+import ExpandableChoicePanelHeader from '~/components/shared/ExpandableChoicePanelHeader.vue'
 
 interface ClassroomOption {
   id: string
@@ -39,26 +43,20 @@ function selectClassroom(classroomId: string) {
 </script>
 
 <template>
-  <div class="rounded-lg border border-info-border bg-info-bg-subtle">
-    <div v-if="open" class="p-3.5 space-y-3">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-start gap-2.5">
-          <Info class="size-4 mt-0.5 text-info-foreground shrink-0" />
-          <p class="text-sm text-info-foreground leading-snug">
-            {{ props.hint }}
-          </p>
-        </div>
+  <ExpandableChoicePanel :expanded="open" tone="info">
+    <template #expanded>
+      <ExpandableChoicePanelHeader
+        :hint="props.hint"
+        :hide-label="t('common.actions.hide')"
+        tone="info"
+        @hide="open = false"
+      >
+        <template #icon>
+          <Info class="mt-0.5 size-4 shrink-0 text-info-foreground" />
+        </template>
+      </ExpandableChoicePanelHeader>
 
-        <button
-          type="button"
-          class="shrink-0 text-xs font-medium text-info-foreground/80 hover:text-info-foreground"
-          @click="open = false"
-        >
-          {{ t('common.actions.hide') }}
-        </button>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
+      <ChoicePillsList>
         <button
           v-for="classroom in props.classrooms"
           :key="classroom.id"
@@ -76,31 +74,24 @@ function selectClassroom(classroomId: string) {
           <Check v-if="props.selectedClassroomId === classroom.id" class="size-3.5" />
           {{ classroom.name }}
         </button>
-      </div>
-    </div>
+      </ChoicePillsList>
+    </template>
 
-    <button
-      v-else
-      type="button"
-      class="flex w-full items-center justify-between gap-3 rounded-lg px-3.5 py-3 text-left transition-colors hover:bg-info-bg-subtle/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      @click="open = true"
-    >
-      <div class="flex min-w-0 items-start gap-2.5">
-        <Info class="size-4 mt-0.5 text-info-foreground shrink-0" />
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-info-foreground">
-            {{
-              selectedClassroomName
-                ? t('common.actions.viewSelectedClassroom')
-                : t('common.actions.chooseClassroom')
-            }}
-          </p>
-          <p v-if="selectedClassroomName" class="text-sm text-info-foreground/80">
-            {{ selectedClassroomName }}
-          </p>
-        </div>
-      </div>
-      <ChevronDown class="size-4 shrink-0 text-info-foreground" />
-    </button>
-  </div>
+    <template #collapsed>
+      <CollapsedChoiceSummary
+        :title="
+          selectedClassroomName
+            ? t('common.actions.viewSelectedClassroom')
+            : t('common.actions.chooseClassroom')
+        "
+        :subtitle="selectedClassroomName"
+        tone="info"
+        @click="open = true"
+      >
+        <template #icon>
+          <Info class="mt-0.5 size-4 shrink-0 text-info-foreground" />
+        </template>
+      </CollapsedChoiceSummary>
+    </template>
+  </ExpandableChoicePanel>
 </template>

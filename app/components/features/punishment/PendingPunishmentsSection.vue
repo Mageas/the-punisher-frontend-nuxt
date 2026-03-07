@@ -46,10 +46,6 @@ const sectionEmptyLabel = computed(
 )
 const useCompactMode = computed(() => props.compact ?? false)
 const showCountBadge = computed(() => props.showCount ?? false)
-const currentPage = computed(() => props.page ?? 1)
-const currentTotalPages = computed(() => props.totalPages ?? 1)
-const paginationLoading = computed(() => props.loading ?? false)
-const paginationDisabled = computed(() => props.disabled ?? false)
 const displayedBadgeText = computed(
   () => props.badgeText ?? props.countOverride ?? props.punishments.length,
 )
@@ -72,35 +68,19 @@ function onResolved() {
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex min-w-0 items-center gap-3">
-        <h2 class="text-lg font-semibold">
-          {{ sectionTitle }}
-        </h2>
-        <SectionHeaderPagination
-          :page="currentPage"
-          :total-pages="currentTotalPages"
-          :loading="paginationLoading"
-          :disabled="paginationDisabled"
-          @update:page="emit('update:page', $event)"
-        />
-      </div>
-      <KpiInfoBadge
-        v-if="showCountBadge"
-        :text="displayedBadgeText"
-        :help-text="props.badgeHelpText"
-        badge-class="border-danger-border text-danger"
-      />
-    </div>
+    <SectionHeaderRow
+      :title="sectionTitle"
+      :page="props.page"
+      :total-pages="props.totalPages"
+      :loading="props.loading"
+      :disabled="props.disabled"
+      :badge-text="showCountBadge ? displayedBadgeText : undefined"
+      :badge-help-text="props.badgeHelpText"
+      badge-class="border-danger-border text-danger"
+      @update:page="emit('update:page', $event)"
+    />
 
-    <div
-      v-if="punishments.length === 0"
-      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
-    >
-      {{ sectionEmptyLabel }}
-    </div>
-
-    <div v-else class="space-y-2">
+    <SectionListBlock :is-empty="punishments.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-2">
       <PunishmentCard
         v-for="punishment in punishments"
         :key="punishment.id"
@@ -127,7 +107,7 @@ function onResolved() {
           </Button>
         </template>
       </PunishmentCard>
-    </div>
+    </SectionListBlock>
 
     <PunishmentResolveModal
       v-if="hasResolveAction"

@@ -4,13 +4,12 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import { getLocalTimeZone } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
-import type { NextLesson, Student } from '~/types/api'
+import type { NextLesson } from '~/types/api'
 import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
 import {
   resolvePunishmentDueAtFromNextLesson,
   resolveSelectedNextLessonKey,
 } from '~/lib/punishment-next-lesson'
-import { resolveStudentClassroomSelection } from '~/lib/student-classroom'
 
 const emit = defineEmits<{
   created: []
@@ -32,20 +31,12 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const punishmentService = usePunishmentService()
-const studentService = useStudentService()
 const scheduleService = useScheduleService()
 const { notifyCreateSuccess } = useActionToast()
 
-const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
-const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
-const selectedStudentClassrooms = ref<Student['classrooms']>([])
-const loadingSelectedStudentClassrooms = ref(false)
-const selectedStudentClassroomId = ref('')
 const nextLessons = ref<NextLesson[]>([])
 const loadingNextLessons = ref(false)
-const isStudentClassroomDrawerOpen = ref(false)
 const isNextLessonsDrawerOpen = ref(false)
-let classroomLookupRequestId = 0
 let nextLessonsRequestId = 0
 
 const schema = toTypedSchema(
@@ -75,8 +66,8 @@ const schema = toTypedSchema(
       occurred_at_time: zod.string().optional(),
       evaluation_label: zod.string().optional(),
     })
-    .superRefine((value, ctx) => {
-      if (selectedStudentClassrooms.value.length > 1 && !selectedStudentClassroomId.value) {
+    .superRefine((_, ctx) => {
+      if (requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value) {
         ctx.addIssue({
           code: zod.ZodIssueCode.custom,
           path: ['classroom_id'],
@@ -109,19 +100,30 @@ const { handleSubmit, resetForm, setFieldError, values, setFieldValue, meta } = 
   initialValues: getInitialValues(),
 })
 
-const studentClassroomOptions = computed(() =>
-  selectedStudentClassrooms.value.map((classroom) => ({
-    id: classroom.id,
-    name: classroom.name,
-  })),
-)
-const requiresStudentClassroomSelection = computed(() => selectedStudentClassrooms.value.length > 1)
-const shouldShowStudentClassroomSelect = computed(() => requiresStudentClassroomSelection.value)
+const {
+  hasPreselectedStudent,
+  hasPreselectedClassroom,
+  loadingSelectedStudentClassrooms,
+  selectedStudentClassroomId,
+  studentClassroomOptions,
+  requiresStudentClassroomSelection,
+  shouldShowStudentClassroomSelect,
+  isStudentClassroomMissing,
+  isStudentClassroomDrawerOpen,
+  selectStudentClassroom,
+  initializeResolvedStudentClassroomSelection,
+  cleanupResolvedStudentClassroomSelection,
+} = useResolvedStudentClassroomSelection({
+  open,
+  values,
+  setFieldValue,
+  setFieldError,
+  preselectedStudentId: () => props.preselectedStudentId,
+  preselectedClassroomId: () => props.preselectedClassroomId,
+})
+
 const shouldShowNextLessonSuggestions = computed(
   () => !!values.student_id && (!!selectedStudentClassroomId.value || loadingNextLessons.value),
-)
-const isStudentClassroomMissing = computed(
-  () => requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value,
 )
 const canSubmit = computed(
   () =>
@@ -141,10 +143,6 @@ function resetNextLessonsState() {
   isNextLessonsDrawerOpen.value = false
 }
 
-function syncStudentClassroomDrawerState(classroomId: string) {
-  isStudentClassroomDrawerOpen.value = selectedStudentClassrooms.value.length > 1 && !classroomId
-}
-
 function syncNextLessonsDrawerState(lessons: readonly NextLesson[]) {
   if (loadingNextLessons.value || lessons.length === 0) {
     isNextLessonsDrawerOpen.value = true
@@ -157,12 +155,6 @@ function syncNextLessonsDrawerState(lessons: readonly NextLesson[]) {
   })
 }
 
-function selectStudentClassroom(classroomId: string) {
-  selectedStudentClassroomId.value = classroomId
-  setFieldValue('classroom_id', classroomId, false)
-  isStudentClassroomDrawerOpen.value = false
-}
-
 function applyNextLesson(lesson: NextLesson) {
   const dueSelection = resolvePunishmentDueAtFromNextLesson(lesson)
   if (!dueSelection) return
@@ -172,43 +164,6 @@ function applyNextLesson(lesson: NextLesson) {
   setFieldError('due_at', undefined)
   setFieldError('due_at_time', undefined)
   isNextLessonsDrawerOpen.value = false
-}
-
-async function loadSelectedStudentClassrooms(studentId: string) {
-  const requestId = ++classroomLookupRequestId
-  loadingSelectedStudentClassrooms.value = true
-
-  try {
-    const student = await studentService.getStudentById(studentId)
-
-    if (requestId !== classroomLookupRequestId) return
-
-    selectedStudentClassrooms.value = student.classrooms
-    setFieldError('classroom_id', undefined)
-
-    const { classroomId } = resolveStudentClassroomSelection(student.classrooms, {
-      currentClassroomId: selectedStudentClassroomId.value,
-      preferredClassroomId: values.student_lookup_classroom_id || null,
-    })
-
-    selectedStudentClassroomId.value = classroomId
-    setFieldValue('classroom_id', classroomId, false)
-    syncStudentClassroomDrawerState(classroomId)
-  } catch {
-    if (requestId !== classroomLookupRequestId) return
-
-    selectedStudentClassrooms.value = []
-    setFieldError('classroom_id', undefined)
-    isStudentClassroomDrawerOpen.value = false
-    selectedStudentClassroomId.value = hasPreselectedStudent.value
-      ? ''
-      : values.student_lookup_classroom_id || ''
-    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
-  } finally {
-    if (requestId === classroomLookupRequestId) {
-      loadingSelectedStudentClassrooms.value = false
-    }
-  }
 }
 
 async function loadNextLessons(classroomId: string) {
@@ -234,94 +189,31 @@ async function loadNextLessons(classroomId: string) {
   }
 }
 
-// When the classroom filter changes, reset the student selection and the resolved classroom.
 watch(
-  () => values.student_lookup_classroom_id,
-  (nextClassroomId) => {
-    if (!open.value) return
-    if (hasPreselectedStudent.value) return
+  [() => open.value, () => values.student_id, selectedStudentClassroomId],
+  async ([isOpen, studentId, classroomId]) => {
+    if (!isOpen) return
 
-    classroomLookupRequestId += 1
-    loadingSelectedStudentClassrooms.value = false
-    selectedStudentClassrooms.value = []
-    setFieldError('classroom_id', undefined)
-    isStudentClassroomDrawerOpen.value = false
-    resetNextLessonsState()
-    selectedStudentClassroomId.value = nextClassroomId || ''
-    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
-    setFieldValue('student_id', '', false)
-  },
-)
-
-watch(
-  () => values.student_id,
-  async (studentId) => {
-    if (!open.value) return
-
-    if (!studentId) {
-      classroomLookupRequestId += 1
-      loadingSelectedStudentClassrooms.value = false
-      selectedStudentClassrooms.value = []
-      setFieldError('classroom_id', undefined)
-      isStudentClassroomDrawerOpen.value = false
+    if (!studentId || !classroomId) {
       resetNextLessonsState()
-      selectedStudentClassroomId.value = hasPreselectedStudent.value
-        ? ''
-        : values.student_lookup_classroom_id || ''
-      setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
       return
     }
 
-    await loadSelectedStudentClassrooms(studentId)
+    await loadNextLessons(classroomId)
   },
 )
-
-watch(selectedStudentClassroomId, async (classroomId) => {
-  if (!open.value) return
-
-  if (classroomId) {
-    setFieldError('classroom_id', undefined)
-  }
-
-  if (!values.student_id || !classroomId) {
-    resetNextLessonsState()
-    return
-  }
-
-  if (selectedStudentClassrooms.value.length > 1) {
-    isStudentClassroomDrawerOpen.value = false
-  }
-
-  await loadNextLessons(classroomId)
-})
 
 // Load data when modal opens
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedStudentClassrooms.value = []
-    classroomLookupRequestId += 1
-    loadingSelectedStudentClassrooms.value = false
-    isStudentClassroomDrawerOpen.value = false
-    selectedStudentClassroomId.value = props.preselectedStudentId
-      ? ''
-      : (props.preselectedClassroomId ?? '')
-    setFieldError('classroom_id', undefined)
     resetNextLessonsState()
     resetForm({ values: getInitialValues() })
-
-    if (props.preselectedStudentId) {
-      await loadSelectedStudentClassrooms(props.preselectedStudentId)
-    }
+    await initializeResolvedStudentClassroomSelection()
     return
   }
 
-  classroomLookupRequestId += 1
-  loadingSelectedStudentClassrooms.value = false
-  selectedStudentClassrooms.value = []
-  isStudentClassroomDrawerOpen.value = false
-  selectedStudentClassroomId.value = ''
-  setFieldError('classroom_id', undefined)
+  cleanupResolvedStudentClassroomSelection()
   resetNextLessonsState()
 })
 
@@ -377,56 +269,24 @@ const onSubmit = handleSubmit(async (formValues) => {
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
-      <FormField
-        v-if="!hasPreselectedClassroom"
-        v-slot="{ value }"
-        name="student_lookup_classroom_id"
-      >
-        <FormItem>
-          <FormLabel>{{ t('common.labels.classroom') }}</FormLabel>
-          <FormControl>
-            <ClassroomSelect
-              :model-value="value"
-              full-width
-              @update:model-value="setFieldValue('student_lookup_classroom_id', $event, false)"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ value, handleChange }" name="student_id">
-        <FormItem>
-          <FormLabel>{{ t('common.labels.student') }}</FormLabel>
-          <FormControl>
-            <StudentSelect
-              :key="values.student_lookup_classroom_id || '__all_students__'"
-              :model-value="value"
-              :classroom-id="values.student_lookup_classroom_id || null"
-              :options-scope-key="values.student_lookup_classroom_id || '__all_students__'"
-              :placeholder="t('common.placeholders.selectStudent')"
-              :empty-text="t('common.empty.noStudents')"
-              @update:model-value="handleChange"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+      <StudentLookupFields
+        :show-classroom-lookup="!hasPreselectedClassroom"
+        :lookup-classroom-id="values.student_lookup_classroom_id || ''"
+        @update:student-lookup-classroom-id="
+          setFieldValue('student_lookup_classroom_id', $event, false)
+        "
+      />
     </template>
 
-    <FormField v-if="shouldShowStudentClassroomSelect" v-slot="{}" name="classroom_id">
-      <FormItem class="space-y-0">
-        <StudentClassroomSelector
-          v-model:open="isStudentClassroomDrawerOpen"
-          :classrooms="studentClassroomOptions"
-          :selected-classroom-id="selectedStudentClassroomId"
-          :loading="loadingSelectedStudentClassrooms"
-          :hint="t('modals.punishment.studentClassroomPickHint')"
-          @select="selectStudentClassroom"
-        />
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <ResolvedStudentClassroomField
+      v-model:open="isStudentClassroomDrawerOpen"
+      :show="shouldShowStudentClassroomSelect"
+      :classrooms="studentClassroomOptions"
+      :selected-classroom-id="selectedStudentClassroomId"
+      :loading="loadingSelectedStudentClassrooms"
+      :hint="t('modals.punishment.studentClassroomPickHint')"
+      @select="selectStudentClassroom"
+    />
 
     <FormField v-slot="{ value, handleChange }" name="punishment_type_id">
       <FormItem>

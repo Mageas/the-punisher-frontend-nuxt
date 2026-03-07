@@ -4,9 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
-import type { Student } from '~/types/api'
 import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
-import { resolveStudentClassroomSelection } from '~/lib/student-classroom'
 
 const emit = defineEmits<{
   created: []
@@ -28,16 +26,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const penaltyService = usePenaltyService()
-const studentService = useStudentService()
 const { notifyCreateSuccess } = useActionToast()
-
-const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
-const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
-const selectedStudentClassrooms = ref<Student['classrooms']>([])
-const loadingSelectedStudentClassrooms = ref(false)
-const selectedStudentClassroomId = ref('')
-const isStudentClassroomDrawerOpen = ref(false)
-let classroomLookupRequestId = 0
 
 const schema = toTypedSchema(
   zod
@@ -64,8 +53,8 @@ const schema = toTypedSchema(
       occurred_at_time: zod.string().optional(),
       evaluation_label: zod.string().optional(),
     })
-    .superRefine((value, ctx) => {
-      if (selectedStudentClassrooms.value.length > 1 && !selectedStudentClassroomId.value) {
+    .superRefine((_, ctx) => {
+      if (requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value) {
         ctx.addIssue({
           code: zod.ZodIssueCode.custom,
           path: ['classroom_id'],
@@ -96,141 +85,43 @@ const { handleSubmit, resetForm, setFieldError, values, setFieldValue, meta } = 
   initialValues: getInitialValues(),
 })
 
-const studentClassroomOptions = computed(() =>
-  selectedStudentClassrooms.value.map((classroom) => ({
-    id: classroom.id,
-    name: classroom.name,
-  })),
-)
-const requiresStudentClassroomSelection = computed(() => selectedStudentClassrooms.value.length > 1)
-const shouldShowStudentClassroomSelect = computed(() => requiresStudentClassroomSelection.value)
-const isStudentClassroomMissing = computed(
-  () => requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value,
-)
+const {
+  hasPreselectedStudent,
+  hasPreselectedClassroom,
+  loadingSelectedStudentClassrooms,
+  selectedStudentClassroomId,
+  studentClassroomOptions,
+  requiresStudentClassroomSelection,
+  shouldShowStudentClassroomSelect,
+  isStudentClassroomMissing,
+  isStudentClassroomDrawerOpen,
+  selectStudentClassroom,
+  initializeResolvedStudentClassroomSelection,
+  cleanupResolvedStudentClassroomSelection,
+} = useResolvedStudentClassroomSelection({
+  open,
+  values,
+  setFieldValue,
+  setFieldError,
+  preselectedStudentId: () => props.preselectedStudentId,
+  preselectedClassroomId: () => props.preselectedClassroomId,
+})
+
 const canSubmit = computed(
   () =>
     meta.value.valid && !loadingSelectedStudentClassrooms.value && !isStudentClassroomMissing.value,
 )
 
-function syncStudentClassroomDrawerState(classroomId: string) {
-  isStudentClassroomDrawerOpen.value = selectedStudentClassrooms.value.length > 1 && !classroomId
-}
-
-function selectStudentClassroom(classroomId: string) {
-  selectedStudentClassroomId.value = classroomId
-  setFieldValue('classroom_id', classroomId, false)
-  isStudentClassroomDrawerOpen.value = false
-}
-
-async function loadSelectedStudentClassrooms(studentId: string) {
-  const requestId = ++classroomLookupRequestId
-  loadingSelectedStudentClassrooms.value = true
-
-  try {
-    const student = await studentService.getStudentById(studentId)
-
-    if (requestId !== classroomLookupRequestId) return
-
-    selectedStudentClassrooms.value = student.classrooms
-    setFieldError('classroom_id', undefined)
-
-    const { classroomId } = resolveStudentClassroomSelection(student.classrooms, {
-      currentClassroomId: selectedStudentClassroomId.value,
-      preferredClassroomId: values.student_lookup_classroom_id || null,
-    })
-
-    selectedStudentClassroomId.value = classroomId
-    setFieldValue('classroom_id', classroomId, false)
-    syncStudentClassroomDrawerState(classroomId)
-  } catch {
-    if (requestId !== classroomLookupRequestId) return
-
-    selectedStudentClassrooms.value = []
-    setFieldError('classroom_id', undefined)
-    isStudentClassroomDrawerOpen.value = false
-    selectedStudentClassroomId.value = hasPreselectedStudent.value
-      ? ''
-      : values.student_lookup_classroom_id || ''
-    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
-  } finally {
-    if (requestId === classroomLookupRequestId) {
-      loadingSelectedStudentClassrooms.value = false
-    }
-  }
-}
-
-// When the classroom filter changes, reset student selection and the resolved classroom.
-watch(
-  () => values.student_lookup_classroom_id,
-  (nextClassroomId) => {
-    if (!open.value) return
-    if (hasPreselectedStudent.value) return
-
-    selectedStudentClassrooms.value = []
-    setFieldError('classroom_id', undefined)
-    isStudentClassroomDrawerOpen.value = false
-    selectedStudentClassroomId.value = nextClassroomId || ''
-    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
-    setFieldValue('student_id', '', false)
-  },
-)
-
-watch(
-  () => values.student_id,
-  async (studentId) => {
-    if (!open.value) return
-
-    if (!studentId) {
-      classroomLookupRequestId += 1
-      loadingSelectedStudentClassrooms.value = false
-      selectedStudentClassrooms.value = []
-      setFieldError('classroom_id', undefined)
-      isStudentClassroomDrawerOpen.value = false
-      selectedStudentClassroomId.value = hasPreselectedStudent.value
-        ? ''
-        : values.student_lookup_classroom_id || ''
-      setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
-      return
-    }
-
-    await loadSelectedStudentClassrooms(studentId)
-  },
-)
-
-watch(selectedStudentClassroomId, (classroomId) => {
-  if (classroomId) {
-    setFieldError('classroom_id', undefined)
-    if (selectedStudentClassrooms.value.length > 1) {
-      isStudentClassroomDrawerOpen.value = false
-    }
-  }
-})
-
 // Load data when modal opens
 watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    selectedStudentClassrooms.value = []
-    classroomLookupRequestId += 1
-    loadingSelectedStudentClassrooms.value = false
-    isStudentClassroomDrawerOpen.value = false
-    selectedStudentClassroomId.value = props.preselectedStudentId
-      ? ''
-      : (props.preselectedClassroomId ?? '')
-    setFieldError('classroom_id', undefined)
     resetForm({ values: getInitialValues() })
-
-    if (props.preselectedStudentId) {
-      await loadSelectedStudentClassrooms(props.preselectedStudentId)
-    }
+    await initializeResolvedStudentClassroomSelection()
     return
   }
 
-  classroomLookupRequestId += 1
-  loadingSelectedStudentClassrooms.value = false
-  selectedStudentClassrooms.value = []
-  isStudentClassroomDrawerOpen.value = false
-  selectedStudentClassroomId.value = ''
+  cleanupResolvedStudentClassroomSelection()
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
@@ -277,56 +168,24 @@ const onSubmit = handleSubmit(async (formValues) => {
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
-      <FormField
-        v-if="!hasPreselectedClassroom"
-        v-slot="{ value }"
-        name="student_lookup_classroom_id"
-      >
-        <FormItem>
-          <FormLabel>{{ t('common.labels.classroom') }}</FormLabel>
-          <FormControl>
-            <ClassroomSelect
-              :model-value="value"
-              full-width
-              @update:model-value="setFieldValue('student_lookup_classroom_id', $event, false)"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-slot="{ value, handleChange }" name="student_id">
-        <FormItem>
-          <FormLabel>{{ t('common.labels.student') }}</FormLabel>
-          <FormControl>
-            <StudentSelect
-              :key="values.student_lookup_classroom_id || '__all_students__'"
-              :model-value="value"
-              :classroom-id="values.student_lookup_classroom_id || null"
-              :options-scope-key="values.student_lookup_classroom_id || '__all_students__'"
-              :placeholder="t('common.placeholders.selectStudent')"
-              :empty-text="t('common.empty.noStudents')"
-              @update:model-value="handleChange"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+      <StudentLookupFields
+        :show-classroom-lookup="!hasPreselectedClassroom"
+        :lookup-classroom-id="values.student_lookup_classroom_id || ''"
+        @update:student-lookup-classroom-id="
+          setFieldValue('student_lookup_classroom_id', $event, false)
+        "
+      />
     </template>
 
-    <FormField v-if="shouldShowStudentClassroomSelect" v-slot="{}" name="classroom_id">
-      <FormItem class="space-y-0">
-        <StudentClassroomSelector
-          v-model:open="isStudentClassroomDrawerOpen"
-          :classrooms="studentClassroomOptions"
-          :selected-classroom-id="selectedStudentClassroomId"
-          :loading="loadingSelectedStudentClassrooms"
-          :hint="t('modals.penalty.studentClassroomPickHint')"
-          @select="selectStudentClassroom"
-        />
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <ResolvedStudentClassroomField
+      v-model:open="isStudentClassroomDrawerOpen"
+      :show="shouldShowStudentClassroomSelect"
+      :classrooms="studentClassroomOptions"
+      :selected-classroom-id="selectedStudentClassroomId"
+      :loading="loadingSelectedStudentClassrooms"
+      :hint="t('modals.penalty.studentClassroomPickHint')"
+      @select="selectStudentClassroom"
+    />
 
     <FormField v-slot="{ value, handleChange }" name="penalty_type_id">
       <FormItem>

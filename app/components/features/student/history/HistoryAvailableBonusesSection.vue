@@ -28,16 +28,7 @@ const emit = defineEmits<{
 
 <template>
   <AvailableBonusesSection
-    :bonuses="props.bonuses"
-    :title="props.title"
-    :empty-label="props.emptyLabel"
-    :badge-text="props.badgeText"
-    :badge-help-text="props.badgeHelpText"
-    :use-fn="props.useFn"
-    :page="props.page"
-    :total-pages="props.totalPages"
-    :loading="props.loading"
-    :disabled="props.disabled"
+    v-bind="props"
     @used="emit('used')"
     @update:page="emit('update:page', $event)"
   />

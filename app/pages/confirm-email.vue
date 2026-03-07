@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MailCheck, Skull } from 'lucide-vue-next'
+import { MailCheck } from 'lucide-vue-next'
 
 definePageMeta({
   layout: false,
@@ -8,7 +8,7 @@ definePageMeta({
 
 const { t } = useI18n()
 const route = useRoute()
-const { confirmEmail, resendConfirmationEmail, isAuthenticated } = useAuth()
+const { confirmEmail, resendConfirmationEmail } = useAuth()
 
 const {
   fieldErrors: confirmFieldErrors,
@@ -28,10 +28,7 @@ const {
 
 useGlobalErrorToast(confirmGlobalError)
 useGlobalErrorToast(resendGlobalError)
-
-if (isAuthenticated.value) {
-  await navigateTo('/')
-}
+await useGuestOnlyPage()
 
 const confirmForm = reactive({
   token: '',
@@ -46,17 +43,33 @@ const { isPending: isResendLoading, withPending: withResendLoading } = useApiAct
 const confirmLocalError = ref<string | null>(null)
 const resendLocalError = ref<string | null>(null)
 const resendSuccess = ref<string | null>(null)
+const queryToken = useRouteStringQueryParam(() => route.query.token)
+const queryEmail = useRouteStringQueryParam(() => route.query.email)
+const registeredQuery = useRouteStringQueryParam(() => route.query.registered)
 
-const showRegisterNotice = computed(() => route.query.registered === '1')
-
-function readQueryParam(value: unknown): string {
-  return typeof value === 'string' ? value : ''
-}
+const showRegisterNotice = computed(() => registeredQuery.value === '1')
+const confirmTokenError = computed(
+  () => confirmFieldErrors.value.token || confirmLocalError.value || '',
+)
+const resendEmailError = computed(
+  () => resendFieldErrors.value.email || resendLocalError.value || '',
+)
+const headerAlerts = computed(() => [
+  {
+    id: 'registered',
+    message: showRegisterNotice.value ? t('auth.confirmEmail.registerSuccessNotice') : '',
+  },
+])
+const resendAlerts = computed(() => [
+  {
+    id: 'resend-success',
+    message: resendSuccess.value,
+  },
+])
 
 watch(
-  () => route.query.token,
-  (token) => {
-    const nextToken = readQueryParam(token)
+  queryToken,
+  (nextToken) => {
     if (nextToken) {
       confirmForm.token = nextToken
     }
@@ -65,9 +78,8 @@ watch(
 )
 
 watch(
-  () => route.query.email,
-  (email) => {
-    const nextEmail = readQueryParam(email)
+  queryEmail,
+  (nextEmail) => {
     if (nextEmail) {
       resendForm.email = nextEmail
     }
@@ -131,97 +143,62 @@ function onResendEmailInput() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-secondary mb-4">
-          <Skull class="w-6 h-6" />
-        </div>
-        <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('auth.confirmEmail.title') }}
-        </h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          {{ t('auth.confirmEmail.subtitle') }}
+  <AuthPageShell :title="t('auth.confirmEmail.title')" :subtitle="t('auth.confirmEmail.subtitle')">
+    <AuthPageCard class="space-y-5">
+      <AuthAlertStack :alerts="headerAlerts" />
+
+      <div class="flex items-start gap-3 rounded-md bg-secondary/60 p-3">
+        <MailCheck class="mt-0.5 h-5 w-5" />
+        <p class="text-sm text-muted-foreground">
+          {{ t('auth.confirmEmail.tokenHint') }}
         </p>
       </div>
 
-      <div class="rounded-lg border border-border bg-card p-6 shadow-sm space-y-5">
-        <Alert v-if="showRegisterNotice">
-          <AlertDescription>{{ t('auth.confirmEmail.registerSuccessNotice') }}</AlertDescription>
-        </Alert>
+      <form class="space-y-4" @submit.prevent="onConfirmEmail">
+        <AuthField
+          id="token"
+          v-model="confirmForm.token"
+          type="text"
+          :label="t('auth.confirmEmail.tokenLabel')"
+          :placeholder="t('auth.confirmEmail.tokenPlaceholder')"
+          :error="confirmTokenError"
+          @input="onTokenInput"
+        />
 
-        <div class="flex items-start gap-3 rounded-md bg-secondary/60 p-3">
-          <MailCheck class="w-5 h-5 mt-0.5" />
-          <p class="text-sm text-muted-foreground">
-            {{ t('auth.confirmEmail.tokenHint') }}
-          </p>
-        </div>
+        <LoadingButton type="submit" class="w-full cursor-pointer" :loading="isConfirmLoading">
+          {{ t('auth.confirmEmail.submit') }}
+        </LoadingButton>
+      </form>
 
-        <form class="space-y-4" @submit.prevent="onConfirmEmail">
-          <div class="space-y-2">
-            <Label for="token">{{ t('auth.confirmEmail.tokenLabel') }}</Label>
-            <Input
-              id="token"
-              v-model="confirmForm.token"
-              type="text"
-              :placeholder="t('auth.confirmEmail.tokenPlaceholder')"
-              :aria-invalid="!!confirmFieldErrors.token || !!confirmLocalError"
-              @input="onTokenInput"
-            />
-            <p v-if="confirmFieldErrors.token" class="text-sm text-destructive">
-              {{ confirmFieldErrors.token }}
-            </p>
-            <p v-if="confirmLocalError" class="text-sm text-destructive">
-              {{ confirmLocalError }}
-            </p>
-          </div>
+      <div class="border-t border-border pt-3">
+        <AuthField
+          id="resend-email"
+          v-model="resendForm.email"
+          type="email"
+          :label="t('auth.confirmEmail.emailLabel')"
+          :placeholder="t('auth.emailPlaceholder')"
+          :error="resendEmailError"
+          @input="onResendEmailInput"
+        />
 
-          <LoadingButton type="submit" class="w-full cursor-pointer" :loading="isConfirmLoading">
-            {{ t('auth.confirmEmail.submit') }}
-          </LoadingButton>
-        </form>
+        <AuthAlertStack :alerts="resendAlerts" class="mt-3" />
 
-        <div class="pt-3 border-t border-border">
-          <div class="space-y-2">
-            <Label for="resend-email">{{ t('auth.confirmEmail.emailLabel') }}</Label>
-            <Input
-              id="resend-email"
-              v-model="resendForm.email"
-              type="email"
-              :placeholder="t('auth.emailPlaceholder')"
-              :aria-invalid="!!resendFieldErrors.email || !!resendLocalError"
-              @input="onResendEmailInput"
-            />
-            <p v-if="resendFieldErrors.email" class="text-sm text-destructive">
-              {{ resendFieldErrors.email }}
-            </p>
-            <p v-if="resendLocalError" class="text-sm text-destructive">
-              {{ resendLocalError }}
-            </p>
-          </div>
-
-          <Alert v-if="resendSuccess" class="mt-3">
-            <AlertDescription>{{ resendSuccess }}</AlertDescription>
-          </Alert>
-
-          <LoadingButton
-            type="button"
-            variant="link"
-            class="px-0 mt-2 cursor-pointer"
-            :loading="isResendLoading"
-            @click="onResendEmail"
-          >
-            {{ t('auth.confirmEmail.resendLink') }}
-          </LoadingButton>
-        </div>
+        <LoadingButton
+          type="button"
+          variant="link"
+          class="mt-2 cursor-pointer px-0"
+          :loading="isResendLoading"
+          @click="onResendEmail"
+        >
+          {{ t('auth.confirmEmail.resendLink') }}
+        </LoadingButton>
       </div>
+    </AuthPageCard>
 
-      <p class="text-center text-sm text-muted-foreground mt-4">
-        {{ t('auth.hasAccount') }}
-        <NuxtLink to="/login" class="underline underline-offset-4 hover:text-foreground">
-          {{ t('common.actions.signIn') }}
-        </NuxtLink>
-      </p>
-    </div>
-  </div>
+    <AuthFooterLink
+      :prompt="t('auth.hasAccount')"
+      to="/login"
+      :label="t('common.actions.signIn')"
+    />
+  </AuthPageShell>
 </template>

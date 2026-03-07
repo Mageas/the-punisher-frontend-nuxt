@@ -37,8 +37,8 @@ export interface RulePayload {
   penalty_type_id: string
   threshold: number
   due_at_mode: RuleDueAtMode
-  due_at_after_days: number | null
-  due_at_after_lessons: number | null
+  due_at_after_days?: number
+  due_at_after_lessons?: number
   mode: RuleMode
   is_active: boolean
 }

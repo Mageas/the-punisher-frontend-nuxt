@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DashboardKpis } from '~/types/api'
 import { Users } from 'lucide-vue-next'
+import KpiCard from '~/components/shared/KpiCard.vue'
+import KpiCardGrid from '~/components/shared/KpiCardGrid.vue'
 
 const props = defineProps<{
   kpis: DashboardKpis
@@ -8,26 +10,30 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const studentCard = computed(() => ({
-  label: t('common.titles.students'),
-  value: props.kpis.student_count,
-  subtitle: t('common.inSelection'),
-}))
+const cards = computed(() => [
+  {
+    key: 'studentCount',
+    label: t('common.titles.students'),
+    value: props.kpis.student_count,
+    subtitle: t('common.inSelection'),
+    icon: Users,
+    iconClass: 'text-muted-foreground',
+    valueClass: '',
+  },
+])
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:max-w-sm">
-    <div class="border border-border rounded-lg p-4 sm:p-6">
-      <div class="flex items-center justify-between mb-2">
-        <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-          {{ studentCard.label }}
-        </p>
-        <Users class="w-4 h-4 text-muted-foreground" />
-      </div>
-      <p class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none">
-        {{ studentCard.value }}
-      </p>
-      <p class="text-[11px] sm:text-xs text-muted-foreground mt-1">{{ studentCard.subtitle }}</p>
-    </div>
-  </div>
+  <KpiCardGrid class="sm:max-w-sm">
+    <KpiCard
+      v-for="card in cards"
+      :key="card.key"
+      :label="card.label"
+      :value="card.value"
+      :subtitle="card.subtitle"
+      :icon="card.icon"
+      :icon-class="card.iconClass"
+      :value-class="card.valueClass"
+    />
+  </KpiCardGrid>
 </template>

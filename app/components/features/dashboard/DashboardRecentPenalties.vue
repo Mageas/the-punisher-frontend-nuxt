@@ -12,18 +12,18 @@ const { t } = useI18n()
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">
-        {{ t('common.titles.recentPenalties') }}
-      </h2>
-      <KpiInfoBadge
-        v-if="props.badgeText"
-        :text="props.badgeText"
-        :help-text="props.badgeHelpText"
-        badge-class="text-muted-foreground"
-      />
-    </div>
-    <div class="space-y-3">
+    <SectionHeaderRow
+      :title="t('common.titles.recentPenalties')"
+      :badge-text="props.badgeText"
+      :badge-help-text="props.badgeHelpText"
+      badge-class="text-muted-foreground"
+      :show-pagination="false"
+    />
+    <SectionListBlock
+      :is-empty="props.penalties.length === 0"
+      :empty-label="t('common.empty.noPenalties')"
+      list-class="space-y-3"
+    >
       <PenaltyCard
         v-for="penalty in penalties"
         :key="penalty.id"
@@ -34,6 +34,6 @@ const { t } = useI18n()
         :student-first-name="penalty.student_first_name"
         :student-last-name="penalty.student_last_name"
       />
-    </div>
+    </SectionListBlock>
   </div>
 </template>

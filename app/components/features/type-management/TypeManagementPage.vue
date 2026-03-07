@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { refDebounced } from '@vueuse/core'
-import { Plus, Search, X } from 'lucide-vue-next'
 import type { BonusType, PenaltyType, PunishmentType } from '~/types/api'
 import type { TypeServiceFunctions, NamedTypeResource } from '~/composables/useTypeCollection'
 
@@ -48,30 +46,35 @@ const handleCreate = (name: string) => createType(name)
 const handleUpdate = (id: string, name: string) => updateType(id, name)
 const handleDelete = (id: string) => deleteType(id)
 
-const safeItemsPerPage = computed(() => itemPerPage.value || 10)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
-const showPagination = computed(() => totalCount.value > 0)
-const searchQuery = ref(filters.search || '')
-const searchDebounced = refDebounced(searchQuery, 300)
-const activeFilterCount = computed(() => (searchQuery.value ? 1 : 0))
+const {
+  searchQuery,
+  activeFilterCount,
+  safeItemsPerPage,
+  showPagination,
+  reload,
+  reloadCurrentPage,
+  reloadFirstPage,
+  onPageChange,
+  resetFilters,
+} = useSearchListPage({
+  page,
+  itemPerPage,
+  totalCount,
+  gotoPage,
+  fetchPage: fetchTypes,
+  applyFilters,
+  buildFilters: (search) => ({
+    search: search || undefined,
+  }),
+  getAppliedSearch: () => filters.search,
+  initialSearch: filters.search || '',
+})
 
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const typeToEdit = ref<ManagedType | null>(null)
 const typeToDeleteId = ref<string | null>(null)
-
-async function reload(pageToLoad = page.value || 1) {
-  await fetchTypes({
-    page: pageToLoad,
-    search: searchDebounced.value || undefined,
-  })
-}
-
-async function onPageChange(nextPage: number) {
-  if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await gotoPage(nextPage)
-}
 
 function openEditModal(item: ManagedType) {
   typeToEdit.value = item
@@ -83,86 +86,46 @@ function openDeleteModal(itemId: string) {
   showDeleteModal.value = true
 }
 
-function resetFilters() {
-  searchQuery.value = ''
-}
-
 async function onCreated() {
-  await reload(1)
+  await reloadFirstPage()
 }
 
 async function onUpdated() {
-  await reload(page.value)
+  await reloadCurrentPage()
 }
 
 async function onDeleteConfirmed() {
-  await reload(page.value)
+  await reloadCurrentPage()
 }
-
-watch(searchDebounced, async (newSearch) => {
-  const normalizedSearch = newSearch || ''
-  if (normalizedSearch === (filters.search || '')) return
-
-  await applyFilters({ search: normalizedSearch || undefined })
-})
 
 await reload()
 </script>
 
 <template>
-  <div>
-    <PageHeaderBar align="center">
-      <template #left>
-        <h1 class="text-2xl font-bold tracking-tight">
-          {{ props.title }}
-        </h1>
-      </template>
+  <SearchListPageShell
+    :title="props.title"
+    :create-label="props.newLabel"
+    :active-filter-count="activeFilterCount"
+    :items-count="types.length"
+    :empty-message="props.emptyLabel"
+    :page="page"
+    :items-per-page="safeItemsPerPage"
+    :total="totalCount"
+    :loading="loading"
+    :show-pagination="showPagination"
+    @create="showCreateModal = true"
+    @reset="resetFilters"
+    @update:page="onPageChange"
+  >
+    <template #filters>
+      <SearchFilterField
+        v-model="searchQuery"
+        :label="t('common.labels.type')"
+        :placeholder="t('common.placeholders.searchType')"
+      />
+    </template>
 
-      <template #actions>
-        <Button
-          class="w-full justify-center cursor-pointer md:w-auto"
-          @click="showCreateModal = true"
-        >
-          <Plus class="h-4 w-4" />
-          {{ props.newLabel }}
-        </Button>
-      </template>
-    </PageHeaderBar>
-
-    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <Label class="text-xs font-medium text-muted-foreground">{{
-            t('common.labels.type')
-          }}</Label>
-          <Button
-            v-if="searchQuery"
-            variant="ghost"
-            size="icon-sm"
-            class="h-5 w-5 cursor-pointer text-muted-foreground hover:text-foreground"
-            @click="searchQuery = ''"
-          >
-            <X class="h-3 w-3" />
-          </Button>
-        </div>
-        <div class="relative">
-          <Search
-            class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            v-model="searchQuery"
-            :placeholder="t('common.placeholders.searchType')"
-            class="h-8 pl-8 text-xs"
-          />
-        </div>
-      </div>
-    </FilterBar>
-
-    <div v-if="types.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ props.emptyLabel }}
-    </div>
-
-    <div v-else class="space-y-3">
+    <div class="space-y-3">
       <TypeCard
         v-for="item in types"
         :key="item.id"
@@ -175,16 +138,6 @@ await reload()
         @delete="openDeleteModal(item.id)"
       />
     </div>
-
-    <CustomPagination
-      v-show="showPagination"
-      class="mt-4"
-      :page="page"
-      :items-per-page="safeItemsPerPage"
-      :total="totalCount"
-      :loading="loading"
-      @update:page="onPageChange"
-    />
 
     <TypeCreateModal
       v-model:open="showCreateModal"
@@ -207,5 +160,5 @@ await reload()
       :message="props.deleteMessage"
       @confirmed="onDeleteConfirmed"
     />
-  </div>
+  </SearchListPageShell>
 </template>

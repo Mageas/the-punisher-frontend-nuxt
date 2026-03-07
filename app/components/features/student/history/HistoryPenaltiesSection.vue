@@ -21,43 +21,27 @@ const { t } = useI18n()
 
 const sectionTitle = computed(() => props.title ?? t('common.titles.penalties'))
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.penalties'))
-const currentPage = computed(() => props.page ?? 1)
-const currentTotalPages = computed(() => props.totalPages ?? 1)
-const paginationLoading = computed(() => props.loading ?? false)
-const paginationDisabled = computed(() => props.disabled ?? false)
 </script>
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex min-w-0 items-center gap-2">
-        <h2 class="text-lg font-semibold">
-          {{ sectionTitle }}
-        </h2>
-        <SectionHeaderPagination
-          :page="currentPage"
-          :total-pages="currentTotalPages"
-          :loading="paginationLoading"
-          :disabled="paginationDisabled"
-          @update:page="emit('update:page', $event)"
-        />
-      </div>
-      <KpiInfoBadge
-        v-if="props.badgeText"
-        :text="props.badgeText"
-        :help-text="props.badgeHelpText"
-        badge-class="text-muted-foreground"
-      />
-    </div>
+    <SectionHeaderRow
+      :title="sectionTitle"
+      :page="props.page"
+      :total-pages="props.totalPages"
+      :loading="props.loading"
+      :disabled="props.disabled"
+      :badge-text="props.badgeText"
+      :badge-help-text="props.badgeHelpText"
+      badge-class="text-muted-foreground"
+      @update:page="emit('update:page', $event)"
+    />
 
-    <div
-      v-if="penalties.length === 0"
-      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
+    <SectionListBlock
+      :is-empty="penalties.length === 0"
+      :empty-label="sectionEmptyLabel"
+      list-class="space-y-2"
     >
-      {{ sectionEmptyLabel }}
-    </div>
-
-    <div v-else class="space-y-2">
       <PenaltyCard
         v-for="penalty in penalties"
         :key="penalty.id"
@@ -65,6 +49,6 @@ const paginationDisabled = computed(() => props.disabled ?? false)
         :occurred-at="penalty.occurred_at ?? penalty.created_at"
         :created-at="penalty.created_at"
       />
-    </div>
+    </SectionListBlock>
   </div>
 </template>

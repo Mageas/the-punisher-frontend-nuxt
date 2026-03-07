@@ -17,11 +17,6 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
-const studentFullName = computed(() => {
-  if (!hasStudentName.value) return ''
-  return `${props.studentFirstName} ${props.studentLastName}`
-})
 const isAutomated = computed(() => props.automated === true)
 const hasRuleName = computed(() => Boolean(props.triggeringRuleName))
 const hasRuleLink = computed(
@@ -42,130 +37,91 @@ const automatedLabel = computed(() => {
 const secondaryLine = computed(() => {
   return props.punishmentTypeName
 })
+const stateLabel = computed(() =>
+  props.resolvedAt ? t('common.states.resolved') : t('common.states.pending'),
+)
+const stateDescription = computed(() => {
+  if (!props.resolvedAt && props.dueAt) {
+    return t('common.dueAt', { date: formatDate(props.dueAt) })
+  }
+
+  if (props.resolvedAt) {
+    return t('punishments.resolvedAt', { date: formatDate(props.resolvedAt) })
+  }
+
+  return undefined
+})
 </script>
 
 <template>
-  <div
-    class="rounded-lg border border-border"
-    :class="[{ 'opacity-60': resolvedAt }, compact ? 'p-3' : 'p-4']"
-  >
-    <!-- Mobile: vertical layout -->
-    <div class="flex items-start gap-3 sm:hidden">
+  <ResponsiveEventCardLayout :compact="props.compact" :dimmed="Boolean(props.resolvedAt)">
+    <template #icon>
       <div
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle"
       >
         <Gavel class="h-4 w-4 text-danger" />
       </div>
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 min-w-0">
-          <p class="text-sm font-medium min-w-0 truncate">
-            <NuxtLink
-              v-if="hasStudentName && props.studentId"
-              :to="`/students/${props.studentId}`"
-              class="transition-colors hover:text-primary hover:underline underline-offset-4"
-            >
-              {{ studentFullName }}
-            </NuxtLink>
-            <span v-else-if="hasStudentName">
-              {{ studentFullName }}
-            </span>
-            <span v-else>{{ punishmentTypeName }}</span>
-          </p>
-        </div>
-        <p v-if="secondaryLine" class="mt-0.5 text-xs text-muted-foreground">
-          {{ secondaryLine }}
-        </p>
-        <p v-if="isAutomated" class="mt-1 inline-flex items-center gap-1.5 text-xs text-info">
-          <Scale class="h-3 w-3 shrink-0" />
-          <NuxtLink
-            v-if="hasRuleLink"
-            :to="rulesLink"
-            class="truncate transition-colors hover:text-primary hover:underline underline-offset-4"
-          >
-            {{ automatedLabel }}
-          </NuxtLink>
-          <span v-else class="truncate">{{ automatedLabel }}</span>
-        </p>
-        <div class="mt-2 flex items-center justify-between">
-          <div>
-            <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
-              {{ t('common.states.pending') }}
-            </Badge>
-            <Badge v-else variant="outline" class="text-success border-success-border">
-              {{ t('common.states.resolved') }}
-            </Badge>
-            <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
-              {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
-            </p>
-            <p v-else-if="resolvedAt" class="mt-1 text-xs text-muted-foreground">
-              {{ t('punishments.resolvedAt', { date: formatDate(resolvedAt) }) }}
-            </p>
-          </div>
-          <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
-            <slot name="actions" />
-          </div>
-        </div>
-      </div>
-    </div>
+    </template>
 
-    <!-- Desktop: horizontal layout -->
-    <div class="hidden items-center gap-4 sm:flex">
-      <div
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-bg-subtle"
-      >
-        <Gavel class="h-4 w-4 text-danger" />
-      </div>
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 min-w-0">
-          <p class="text-sm font-medium min-w-0 truncate">
+    <template #title>
+      <StudentEventTitle
+        :fallback-label="props.punishmentTypeName"
+        :student-id="props.studentId"
+        :student-first-name="props.studentFirstName"
+        :student-last-name="props.studentLastName"
+      />
+    </template>
+
+    <template #mobile-meta>
+      <StudentEventMeta v-if="secondaryLine">
+        {{ secondaryLine }}
+      </StudentEventMeta>
+      <StudentEventMeta v-if="isAutomated" inline tone="info">
+        <template #icon>
+          <Scale class="h-3 w-3 shrink-0" />
+        </template>
+        <NuxtLink
+          v-if="hasRuleLink"
+          :to="rulesLink"
+          class="truncate transition-colors hover:text-primary hover:underline underline-offset-4"
+        >
+          {{ automatedLabel }}
+        </NuxtLink>
+        <span v-else class="truncate">{{ automatedLabel }}</span>
+      </StudentEventMeta>
+    </template>
+
+    <template #desktop-meta>
+      <StudentEventMeta v-if="secondaryLine" inline class="min-w-0">
+        <span>{{ secondaryLine }}</span>
+        <template v-if="isAutomated">
+          <span class="mx-1.5">·</span>
+          <span class="inline-flex min-w-0 items-center gap-1 text-info">
+            <Scale class="h-3 w-3 shrink-0" />
             <NuxtLink
-              v-if="hasStudentName && props.studentId"
-              :to="`/students/${props.studentId}`"
+              v-if="hasRuleLink"
+              :to="rulesLink"
               class="transition-colors hover:text-primary hover:underline underline-offset-4"
             >
-              {{ studentFullName }}
+              {{ automatedLabel }}
             </NuxtLink>
-            <span v-else-if="hasStudentName">
-              {{ studentFullName }}
-            </span>
-            <span v-else>{{ punishmentTypeName }}</span>
-          </p>
-        </div>
-        <p v-if="secondaryLine" class="mt-0.5 flex items-center text-xs text-muted-foreground">
-          <span>{{ secondaryLine }}</span>
-          <template v-if="isAutomated">
-            <span class="mx-1.5">·</span>
-            <span class="inline-flex items-center gap-1 text-info">
-              <Scale class="h-3 w-3 shrink-0" />
-              <NuxtLink
-                v-if="hasRuleLink"
-                :to="rulesLink"
-                class="transition-colors hover:text-primary hover:underline underline-offset-4"
-              >
-                {{ automatedLabel }}
-              </NuxtLink>
-              <span v-else>{{ automatedLabel }}</span>
-            </span>
-          </template>
-        </p>
-      </div>
-      <div class="text-right">
-        <Badge v-if="!resolvedAt" variant="outline" class="text-warning border-warning-border">
-          {{ t('common.states.pending') }}
-        </Badge>
-        <Badge v-else variant="outline" class="text-success border-success-border">
-          {{ t('common.states.resolved') }}
-        </Badge>
-        <p v-if="!resolvedAt && dueAt" class="mt-1 text-xs text-muted-foreground">
-          {{ t('common.dueAt', { date: formatDate(dueAt) }) }}
-        </p>
-        <p v-else-if="resolvedAt" class="mt-1 text-xs text-muted-foreground">
-          {{ t('punishments.resolvedAt', { date: formatDate(resolvedAt) }) }}
-        </p>
-      </div>
-      <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
-        <slot name="actions" />
-      </div>
-    </div>
-  </div>
+            <span v-else>{{ automatedLabel }}</span>
+          </span>
+        </template>
+      </StudentEventMeta>
+    </template>
+
+    <template #status>
+      <StudentEventStatus
+        :label="stateLabel"
+        :description="stateDescription"
+        :tone="props.resolvedAt ? 'success' : 'warning'"
+        desktop-align-right
+      />
+    </template>
+
+    <template v-if="$slots.actions" #actions>
+      <slot name="actions" />
+    </template>
+  </ResponsiveEventCardLayout>
 </template>

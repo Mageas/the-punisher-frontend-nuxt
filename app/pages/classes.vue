@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { refDebounced } from '@vueuse/core'
-import { AlertCircle, Plus, Search, Star, X } from 'lucide-vue-next'
+import { AlertCircle, Star } from 'lucide-vue-next'
 import type { Classroom, DashboardKpis } from '~/types/api'
-import { getInitials } from '~/lib/utils'
+import { formatRatio } from '~/lib/kpi-formatters'
 
 const { t } = useI18n()
 const classroomService = useClassroomService()
@@ -21,12 +20,29 @@ const {
 const showCreateModal = ref(false)
 const loadingClassroomKpis = ref(false)
 const classroomKpisById = ref<Record<string, DashboardKpis>>({})
-const searchQuery = ref(filters.search || '')
-const searchDebounced = refDebounced(searchQuery, 300)
-const safeItemsPerPage = computed(() => itemPerPage.value || 10)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
-const showPagination = computed(() => totalCount.value > 0)
-const activeFilterCount = computed(() => (searchQuery.value ? 1 : 0))
+
+const {
+  searchQuery,
+  activeFilterCount,
+  safeItemsPerPage,
+  showPagination,
+  reload,
+  reloadFirstPage,
+  onPageChange,
+  resetFilters,
+} = useSearchListPage({
+  page,
+  itemPerPage,
+  totalCount,
+  gotoPage,
+  fetchPage: fetchClassrooms,
+  applyFilters,
+  buildFilters: (search) => ({
+    search: search || undefined,
+  }),
+  getAppliedSearch: () => filters.search,
+  initialSearch: filters.search || '',
+})
 
 function extraStudentsCount(classroom: Classroom): number {
   return Math.max(0, classroom.student_count - previewStudents(classroom).length)
@@ -34,10 +50,6 @@ function extraStudentsCount(classroom: Classroom): number {
 
 function previewStudents(classroom: Classroom): Classroom['students_preview'] {
   return classroom.students_preview.slice(0, 3)
-}
-
-function formatRatio(current: number, total: number): string {
-  return `${current} / ${total}`
 }
 
 async function fetchVisibleClassroomKpis() {
@@ -71,24 +83,8 @@ async function fetchVisibleClassroomKpis() {
   }
 }
 
-async function reload(pageToLoad = page.value || 1) {
-  await fetchClassrooms({
-    page: pageToLoad,
-    search: searchDebounced.value || undefined,
-  })
-}
-
-async function onPageChange(nextPage: number) {
-  if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await gotoPage(nextPage)
-}
-
 async function onCreated() {
-  await reload(1)
-}
-
-function resetFilters() {
-  searchQuery.value = ''
+  await reloadFirstPage()
 }
 
 watch(
@@ -99,73 +95,35 @@ watch(
   { immediate: true },
 )
 
-watch(searchDebounced, async (newSearch) => {
-  const normalizedSearch = newSearch || ''
-  if (normalizedSearch === (filters.search || '')) return
-
-  await applyFilters({ search: normalizedSearch || undefined })
-})
-
 await reload()
 </script>
 
 <template>
-  <div>
-    <PageHeaderBar align="center">
-      <template #left>
-        <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('common.titles.classes') }}
-        </h1>
-        <Badge variant="outline" class="text-muted-foreground">
-          {{ t('classes.count', totalCount) }}
-        </Badge>
-      </template>
+  <SearchListPageShell
+    :title="t('common.titles.classes')"
+    :count-label="t('classes.count', totalCount)"
+    :create-label="t('common.actions.addClassroom')"
+    :active-filter-count="activeFilterCount"
+    :items-count="classrooms.length"
+    :empty-message="t('common.empty.noClasses')"
+    :page="page"
+    :items-per-page="safeItemsPerPage"
+    :total="totalCount"
+    :loading="loading"
+    :show-pagination="showPagination"
+    @create="showCreateModal = true"
+    @reset="resetFilters"
+    @update:page="onPageChange"
+  >
+    <template #filters>
+      <SearchFilterField
+        v-model="searchQuery"
+        :label="t('common.labels.classroom')"
+        :placeholder="t('common.placeholders.searchClassroom')"
+      />
+    </template>
 
-      <template #actions>
-        <Button
-          class="w-full justify-center cursor-pointer md:w-auto"
-          @click="showCreateModal = true"
-        >
-          <Plus class="w-4 h-4" />
-          {{ t('common.actions.addClassroom') }}
-        </Button>
-      </template>
-    </PageHeaderBar>
-
-    <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <Label class="text-xs font-medium text-muted-foreground">{{
-            t('common.labels.classroom')
-          }}</Label>
-          <Button
-            v-if="searchQuery"
-            variant="ghost"
-            size="icon-sm"
-            class="h-5 w-5 cursor-pointer text-muted-foreground hover:text-foreground"
-            @click="searchQuery = ''"
-          >
-            <X class="h-3 w-3" />
-          </Button>
-        </div>
-        <div class="relative">
-          <Search
-            class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            v-model="searchQuery"
-            :placeholder="t('common.placeholders.searchClassroom')"
-            class="h-8 pl-8 text-xs"
-          />
-        </div>
-      </div>
-    </FilterBar>
-
-    <div v-if="classrooms.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('common.empty.noClasses') }}
-    </div>
-
-    <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <NuxtLink
         v-for="classroom in classrooms"
         :key="classroom.id"
@@ -187,13 +145,14 @@ await reload()
           </p>
 
           <div v-if="classroom.students_preview.length > 0" class="flex -space-x-2">
-            <div
+            <StudentAvatar
               v-for="student in previewStudents(classroom)"
               :key="student.id"
-              class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-secondary text-[10px] font-medium"
-            >
-              {{ getInitials(student.first_name, student.last_name) }}
-            </div>
+              :first-name="student.first_name"
+              :last-name="student.last_name"
+              size="xs"
+              bordered
+            />
 
             <div
               v-if="extraStudentsCount(classroom) > 0"
@@ -230,16 +189,6 @@ await reload()
       </NuxtLink>
     </div>
 
-    <CustomPagination
-      v-show="showPagination"
-      class="mt-4"
-      :page="page"
-      :items-per-page="safeItemsPerPage"
-      :total="totalCount"
-      :loading="loading"
-      @update:page="onPageChange"
-    />
-
     <ClassroomCreateModal v-model:open="showCreateModal" @created="onCreated" />
-  </div>
+  </SearchListPageShell>
 </template>

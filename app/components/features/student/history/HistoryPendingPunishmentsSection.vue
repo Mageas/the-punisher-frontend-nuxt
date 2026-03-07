@@ -34,19 +34,7 @@ const emit = defineEmits<{
 
 <template>
   <PendingPunishmentsSection
-    :punishments="props.punishments"
-    :title="props.title"
-    :empty-label="props.emptyLabel"
-    :show-count="props.showCount"
-    :count-override="props.countOverride"
-    :badge-text="props.badgeText"
-    :badge-help-text="props.badgeHelpText"
-    :compact="props.compact"
-    :resolve-fn="props.resolveFn"
-    :page="props.page"
-    :total-pages="props.totalPages"
-    :loading="props.loading"
-    :disabled="props.disabled"
+    v-bind="props"
     @resolved="emit('resolved')"
     @update:page="emit('update:page', $event)"
   />

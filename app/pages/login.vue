@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Skull } from 'lucide-vue-next'
 import {
   getEmailFieldError,
   getRequiredFieldError,
@@ -13,26 +12,35 @@ definePageMeta({
 
 const { t } = useI18n()
 const route = useRoute()
-const { login, isAuthenticated } = useAuth()
+const { login } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
 useGlobalErrorToast(globalError)
-
-if (isAuthenticated.value) {
-  await navigateTo('/')
-}
+await useGuestOnlyPage()
 
 const form = reactive({
   email: '',
   password: '',
 })
 const { isPending: isLoading, withPending: withLoginLoading } = useApiActionState()
-const showConfirmedSuccess = computed(() => route.query.confirmed === '1')
-const showPasswordResetSuccess = computed(() => route.query.reset === '1')
+const confirmedQuery = useRouteStringQueryParam(() => route.query.confirmed)
+const resetQuery = useRouteStringQueryParam(() => route.query.reset)
 const localErrors = ref({
   email: '',
   password: '',
 })
+const emailError = computed(() => localErrors.value.email || fieldErrors.value.email || '')
+const passwordError = computed(() => localErrors.value.password || fieldErrors.value.password || '')
+const alerts = computed(() => [
+  {
+    id: 'confirmed',
+    message: confirmedQuery.value === '1' ? t('auth.confirmEmail.loginSuccess') : '',
+  },
+  {
+    id: 'reset',
+    message: resetQuery.value === '1' ? t('auth.resetPassword.loginSuccess') : '',
+  },
+])
 
 async function onSubmit() {
   clearErrors()
@@ -68,61 +76,31 @@ function onPasswordInput() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-sm">
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-secondary mb-4">
-          <Skull class="w-6 h-6" />
-        </div>
-        <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('app.title') }}
-        </h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          {{ t('auth.loginSubtitle') }}
-        </p>
-      </div>
+  <AuthPageShell :title="t('app.title')" :subtitle="t('auth.loginSubtitle')">
+    <AuthPageCard>
+      <AuthAlertStack :alerts="alerts" />
 
-      <!-- Card -->
-      <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <Alert v-if="showConfirmedSuccess" class="mb-4">
-          <AlertDescription>{{ t('auth.confirmEmail.loginSuccess') }}</AlertDescription>
-        </Alert>
-        <Alert v-if="showPasswordResetSuccess" class="mb-4">
-          <AlertDescription>{{ t('auth.resetPassword.loginSuccess') }}</AlertDescription>
-        </Alert>
+      <form class="space-y-4" @submit.prevent="onSubmit">
+        <AuthField
+          id="email"
+          v-model="form.email"
+          type="email"
+          :label="t('auth.email')"
+          :placeholder="t('auth.emailPlaceholder')"
+          :error="emailError"
+          @input="onEmailInput"
+        />
 
-        <form class="space-y-4" @submit.prevent="onSubmit">
-          <!-- Email -->
-          <div class="space-y-2">
-            <Label for="email">{{ t('auth.email') }}</Label>
-            <Input
-              id="email"
-              v-model="form.email"
-              type="email"
-              :placeholder="t('auth.emailPlaceholder')"
-              :aria-invalid="!!localErrors.email || !!fieldErrors.email"
-              @input="onEmailInput"
-            />
-            <p v-if="localErrors.email || fieldErrors.email" class="text-sm text-destructive">
-              {{ localErrors.email || fieldErrors.email }}
-            </p>
-          </div>
-
-          <!-- Password -->
-          <div class="space-y-2">
-            <Label for="password">{{ t('auth.password') }}</Label>
-            <Input
-              id="password"
-              v-model="form.password"
-              type="password"
-              :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!localErrors.password || !!fieldErrors.password"
-              @input="onPasswordInput"
-            />
-            <p v-if="localErrors.password || fieldErrors.password" class="text-sm text-destructive">
-              {{ localErrors.password || fieldErrors.password }}
-            </p>
+        <AuthField
+          id="password"
+          v-model="form.password"
+          type="password"
+          :label="t('auth.password')"
+          :placeholder="t('auth.passwordPlaceholder')"
+          :error="passwordError"
+          @input="onPasswordInput"
+        >
+          <template #footer>
             <div class="flex justify-end">
               <NuxtLink
                 to="/forgot-password"
@@ -131,22 +109,15 @@ function onPasswordInput() {
                 {{ t('auth.forgotPasswordLink') }}
               </NuxtLink>
             </div>
-          </div>
+          </template>
+        </AuthField>
 
-          <!-- Submit -->
-          <LoadingButton type="submit" class="w-full mt-2 cursor-pointer" :loading="isLoading">
-            {{ t('common.actions.signIn') }}
-          </LoadingButton>
-        </form>
-      </div>
+        <LoadingButton type="submit" class="mt-2 w-full cursor-pointer" :loading="isLoading">
+          {{ t('common.actions.signIn') }}
+        </LoadingButton>
+      </form>
+    </AuthPageCard>
 
-      <!-- Link -->
-      <p class="text-center text-sm text-muted-foreground mt-4">
-        {{ t('auth.noAccount') }}
-        <NuxtLink to="/register" class="underline underline-offset-4 hover:text-foreground">
-          {{ t('auth.createAccount') }}
-        </NuxtLink>
-      </p>
-    </div>
-  </div>
+    <AuthFooterLink :prompt="t('auth.noAccount')" to="/register" :label="t('auth.createAccount')" />
+  </AuthPageShell>
 </template>

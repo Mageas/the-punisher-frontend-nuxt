@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { PenaltyType } from '~/types/api'
+import { toIdNameOption } from '~/composables/useTrackedEntityFilterOptions'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 const props = defineProps<{
   penaltyTypes?: readonly PenaltyType[]
   placeholder?: string
+  searchPlaceholder?: string
   emptyText?: string
   selectedName?: string
 }>()
@@ -13,34 +19,24 @@ const emit = defineEmits<{
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
+const attrs = useAttrs()
 
-const { t } = useI18n()
-const typeService = useTypeService()
+const { fetchPenaltyTypeOptions } = useTrackedEntityFilterOptions()
 
+const options = computed(() => (props.penaltyTypes ?? []).map(toIdNameOption))
 const shouldUseRemoteOptions = computed(() => props.penaltyTypes === undefined)
-
-async function fetchPenaltyTypeOptions(options: { page: number; search?: string }) {
-  const response = await typeService.getPenaltyTypes(options)
-
-  return {
-    ...response,
-    data: response.data.map((penaltyType) => ({
-      id: penaltyType.id,
-      name: penaltyType.name,
-    })),
-  }
-}
 </script>
 
 <template>
-  <FilterIdNameSelect
+  <TypeSelect
+    v-bind="attrs"
     v-model="modelValue"
-    :options="props.penaltyTypes"
+    :options="options"
     :fetch-options="shouldUseRemoteOptions ? fetchPenaltyTypeOptions : undefined"
-    :selected-label="props.selectedName"
-    :placeholder="props.placeholder ?? t('common.placeholders.selectType')"
-    :search-placeholder="props.placeholder ?? t('common.placeholders.selectType')"
-    :empty-text="props.emptyText ?? t('common.empty.noTypeFound')"
+    :selected-name="props.selectedName"
+    :placeholder="props.placeholder"
+    :search-placeholder="props.searchPlaceholder"
+    :empty-text="props.emptyText"
     @selected-option="emit('selectedOption', $event)"
   />
 </template>

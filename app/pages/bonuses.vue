@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Gift, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { Gift, Pencil, Trash2 } from 'lucide-vue-next'
 import type { Bonus } from '~/types/api'
 
 const { t } = useI18n()
@@ -18,7 +18,6 @@ const {
   deleteBonus,
 } = useBonuses()
 
-// Filters local state (synced via applyFilters)
 const classroomId = ref(filters.classroom_id || '')
 const studentId = ref(filters.student_id || '')
 const bonusTypeId = ref(filters.bonus_type_id || '')
@@ -26,33 +25,20 @@ const state = ref(filters.state || '')
 const createdFrom = ref(filters.created_from || '')
 const createdTo = ref(filters.created_to || '')
 
-const classroomService = useClassroomService()
-const studentService = useStudentService()
-const typeService = useTypeService()
-
-const safeItemsPerPage = computed(() => itemPerPage.value || 10)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
-const showPagination = computed(() => totalCount.value > 0)
-const studentFilterScopeKey = computed(() => classroomId.value || '__all_students__')
-
 const stateOptions = computed(() => [
   { value: 'unused', label: t('common.states.unused') },
   { value: 'used', label: t('common.states.used') },
 ])
 
-// Count active filters
-const activeFilterCount = computed(() => {
-  let count = 0
-  if (classroomId.value) count++
-  if (studentId.value) count++
-  if (bonusTypeId.value) count++
-  if (state.value) count++
-  if (createdFrom.value) count++
-  if (createdTo.value) count++
-  return count
-})
+const activeFilterCount = useActiveFilterCount([
+  classroomId,
+  studentId,
+  bonusTypeId,
+  state,
+  createdFrom,
+  createdTo,
+])
 
-// Modals
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
@@ -61,23 +47,26 @@ const bonusToDeleteId = ref<string | null>(null)
 const bonusToUseId = ref<string | null>(null)
 const bonusToEdit = ref<Bonus | null>(null)
 
-// Fetch with current filters
-async function reload(pageToLoad = page.value || 1) {
-  await fetchBonuses({
-    page: pageToLoad,
+function buildFilters() {
+  return {
     classroom_id: classroomId.value || undefined,
     student_id: studentId.value || undefined,
     bonus_type_id: bonusTypeId.value || undefined,
     state: (state.value as 'used' | 'unused') || undefined,
     created_from: createdFrom.value || undefined,
     created_to: createdTo.value || undefined,
-  })
+  }
 }
 
-async function onPageChange(nextPage: number) {
-  if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
-  await gotoPage(nextPage)
-}
+const { safeItemsPerPage, reload, reloadCurrentPage, reloadFirstPage, onPageChange } =
+  useTrackingListPage({
+    page,
+    itemPerPage,
+    totalCount,
+    gotoPage,
+    fetchPage: fetchBonuses,
+    buildFilters,
+  })
 
 async function handleUse(id: string) {
   await useBonus(id)
@@ -98,22 +87,6 @@ function openUseModal(id: string) {
   showUseModal.value = true
 }
 
-async function onDeleteConfirmed() {
-  await reload(page.value)
-}
-
-async function onUseConfirmed() {
-  await reload(page.value)
-}
-
-async function onCreated() {
-  await reload(1)
-}
-
-async function onUpdated() {
-  await reload(page.value)
-}
-
 function resetFilters() {
   classroomId.value = ''
   studentId.value = ''
@@ -123,52 +96,12 @@ function resetFilters() {
   createdTo.value = ''
 }
 
-// Watch filter changes and apply with debounce
-watch([classroomId, studentId, bonusTypeId, state, createdFrom, createdTo], () => {
-  applyFilters({
-    classroom_id: classroomId.value || undefined,
-    student_id: studentId.value || undefined,
-    bonus_type_id: bonusTypeId.value || undefined,
-    state: (state.value as 'used' | 'unused') || undefined,
-    created_from: createdFrom.value || undefined,
-    created_to: createdTo.value || undefined,
-  })
+useTrackingFiltersSync({
+  filterRefs: [classroomId, studentId, bonusTypeId, state, createdFrom, createdTo],
+  buildFilters,
+  applyFilters,
+  resetPairs: [{ source: classroomId, target: studentId }],
 })
-
-// When classroom changes, reset selected student filter
-watch(classroomId, () => {
-  studentId.value = ''
-})
-
-async function fetchClassroomOptions(options: { page: number; search?: string }) {
-  const response = await classroomService.getClassrooms(options)
-  return {
-    ...response,
-    data: response.data.map((classroom) => ({ id: classroom.id, name: classroom.name })),
-  }
-}
-
-async function fetchStudentOptions(options: { page: number; search?: string }) {
-  const response = classroomId.value
-    ? await classroomService.getClassroomStudents(classroomId.value, options)
-    : await studentService.getStudents(options)
-
-  return {
-    ...response,
-    data: response.data.map((student) => ({
-      id: student.id,
-      name: `${student.first_name} ${student.last_name}`,
-    })),
-  }
-}
-
-async function fetchBonusTypeOptions(options: { page: number; search?: string }) {
-  const response = await typeService.getBonusTypes(options)
-  return {
-    ...response,
-    data: response.data.map((bonusType) => ({ id: bonusType.id, name: bonusType.name })),
-  }
-}
 
 await useAsyncData(
   () => `bonuses:initial:${route.fullPath}`,
@@ -184,51 +117,18 @@ await useAsyncData(
 
 <template>
   <div>
-    <PageHeaderBar align="center">
-      <template #left>
-        <h1 class="text-2xl font-bold tracking-tight">
-          {{ t('common.titles.bonuses') }}
-        </h1>
-      </template>
-
-      <template #actions>
-        <Button
-          class="w-full justify-center cursor-pointer md:w-auto"
-          @click="showCreateModal = true"
-        >
-          <Plus class="w-4 h-4" />
-          {{ t('common.actions.addBonus') }}
-        </Button>
-      </template>
-    </PageHeaderBar>
+    <TrackingListPageHeader
+      :title="t('common.titles.bonuses')"
+      :create-label="t('common.actions.addBonus')"
+      @create="showCreateModal = true"
+    />
 
     <FilterBar :active-filter-count="activeFilterCount" @reset="resetFilters">
-      <FilterIdNameSelect
-        v-model="classroomId"
-        :label="t('common.labels.classroom')"
-        :placeholder="t('common.options.allClassrooms')"
-        :search-placeholder="t('common.placeholders.searchClassroom')"
-        :empty-text="t('common.empty.noClasses')"
-        :fetch-options="fetchClassroomOptions"
-      />
-
-      <FilterIdNameSelect
-        v-model="studentId"
-        :label="t('common.labels.student')"
-        :placeholder="t('common.options.allStudents')"
-        :search-placeholder="t('common.placeholders.searchStudent')"
-        :empty-text="t('common.empty.noStudents')"
-        :fetch-options="fetchStudentOptions"
-        :options-scope-key="studentFilterScopeKey"
-      />
-
-      <FilterIdNameSelect
-        v-model="bonusTypeId"
-        :label="t('common.labels.type')"
-        :placeholder="t('common.options.allTypes')"
-        :search-placeholder="t('common.placeholders.searchType')"
-        :empty-text="t('common.empty.noTypeFound')"
-        :fetch-options="fetchBonusTypeOptions"
+      <ClassroomStudentTypeFilters
+        v-model:classroom-id="classroomId"
+        v-model:student-id="studentId"
+        v-model:type-id="bonusTypeId"
+        type-kind="bonus"
       />
 
       <FilterSelect
@@ -245,9 +145,12 @@ await useAsyncData(
       />
     </FilterBar>
 
-    <div v-if="bonuses.length === 0 && !loading" class="py-16 text-center text-muted-foreground">
-      {{ t('common.empty.noBonuses') }}
-    </div>
+    <TrackingListEmptyState
+      v-if="bonuses.length === 0 && !loading"
+      :items-count="bonuses.length"
+      :loading="loading"
+      :message="t('common.empty.noBonuses')"
+    />
 
     <div v-else class="space-y-3">
       <BonusCard
@@ -263,46 +166,34 @@ await useAsyncData(
         :student-last-name="bonus.student_last_name"
       >
         <template #actions>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.actions.edit')"
-            :aria-label="t('common.actions.edit')"
-            @click="openEditModal(bonus)"
-          >
-            <Pencil class="w-4 h-4" />
-          </Button>
+          <TrackingCardActions>
+            <TrackingCardActionButton
+              :label="t('common.actions.edit')"
+              @click="openEditModal(bonus)"
+            >
+              <Pencil class="h-4 w-4" />
+            </TrackingCardActionButton>
 
-          <Button
-            v-if="!bonus.used_at"
-            variant="ghost"
-            size="icon-sm"
-            class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.actions.consume')"
-            :aria-label="t('common.actions.consume')"
-            @click="openUseModal(bonus.id)"
-          >
-            <Gift class="w-5 h-5 text-warning" />
-          </Button>
+            <TrackingCardActionButton
+              v-if="!bonus.used_at"
+              :label="t('common.actions.consume')"
+              @click="openUseModal(bonus.id)"
+            >
+              <Gift class="h-5 w-5 text-warning" />
+            </TrackingCardActionButton>
 
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            class="cursor-pointer text-muted-foreground hover:text-foreground"
-            :title="t('common.actions.delete')"
-            :aria-label="t('common.actions.delete')"
-            @click="openDeleteModal(bonus.id)"
-          >
-            <Trash2 class="w-4 h-4 text-danger" />
-          </Button>
+            <TrackingCardActionButton
+              :label="t('common.actions.delete')"
+              @click="openDeleteModal(bonus.id)"
+            >
+              <Trash2 class="h-4 w-4 text-danger" />
+            </TrackingCardActionButton>
+          </TrackingCardActions>
         </template>
       </BonusCard>
     </div>
 
-    <CustomPagination
-      v-show="showPagination"
-      class="mt-4"
+    <TrackingPagePagination
       :page="page"
       :items-per-page="safeItemsPerPage"
       :total="totalCount"
@@ -310,19 +201,23 @@ await useAsyncData(
       @update:page="onPageChange"
     />
 
-    <BonusCreateModal v-model:open="showCreateModal" @created="onCreated" />
-    <BonusEditModal v-model:open="showEditModal" :bonus="bonusToEdit" @updated="onUpdated" />
+    <BonusCreateModal v-model:open="showCreateModal" @created="reloadFirstPage" />
+    <BonusEditModal
+      v-model:open="showEditModal"
+      :bonus="bonusToEdit"
+      @updated="reloadCurrentPage"
+    />
     <BonusDeleteModal
       v-model:open="showDeleteModal"
       :bonus-id="bonusToDeleteId"
       :delete-fn="deleteBonus"
-      @confirmed="onDeleteConfirmed"
+      @confirmed="reloadCurrentPage"
     />
     <BonusUseModal
       v-model:open="showUseModal"
       :bonus-id="bonusToUseId"
       :use-fn="handleUse"
-      @confirmed="onUseConfirmed"
+      @confirmed="reloadCurrentPage"
     />
   </div>
 </template>

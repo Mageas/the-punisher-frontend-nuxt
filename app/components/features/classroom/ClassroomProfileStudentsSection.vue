@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { AlertCircle, Plus, Star, X } from 'lucide-vue-next'
 import type { Student } from '~/types/api'
-import { getInitials, formatPoints } from '~/lib/utils'
+import { formatPoints } from '~/lib/utils'
 
 const props = withDefaults(
   defineProps<{
@@ -32,10 +32,6 @@ useGlobalErrorToast(() => props.addStudentError)
 
 function studentFullName(student: Student): string {
   return `${student.first_name} ${student.last_name}`
-}
-
-function initials(student: Student): string {
-  return getInitials(student.first_name, student.last_name)
 }
 
 function formatBonusPoints(points: number): string {
@@ -113,11 +109,7 @@ watch(modelValue, (nextValue, previousValue) => {
       :to="`/students/${student.id}`"
       class="flex items-center gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-secondary-hover"
     >
-      <div
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium"
-      >
-        {{ initials(student) }}
-      </div>
+      <StudentAvatar :first-name="student.first_name" :last-name="student.last_name" size="md" />
 
       <div class="min-w-0 flex-1">
         <p class="text-sm font-medium">
