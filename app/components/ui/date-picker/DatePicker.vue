@@ -49,7 +49,7 @@ function formatDisplay(): string {
   if (!modelValue.value) return ''
   const formatted = df.format(modelValue.value.toDate(getLocalTimeZone()))
   if (props.showTime && time.value) {
-    return `${formatted} ${time.value}`
+    return `${formatted} ${hours.value}:${minutes.value}`
   }
   return formatted
 }

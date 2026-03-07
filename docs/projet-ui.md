@@ -6,6 +6,11 @@
   * **Succès :** toute création, modification, suppression et action validée associée (`ajout`, `retrait`, `consommation`, `résolution`) affiche un toast vert en bas à droite.
   * **Erreurs :** les erreurs d'action restent affichées inline ou via toast rouge centré en haut selon l'écran.
 
+*Champs date/heure métier.*
+  * **Affichage :** les sélecteurs exposent uniquement `HH:mm`.
+  * **Création :** les secondes sont envoyées automatiquement à `00`.
+  * **Modification :** si l'utilisateur enregistre sans toucher au champ date/heure, les secondes existantes fournies par l'API sont conservées. Dès qu'il modifie activement la date ou l'heure, les secondes sont réinitialisées à `00`.
+
 ---
 
 ## 2. Sidebar (Navigation)

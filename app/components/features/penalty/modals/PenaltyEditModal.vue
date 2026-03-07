@@ -6,7 +6,12 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { Penalty } from '~/types/api'
 import { buildDelta } from '~/lib/delta'
-import { parseApiDateTime, toApiDateTimeString } from '~/lib/date-time'
+import {
+  parseApiDateTime,
+  serializeEditableDateTime,
+  toApiDateTimeString,
+  toTimeInputValue,
+} from '~/lib/date-time'
 
 const emit = defineEmits<{
   updated: []
@@ -23,6 +28,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const penaltyService = usePenaltyService()
 const { notifyUpdateSuccess } = useActionToast()
+const occurredAtTouched = ref(false)
 
 function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
   const parsed = parseApiDateTime(dateTime)
@@ -32,15 +38,6 @@ function toDateValue(dateTime: string | null | undefined): DateValue | undefined
   const m = String(parsed.getMonth() + 1).padStart(2, '0')
   const d = String(parsed.getDate()).padStart(2, '0')
   return parseDate(`${y}-${m}-${d}`)
-}
-
-function toTimeValue(dateTime: string | null | undefined): string {
-  const parsed = parseApiDateTime(dateTime)
-  if (!parsed) return '08:00'
-
-  const hours = String(parsed.getHours()).padStart(2, '0')
-  const minutes = String(parsed.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
 }
 
 function getInitialOccurredAt(): string | null {
@@ -59,7 +56,7 @@ const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = 
   validationSchema: schema,
   initialValues: {
     occurred_at: toDateValue(getInitialOccurredAt()),
-    occurred_at_time: toTimeValue(getInitialOccurredAt()),
+    occurred_at_time: toTimeInputValue(getInitialOccurredAt()),
     evaluation_label: props.penalty?.evaluation_label ?? '',
   },
 })
@@ -67,18 +64,32 @@ const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = 
 watch(open, (isOpen) => {
   if (isOpen) {
     clearErrors()
+    occurredAtTouched.value = false
 
     const initialOccurredAt = getInitialOccurredAt()
 
     resetForm({
       values: {
         occurred_at: toDateValue(initialOccurredAt),
-        occurred_at_time: toTimeValue(initialOccurredAt),
+        occurred_at_time: toTimeInputValue(initialOccurredAt),
         evaluation_label: props.penalty?.evaluation_label ?? '',
       },
     })
   }
 })
+
+function handleOccurredAtDateChange(
+  value: DateValue | undefined,
+  handleChangeDate: (value: DateValue | undefined) => void,
+) {
+  occurredAtTouched.value = true
+  handleChangeDate(value)
+}
+
+function handleOccurredAtTimeChange(value: string) {
+  occurredAtTouched.value = true
+  setFieldValue('occurred_at_time', value, false)
+}
 
 const onSubmit = handleSubmit(async (formValues) => {
   const penalty = props.penalty
@@ -86,17 +97,17 @@ const onSubmit = handleSubmit(async (formValues) => {
 
   clearErrors()
   try {
-    let occurredAt: string | undefined
-
-    if (formValues.occurred_at) {
-      const date = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
-      const [h = '08', m = '00'] = (formValues.occurred_at_time || '08:00').split(':')
-      date.setHours(Number(h), Number(m), 0, 0)
-      occurredAt = toApiDateTimeString(date) ?? undefined
-    }
+    const initialOccurredAt = getInitialOccurredAt()
+    const occurredAt = serializeEditableDateTime({
+      dateValue: formValues.occurred_at as DateValue | undefined,
+      timeValue: formValues.occurred_at_time,
+      timeZone: getLocalTimeZone(),
+      touched: occurredAtTouched.value,
+      initialApiValue: initialOccurredAt,
+    })
 
     const initialPayload = {
-      occurred_at: toApiDateTimeString(getInitialOccurredAt()) ?? undefined,
+      occurred_at: toApiDateTimeString(initialOccurredAt) ?? undefined,
       evaluation_label: penalty.evaluation_label ?? '',
     }
 
@@ -142,8 +153,8 @@ const onSubmit = handleSubmit(async (formValues) => {
             :time="values.occurred_at_time"
             :placeholder="t('common.placeholders.selectOccurredDate')"
             show-time
-            @update:model-value="handleChangeDate"
-            @update:time="(value) => setFieldValue('occurred_at_time', value, false)"
+            @update:model-value="(value) => handleOccurredAtDateChange(value, handleChangeDate)"
+            @update:time="handleOccurredAtTimeChange"
           />
         </FormControl>
         <FormMessage />

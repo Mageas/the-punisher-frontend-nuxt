@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { parseDate } from '@internationalized/date'
 import { defineComponent, h } from 'vue'
 import DatePicker from '../DatePicker.vue'
 
@@ -57,5 +58,31 @@ describe('DatePicker', () => {
     expect(button.attributes('id')).toBe('due-at')
     expect(button.attributes('aria-invalid')).toBe('true')
     expect(button.attributes('aria-describedby')).toBe('due-at-message')
+  })
+
+  it('displays only hours and minutes when the time contains seconds', () => {
+    const wrapper = mount(DatePicker, {
+      props: {
+        modelValue: parseDate('2026-03-15'),
+        time: '10:15:45',
+        showTime: true,
+      },
+      global: {
+        mocks: {
+          $t: (key: string) => key,
+        },
+        stubs: {
+          Button: ButtonStub,
+          Popover: passthroughStub,
+          PopoverTrigger: passthroughStub,
+          PopoverContent: passthroughStub,
+          Calendar: true,
+          CalendarIcon: true,
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('10:15')
+    expect(wrapper.text()).not.toContain('10:15:45')
   })
 })

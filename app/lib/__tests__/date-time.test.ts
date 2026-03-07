@@ -1,5 +1,13 @@
+import { getLocalTimeZone, parseDate } from '@internationalized/date'
 import { describe, it, expect } from 'vitest'
-import { normalizeApiDateTimeFields, parseApiDateTime, toApiDateTimeString } from '../date-time'
+import {
+  applyTimeInputToDate,
+  normalizeApiDateTimeFields,
+  parseApiDateTime,
+  serializeEditableDateTime,
+  toApiDateTimeString,
+  toTimeInputValue,
+} from '../date-time'
 
 describe('date-time.ts', () => {
   describe('parseApiDateTime', () => {
@@ -20,6 +28,84 @@ describe('date-time.ts', () => {
     it('serializes Date values to RFC3339 UTC', () => {
       const date = new Date('2026-03-15T18:00:00Z')
       expect(toApiDateTimeString(date)).toBe('2026-03-15T18:00:00.000Z')
+    })
+  })
+
+  describe('toTimeInputValue', () => {
+    it('formats API datetimes as HH:mm and hides seconds', () => {
+      const date = new Date(2026, 2, 15, 18, 45, 37, 250)
+      expect(toTimeInputValue(date.toISOString())).toBe('18:45')
+    })
+
+    it('falls back to the provided default when the datetime is invalid', () => {
+      expect(toTimeInputValue('invalid-datetime', '09:30')).toBe('09:30')
+    })
+  })
+
+  describe('applyTimeInputToDate', () => {
+    it('defaults hidden seconds to zero for new datetimes', () => {
+      const date = new Date(2026, 2, 20, 0, 0, 12, 250)
+
+      applyTimeInputToDate(date, '14:25')
+
+      expect(date.getHours()).toBe(14)
+      expect(date.getMinutes()).toBe(25)
+      expect(date.getSeconds()).toBe(0)
+      expect(date.getMilliseconds()).toBe(0)
+    })
+
+    it('preserves sub-minute precision from the API during edition', () => {
+      const date = new Date(2026, 2, 20, 0, 0, 0, 0)
+      const originalDateTime = new Date(2026, 2, 15, 9, 10, 37, 250)
+
+      applyTimeInputToDate(date, '14:25', {
+        preserveSubMinuteFrom: originalDateTime.toISOString(),
+      })
+
+      expect(date.getHours()).toBe(14)
+      expect(date.getMinutes()).toBe(25)
+      expect(date.getSeconds()).toBe(37)
+      expect(date.getMilliseconds()).toBe(250)
+    })
+  })
+
+  describe('serializeEditableDateTime', () => {
+    it('preserves API-provided seconds when the field was not touched', () => {
+      const originalDateTime = new Date(2026, 2, 15, 9, 10, 37, 250)
+
+      const serialized = serializeEditableDateTime({
+        dateValue: parseDate('2026-03-20'),
+        timeValue: '14:25',
+        timeZone: getLocalTimeZone(),
+        touched: false,
+        initialApiValue: originalDateTime.toISOString(),
+      })
+
+      const parsed = parseApiDateTime(serialized)
+
+      expect(parsed?.getHours()).toBe(14)
+      expect(parsed?.getMinutes()).toBe(25)
+      expect(parsed?.getSeconds()).toBe(37)
+      expect(parsed?.getMilliseconds()).toBe(250)
+    })
+
+    it('resets hidden seconds when the field was touched', () => {
+      const originalDateTime = new Date(2026, 2, 15, 9, 10, 37, 250)
+
+      const serialized = serializeEditableDateTime({
+        dateValue: parseDate('2026-03-20'),
+        timeValue: '14:25',
+        timeZone: getLocalTimeZone(),
+        touched: true,
+        initialApiValue: originalDateTime.toISOString(),
+      })
+
+      const parsed = parseApiDateTime(serialized)
+
+      expect(parsed?.getHours()).toBe(14)
+      expect(parsed?.getMinutes()).toBe(25)
+      expect(parsed?.getSeconds()).toBe(0)
+      expect(parsed?.getMilliseconds()).toBe(0)
     })
   })
 
