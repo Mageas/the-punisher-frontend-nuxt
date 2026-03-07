@@ -222,6 +222,7 @@
       * Type de punition et autres métadonnées affichés en zone secondaire.
     * **Statut :** "Échéance : [Date]" (si en attente) ou "Résolu le..." (si fait).
     * **Action :** Bouton `Check` (Cercle coché) pour valider la punition (Uniquement si en attente).
+    * **Création manuelle :** après sélection de l'élève, proposer les 5 prochains cours de sa classe sous `Échéance` pour préremplir la date; si l'élève a plusieurs classes, demander d'abord laquelle utiliser. Les blocs `Classe` et `Prochains cours` se replient après sélection et restent réouvrables.
 
 ---
 

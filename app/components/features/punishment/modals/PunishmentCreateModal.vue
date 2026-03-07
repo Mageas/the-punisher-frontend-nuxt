@@ -2,9 +2,15 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
+import type { DateValue } from '@internationalized/date'
+import type { NextLesson, Student } from '~/types/api'
 import { toApiDateTimeString } from '~/lib/date-time'
+import {
+  resolvePunishmentDueAtFromNextLesson,
+  resolveSelectedNextLessonKey,
+} from '~/lib/punishment-next-lesson'
+import { resolveStudentClassroomSelection } from '~/lib/student-classroom'
 
 const emit = defineEmits<{
   created: []
@@ -25,12 +31,24 @@ const props = withDefaults(
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const punishmentService = usePunishmentService()
+const studentService = useStudentService()
+const scheduleService = useScheduleService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
+const selectedStudentClassrooms = ref<Student['classrooms']>([])
+const loadingSelectedStudentClassrooms = ref(false)
+const selectedStudentClassroomId = ref('')
+const nextLessons = ref<NextLesson[]>([])
+const loadingNextLessons = ref(false)
+const isStudentClassroomDrawerOpen = ref(false)
+const isNextLessonsDrawerOpen = ref(false)
+let classroomLookupRequestId = 0
+let nextLessonsRequestId = 0
 
 const schema = toTypedSchema(
   zod.object({
+    student_lookup_classroom_id: zod.string().optional(),
     classroom_id: zod.string().optional(),
     student_id: zod
       .string()
@@ -56,48 +74,225 @@ const schema = toTypedSchema(
   }),
 )
 
+function getInitialValues() {
+  const preselectedLookupClassroomId = props.preselectedStudentId
+    ? ''
+    : (props.preselectedClassroomId ?? '')
+
+  return {
+    student_lookup_classroom_id: preselectedLookupClassroomId,
+    classroom_id: props.preselectedStudentId ? '' : preselectedLookupClassroomId,
+    student_id: props.preselectedStudentId ?? '',
+    punishment_type_id: '',
+    due_at: undefined as DateValue | undefined,
+    due_at_time: '08:00',
+    occurred_at: undefined as DateValue | undefined,
+    occurred_at_time: '08:00',
+    evaluation_label: '',
+  }
+}
+
 const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } =
   useForm({
     validationSchema: schema,
-    initialValues: {
-      classroom_id: props.preselectedClassroomId ?? '',
-      student_id: props.preselectedStudentId ?? '',
-      punishment_type_id: '',
-      due_at: undefined as DateValue | undefined,
-      due_at_time: '08:00',
-      occurred_at: undefined as DateValue | undefined,
-      occurred_at_time: '08:00',
-      evaluation_label: '',
-    },
+    initialValues: getInitialValues(),
   })
 
-// When classroom changes, reset student selection
+const studentClassroomOptions = computed(() =>
+  selectedStudentClassrooms.value.map((classroom) => ({
+    id: classroom.id,
+    name: classroom.name,
+  })),
+)
+const shouldShowStudentClassroomSelect = computed(() => selectedStudentClassrooms.value.length > 1)
+const shouldShowNextLessonSuggestions = computed(
+  () => !!values.student_id && (!!selectedStudentClassroomId.value || loadingNextLessons.value),
+)
+const canSubmit = computed(() => meta.value.valid && !loadingSelectedStudentClassrooms.value)
+const selectedNextLessonKey = computed(() =>
+  resolveSelectedNextLessonKey(nextLessons.value, {
+    dueAt: values.due_at as DateValue | undefined,
+    dueAtTime: values.due_at_time,
+  }),
+)
+
+function resetNextLessonsState() {
+  nextLessonsRequestId += 1
+  loadingNextLessons.value = false
+  nextLessons.value = []
+  isNextLessonsDrawerOpen.value = false
+}
+
+function syncStudentClassroomDrawerState(classroomId: string) {
+  isStudentClassroomDrawerOpen.value = selectedStudentClassrooms.value.length > 1 && !classroomId
+}
+
+function syncNextLessonsDrawerState(lessons: readonly NextLesson[]) {
+  if (loadingNextLessons.value || lessons.length === 0) {
+    isNextLessonsDrawerOpen.value = true
+    return
+  }
+
+  isNextLessonsDrawerOpen.value = !resolveSelectedNextLessonKey(lessons, {
+    dueAt: values.due_at as DateValue | undefined,
+    dueAtTime: values.due_at_time,
+  })
+}
+
+function selectStudentClassroom(classroomId: string) {
+  selectedStudentClassroomId.value = classroomId
+  setFieldValue('classroom_id', classroomId, false)
+  isStudentClassroomDrawerOpen.value = false
+}
+
+function applyNextLesson(lesson: NextLesson) {
+  const dueSelection = resolvePunishmentDueAtFromNextLesson(lesson)
+  if (!dueSelection) return
+
+  setFieldValue('due_at', dueSelection.dueAt, false)
+  setFieldValue('due_at_time', dueSelection.dueAtTime, false)
+  isNextLessonsDrawerOpen.value = false
+}
+
+async function loadSelectedStudentClassrooms(studentId: string) {
+  const requestId = ++classroomLookupRequestId
+  loadingSelectedStudentClassrooms.value = true
+
+  try {
+    const student = await studentService.getStudentById(studentId)
+
+    if (requestId !== classroomLookupRequestId) return
+
+    selectedStudentClassrooms.value = student.classrooms
+
+    const { classroomId } = resolveStudentClassroomSelection(student.classrooms, {
+      currentClassroomId: selectedStudentClassroomId.value,
+      preferredClassroomId: values.student_lookup_classroom_id || null,
+    })
+
+    selectedStudentClassroomId.value = classroomId
+    setFieldValue('classroom_id', classroomId, false)
+    syncStudentClassroomDrawerState(classroomId)
+  } catch {
+    if (requestId !== classroomLookupRequestId) return
+
+    selectedStudentClassrooms.value = []
+    isStudentClassroomDrawerOpen.value = false
+    selectedStudentClassroomId.value = hasPreselectedStudent.value
+      ? ''
+      : values.student_lookup_classroom_id || ''
+    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
+  } finally {
+    if (requestId === classroomLookupRequestId) {
+      loadingSelectedStudentClassrooms.value = false
+    }
+  }
+}
+
+async function loadNextLessons(classroomId: string) {
+  const requestId = ++nextLessonsRequestId
+  loadingNextLessons.value = true
+
+  try {
+    const lessons = await scheduleService.getClassroomNextLessons(classroomId)
+
+    if (requestId !== nextLessonsRequestId) return
+
+    nextLessons.value = lessons
+  } catch {
+    if (requestId !== nextLessonsRequestId) return
+
+    nextLessons.value = []
+    isNextLessonsDrawerOpen.value = true
+  } finally {
+    if (requestId === nextLessonsRequestId) {
+      loadingNextLessons.value = false
+      syncNextLessonsDrawerState(nextLessons.value)
+    }
+  }
+}
+
+// When the classroom filter changes, reset the student selection and the resolved classroom.
 watch(
-  () => values.classroom_id,
-  () => {
+  () => values.student_lookup_classroom_id,
+  (nextClassroomId) => {
     if (!open.value) return
     if (hasPreselectedStudent.value) return
+
+    classroomLookupRequestId += 1
+    loadingSelectedStudentClassrooms.value = false
+    selectedStudentClassrooms.value = []
+    isStudentClassroomDrawerOpen.value = false
+    resetNextLessonsState()
+    selectedStudentClassroomId.value = nextClassroomId || ''
+    setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
     setFieldValue('student_id', '', false)
   },
 )
 
+watch(
+  () => values.student_id,
+  async (studentId) => {
+    if (!open.value) return
+
+    if (!studentId) {
+      classroomLookupRequestId += 1
+      loadingSelectedStudentClassrooms.value = false
+      selectedStudentClassrooms.value = []
+      isStudentClassroomDrawerOpen.value = false
+      resetNextLessonsState()
+      selectedStudentClassroomId.value = hasPreselectedStudent.value
+        ? ''
+        : values.student_lookup_classroom_id || ''
+      setFieldValue('classroom_id', selectedStudentClassroomId.value, false)
+      return
+    }
+
+    await loadSelectedStudentClassrooms(studentId)
+  },
+)
+
+watch(selectedStudentClassroomId, async (classroomId) => {
+  if (!open.value) return
+
+  if (!values.student_id || !classroomId) {
+    resetNextLessonsState()
+    return
+  }
+
+  if (selectedStudentClassrooms.value.length > 1) {
+    isStudentClassroomDrawerOpen.value = false
+  }
+
+  await loadNextLessons(classroomId)
+})
+
 // Load data when modal opens
-watch(open, (isOpen) => {
+watch(open, async (isOpen) => {
   if (isOpen) {
     clearErrors()
-    resetForm({
-      values: {
-        classroom_id: props.preselectedClassroomId ?? '',
-        student_id: props.preselectedStudentId ?? '',
-        punishment_type_id: '',
-        due_at: undefined,
-        due_at_time: '08:00',
-        occurred_at: undefined,
-        occurred_at_time: '08:00',
-        evaluation_label: '',
-      },
-    })
+    selectedStudentClassrooms.value = []
+    classroomLookupRequestId += 1
+    loadingSelectedStudentClassrooms.value = false
+    isStudentClassroomDrawerOpen.value = false
+    selectedStudentClassroomId.value = props.preselectedStudentId
+      ? ''
+      : (props.preselectedClassroomId ?? '')
+    resetNextLessonsState()
+    resetForm({ values: getInitialValues() })
+
+    if (props.preselectedStudentId) {
+      await loadSelectedStudentClassrooms(props.preselectedStudentId)
+    }
+    return
   }
+
+  classroomLookupRequestId += 1
+  loadingSelectedStudentClassrooms.value = false
+  selectedStudentClassrooms.value = []
+  isStudentClassroomDrawerOpen.value = false
+  selectedStudentClassroomId.value = ''
+  resetNextLessonsState()
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
@@ -141,20 +336,24 @@ const onSubmit = handleSubmit(async (formValues) => {
     :title="t('modals.punishment.title')"
     :global-error="globalError"
     :submitting="isSubmitting"
-    :can-submit="meta.valid"
+    :can-submit="canSubmit"
     :submit-text="t('common.actions.submit')"
     prevent-auto-focus
     @submit="onSubmit"
   >
     <template v-if="!hasPreselectedStudent">
-      <FormField v-if="!hasPreselectedClassroom" v-slot="{ value }" name="classroom_id">
+      <FormField
+        v-if="!hasPreselectedClassroom"
+        v-slot="{ value }"
+        name="student_lookup_classroom_id"
+      >
         <FormItem>
           <FormLabel>{{ t('common.labels.classroom') }}</FormLabel>
           <FormControl>
             <ClassroomSelect
               :model-value="value"
               full-width
-              @update:model-value="setFieldValue('classroom_id', $event, false)"
+              @update:model-value="setFieldValue('student_lookup_classroom_id', $event, false)"
             />
           </FormControl>
           <FormMessage />
@@ -166,10 +365,10 @@ const onSubmit = handleSubmit(async (formValues) => {
           <FormLabel>{{ t('common.labels.student') }}</FormLabel>
           <FormControl>
             <StudentSelect
-              :key="values.classroom_id || '__all_students__'"
+              :key="values.student_lookup_classroom_id || '__all_students__'"
               :model-value="value"
-              :classroom-id="values.classroom_id || null"
-              :options-scope-key="values.classroom_id || '__all_students__'"
+              :classroom-id="values.student_lookup_classroom_id || null"
+              :options-scope-key="values.student_lookup_classroom_id || '__all_students__'"
               :placeholder="t('common.placeholders.selectStudent')"
               :empty-text="t('common.empty.noStudents')"
               @update:model-value="handleChange"
@@ -179,6 +378,20 @@ const onSubmit = handleSubmit(async (formValues) => {
         </FormItem>
       </FormField>
     </template>
+
+    <FormField v-if="shouldShowStudentClassroomSelect" v-slot="{}" name="classroom_id">
+      <FormItem class="space-y-0">
+        <StudentClassroomSelector
+          v-model:open="isStudentClassroomDrawerOpen"
+          :classrooms="studentClassroomOptions"
+          :selected-classroom-id="selectedStudentClassroomId"
+          :loading="loadingSelectedStudentClassrooms"
+          :hint="t('modals.punishment.studentClassroomPickHint')"
+          @select="selectStudentClassroom"
+        />
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
     <FormField v-slot="{ value, handleChange }" name="punishment_type_id">
       <FormItem>
@@ -208,6 +421,18 @@ const onSubmit = handleSubmit(async (formValues) => {
         </FormItem>
       </FormField>
     </FormField>
+
+    <NextLessonSelector
+      v-if="shouldShowNextLessonSuggestions"
+      v-model:open="isNextLessonsDrawerOpen"
+      :lessons="nextLessons"
+      :selected-lesson-key="selectedNextLessonKey"
+      :loading="loadingNextLessons"
+      :title="t('modals.punishment.nextLessonsTitle')"
+      :hint="t('modals.punishment.nextLessonsHint')"
+      :empty-text="t('modals.punishment.nextLessonsEmpty')"
+      @select="applyNextLesson"
+    />
 
     <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="occurred_at">
       <FormField

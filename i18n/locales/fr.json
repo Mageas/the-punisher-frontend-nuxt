@@ -18,12 +18,16 @@
       "create": "Créer",
       "delete": "Supprimer",
       "edit": "Modifier",
+      "hide": "Masquer",
       "logoutAll": "Tout déconnecter",
+      "chooseClassroom": "Choisir la classe",
       "remove": "Retirer",
       "resolve": "Marquer comme fait",
       "save": "Enregistrer",
       "signIn": "Se connecter",
-      "submit": "Valider"
+      "submit": "Valider",
+      "viewNextLessons": "Voir les prochains cours",
+      "viewSelectedClassroom": "Voir la classe sélectionnée"
     },
     "labels": {
       "actions": "Actions",
@@ -271,7 +275,12 @@
     "punishment": {
       "title": "Nouvelle punition",
       "editTitle": "Modifier la punition",
-      "punishmentType": "Type de punition"
+      "punishmentType": "Type de punition",
+      "studentClassroomPickHint": "Cet élève est inscrit dans plusieurs classes. Sélectionnez celle à utiliser pour proposer les prochains cours.",
+      "nextLessonsTitle": "Prochains cours",
+      "nextLessonsHint": "Choisissez un prochain cours pour préremplir l'échéance.",
+      "nextLessonsLoading": "Chargement des prochains cours...",
+      "nextLessonsEmpty": "Aucun prochain cours trouvé pour cette classe."
     },
     "rule": {
       "title": "Nouvelle règle",
