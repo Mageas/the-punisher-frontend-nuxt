@@ -1,4 +1,4 @@
-type DeltaSource = Record<string, unknown>
+type DeltaSource = object
 
 /**
  * Build a shallow delta object from two payloads.
@@ -9,8 +9,9 @@ export function buildDelta<T extends DeltaSource>(
   current: Partial<T>,
 ): Partial<T> {
   const delta: Partial<T> = {}
+  const currentKeys = Object.keys(current as Record<string, unknown>) as Array<keyof T>
 
-  for (const key of Object.keys(current) as Array<keyof T>) {
+  for (const key of currentKeys) {
     const nextValue = current[key]
 
     // `undefined` should be omitted from request bodies.

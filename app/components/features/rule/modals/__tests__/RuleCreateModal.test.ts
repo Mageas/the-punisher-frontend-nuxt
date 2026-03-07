@@ -21,13 +21,17 @@ const translations: Record<string, string> = {
   'modals.rule.penaltyType': 'Déclencheur',
   'modals.rule.punishmentType': 'Conséquence',
   'common.labels.threshold': 'Seuil',
-  'common.labels.mode': 'Mode',
+  'modals.rule.triggerMode': 'Mode de déclenchement',
+  'modals.rule.dueAtMode': 'Mode d\u2019échéance',
   'modals.rule.dueAtAfterDays': 'Délai',
+  'modals.rule.dueAtAfterLessons': 'Nombre de prochains cours',
   'common.placeholders.selectType': 'Sélectionner un type...',
   'common.empty.noTypeFound': 'Aucun type trouvé.',
   'rules.modes.at': 'Au seuil exact',
   'rules.modes.every': 'À chaque multiple',
   'rules.modes.after': 'À partir de',
+  'rules.dueModes.days': 'Jours',
+  'rules.dueModes.next_lessons': 'Prochains cours',
   'rules.defaultName': 'Règle automatique',
   'apiErrors.details.validation_field_required': 'Champ requis',
   'apiErrors.details.validation_min_length': 'Longueur minimale',
@@ -45,7 +49,9 @@ let mockFormValues: Record<string, unknown> = {
   resulting_punishment_type_id: 'punishment-1',
   threshold: 3,
   mode: 'at',
+  due_at_mode: 'days',
   due_at_after_days: 7,
+  due_at_after_lessons: null,
 }
 
 vi.mock('~/composables/services/useRuleService', () => ({
@@ -64,15 +70,27 @@ vi.mock('vee-validate', async () => {
   const original = (await vi.importActual('vee-validate')) as Record<string, unknown>
   return {
     ...original,
-    useForm: () => ({
-      handleSubmit: (fn: (values: Record<string, unknown>) => Promise<unknown>) => async () => {
-        await fn(mockFormValues)
-      },
-      isSubmitting: ref(false),
-      resetForm: vi.fn(),
-      setFieldError: vi.fn(),
-      meta: reactive({ valid: true }),
-    }),
+    useForm: () => {
+      const values = reactive({ ...mockFormValues })
+
+      return {
+        handleSubmit:
+          (fn: (formValues: Record<string, unknown>) => Promise<unknown>) => async () => {
+            await fn({ ...values })
+          },
+        isSubmitting: ref(false),
+        resetForm: vi.fn((payload?: { values?: Record<string, unknown> }) => {
+          if (!payload?.values) return
+          Object.assign(values, payload.values)
+        }),
+        setFieldError: vi.fn(),
+        setFieldValue: vi.fn((field: string, value: unknown) => {
+          values[field] = value
+        }),
+        values,
+        meta: reactive({ valid: true }),
+      }
+    },
   }
 })
 
@@ -103,11 +121,11 @@ const stubs = {
   },
   PenaltyTypeSelect: {
     template:
-      "<button data-testid=\"penalty-select\" @click=\"$emit('selected-option', { id: 'penalty-1', name: 'Retard' })\">Penalty</button>",
+      '<button data-testid="penalty-select" @click="$emit(`selected-option`, { id: `penalty-1`, name: `Retard` })">Penalty</button>',
   },
   PunishmentTypeSelect: {
     template:
-      "<button data-testid=\"punishment-select\" @click=\"$emit('selected-option', { id: 'punishment-1', name: 'Retenue' })\">Punishment</button>",
+      '<button data-testid="punishment-select" @click="$emit(`selected-option`, { id: `punishment-1`, name: `Retenue` })">Punishment</button>',
   },
   FormMessage: {
     template: '<span><slot /></span>',
@@ -127,7 +145,9 @@ describe('RuleCreateModal', () => {
       resulting_punishment_type_id: 'punishment-1',
       threshold: 3,
       mode: 'at',
+      due_at_mode: 'days',
       due_at_after_days: 7,
+      due_at_after_lessons: null,
     }
     mockRuleService.createRule.mockResolvedValue({ id: 'rule-1' })
 
@@ -149,7 +169,9 @@ describe('RuleCreateModal', () => {
       resulting_punishment_type_id: 'punishment-1',
       threshold: 3,
       mode: 'at',
+      due_at_mode: 'days',
       due_at_after_days: 7,
+      due_at_after_lessons: null,
       name: 'Retard -> Retenue',
       is_active: true,
     })
@@ -162,7 +184,9 @@ describe('RuleCreateModal', () => {
       resulting_punishment_type_id: 'punishment-1',
       threshold: 3,
       mode: 'at',
+      due_at_mode: 'days',
       due_at_after_days: 7,
+      due_at_after_lessons: null,
     }
     mockRuleService.createRule.mockResolvedValue({ id: 'rule-2' })
 
@@ -182,10 +206,49 @@ describe('RuleCreateModal', () => {
       resulting_punishment_type_id: 'punishment-1',
       threshold: 3,
       mode: 'at',
+      due_at_mode: 'days',
       due_at_after_days: 7,
+      due_at_after_lessons: null,
       name: 'Règle personnalisée',
       is_active: true,
     })
     expect(wrapper.emitted()).toHaveProperty('created')
+  })
+
+  it('sends the next_lessons payload and nulls due_at_after_days', async () => {
+    mockFormValues = {
+      name: 'Au prochain cours',
+      penalty_type_id: 'penalty-1',
+      resulting_punishment_type_id: 'punishment-1',
+      threshold: 3,
+      mode: 'every',
+      due_at_mode: 'next_lessons',
+      due_at_after_days: null,
+      due_at_after_lessons: 2,
+    }
+    mockRuleService.createRule.mockResolvedValue({ id: 'rule-3' })
+
+    const wrapper = mount(RuleCreateModal, {
+      props: {
+        open: true,
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    await wrapper.get('#submit-btn').trigger('click')
+
+    expect(mockRuleService.createRule).toHaveBeenCalledWith({
+      penalty_type_id: 'penalty-1',
+      resulting_punishment_type_id: 'punishment-1',
+      threshold: 3,
+      mode: 'every',
+      due_at_mode: 'next_lessons',
+      due_at_after_days: null,
+      due_at_after_lessons: 2,
+      name: 'Au prochain cours',
+      is_active: true,
+    })
   })
 })

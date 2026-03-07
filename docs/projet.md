@@ -135,7 +135,7 @@ En tant que **Professeur**, je veux :
     * **Consommer un bonus :** Cliquer sur un bouton pour utiliser un bonus (passe `used_at` de NULL à DATE), par exemple pour "acheter" un privilège.
   * **Attributions Manuelles :**
     * Ajouter un point bonus manuel
-    * Ajouter une pénalité manuelle (ce qui alimentera l'historique pour les règles auto).
+    * Ajouter une pénalité manuelle (ce qui alimentera l'historique pour les règles auto), avec choix explicite de la classe si l'élève appartient à plusieurs classes et qu'une règle automatique calcule l'échéance au prochain cours.
     * Ajouter une punition manuelle (sans passer par une règle).
 
 ### 3. Gestion des Classes
@@ -160,7 +160,9 @@ En tant que **Professeur**, je veux définir la logique automatique ("Loi") :
   * **CRUD Règle :** Créer une règle liant un *Type de Pénalité* à un *Type de Punition*.
   * **Paramétrage fin :**
     * Définir le **Seuil** (`threshold`) : Combien de pénalités pour déclencher ?
-    * Définir le **Délai** (`due_at_after_days`) : Combien de jours l'élève a pour faire la punition ?
+    * Définir le **Mode d'échéance** (`due_at_mode`) :
+      * *En jours* (`days`) avec `due_at_after_days`.
+      * *Au prochain / aux prochains cours* (`next_lessons`) avec `due_at_after_lessons` entre 1 et 5.
     * Choisir le **Mode** de calcul :
       * *Au seuil exact* (`at`).
       * *Tous les X pénalités* (`every`).
@@ -193,7 +195,7 @@ Voici le périmètre strict de la première version :
   * Types de Bonus (ex: "Participation").
 
 * **Gestion des Règles (Automation) :**
-  * Formulaire de création de règle : Choix du Trigger + Seuil + Conséquence + Mode (`at`, `every`, `after`).
+  * Formulaire de création de règle : Choix du Trigger + Seuil + Conséquence + Mode (`at`, `every`, `after`) + Mode d'échéance (`days` ou `next_lessons`).
   * Switch d'activation/désactivation rapide d'une règle.
 
 #### 3. Module Administratif (Données)

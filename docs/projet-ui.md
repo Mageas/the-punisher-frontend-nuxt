@@ -232,9 +232,9 @@
   * **Liste des Règles :** Cartes larges.
   * **Gauche :** `Switch` (Toggle) pour activer/désactiver instantanément.
   * **Centre :** titre principal `rule.name`, puis ligne secondaire "Trigger (ex: Bavardage) ➝ Conséquence (ex: Retenue)".
-  * **Détails :** Badge Mode "Au seuil exact" / "A chaque multiple", puis texte "Seuil: X".
+  * **Détails :** Badge Mode "Au seuil exact" / "A chaque multiple", puis texte "Seuil: X" et rappel d'échéance ("Délai : 2 jours" ou "Échéance : après 2 cours").
   * **Droite :** Actions Edit/Delete (ouvrent Modale).
-  * **Création :** champ optionnel `Nom de la règle`. Si vide, fallback auto `from -> to`.
+  * **Création :** champ optionnel `Nom de la règle`. Si vide, fallback auto `from -> to`. Le formulaire expose aussi un sélecteur de mode d'échéance qui masque/affiche `due_at_after_days` ou `due_at_after_lessons`.
 
 ---
 
