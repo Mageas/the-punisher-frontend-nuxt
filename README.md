@@ -81,4 +81,5 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 
 - API response datetime fields ending with `*_at` are normalized to RFC3339 UTC (`Z`) in the shared utility `app/lib/date-time.ts`, wired through the global API plugin.
 - Request body datetime fields ending with `*_at` are serialized to RFC3339 UTC (`.toISOString()`) before being sent.
+- Event datetime pickers only expose `HH:mm` in the UI; new datetimes are sent with seconds forced to `00`, while edit flows preserve API-provided seconds until the user actively changes the date/time, at which point seconds are reset to `00`.
 - Date filters in query params (`created_from`, `created_to`, `due_from`, `due_to`) stay as `YYYY-MM-DD`.

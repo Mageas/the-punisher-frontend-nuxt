@@ -5,7 +5,7 @@ import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
 import { getLocalTimeZone } from '@internationalized/date'
 import type { Student } from '~/types/api'
-import { toApiDateTimeString } from '~/lib/date-time'
+import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
 import { resolveStudentClassroomSelection } from '~/lib/student-classroom'
 
 const emit = defineEmits<{
@@ -239,8 +239,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     let occurredAt: string | undefined
     if (formValues.occurred_at) {
       const date = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
-      const [h = '08', m = '00'] = (formValues.occurred_at_time || '08:00').split(':')
-      date.setHours(Number(h), Number(m), 0, 0)
+      applyTimeInputToDate(date, formValues.occurred_at_time)
       occurredAt = toApiDateTimeString(date) ?? undefined
     }
 
