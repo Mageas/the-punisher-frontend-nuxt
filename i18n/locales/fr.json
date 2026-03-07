@@ -81,6 +81,15 @@
       "noStudents": "Aucun élève trouvé.",
       "noTypeFound": "Aucun type trouvé."
     },
+    "feedback": {
+      "addSuccess": "Ajout effectué avec succès.",
+      "consumeSuccess": "Action effectuée avec succès.",
+      "createSuccess": "Création effectuée avec succès.",
+      "deleteSuccess": "Suppression effectuée avec succès.",
+      "removeSuccess": "Retrait effectué avec succès.",
+      "resolveSuccess": "Action effectuée avec succès.",
+      "updateSuccess": "Modification effectuée avec succès."
+    },
     "states": {
       "automatedNo": "Non",
       "automatedYes": "Oui",

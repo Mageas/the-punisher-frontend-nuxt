@@ -21,6 +21,7 @@ const props = defineProps<{
     :action-fn="props.deleteFn"
     :title="t('modals.delete.title')"
     :message="props.message"
+    :success-message="t('common.feedback.deleteSuccess')"
     :warning-message="t('modals.delete.typeChildrenWarning')"
     :cancel-label="t('common.actions.cancel')"
     :confirm-label="t('common.actions.delete')"

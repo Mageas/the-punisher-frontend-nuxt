@@ -20,6 +20,7 @@ const props = defineProps<{
     :action-fn="props.resolveFn"
     :title="t('modals.resolve.title')"
     :message="t('modals.resolve.punishmentMessage')"
+    :success-message="t('common.feedback.resolveSuccess')"
     :cancel-label="t('common.actions.cancel')"
     :confirm-label="t('common.actions.resolve')"
     @confirmed="emit('confirmed')"

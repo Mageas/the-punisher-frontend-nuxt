@@ -28,6 +28,7 @@ const { t } = useI18n()
 const classroomService = useClassroomService()
 const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
 const { isPending: submitting, withPending: withSubmitting } = useApiActionState()
+const { notifyCreateSuccess, notifyUpdateSuccess } = useActionToast()
 
 const isEditMode = computed(() => !!props.scheduleSlot)
 const hasAttemptedSubmit = ref(false)
@@ -136,6 +137,12 @@ async function handleSubmit() {
         classroom_ids: form.classroom_ids,
       }),
     )
+
+    if (isEditMode.value) {
+      notifyUpdateSuccess()
+    } else {
+      notifyCreateSuccess()
+    }
 
     open.value = false
     emit('saved', savedSlot)

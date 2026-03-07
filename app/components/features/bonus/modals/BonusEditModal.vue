@@ -22,6 +22,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const bonusService = useBonusService()
+const { notifyUpdateSuccess } = useActionToast()
 
 function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
   const parsed = parseApiDateTime(dateTime)
@@ -114,6 +115,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     if (Object.keys(deltaPayload).length > 0) {
       await withSubmitLoading(async () => {
         await bonusService.updateBonus(bonus.id, deltaPayload)
+        notifyUpdateSuccess()
         emit('updated')
       })
     }

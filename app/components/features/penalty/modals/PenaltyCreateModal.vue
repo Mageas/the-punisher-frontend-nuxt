@@ -29,6 +29,7 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const penaltyService = usePenaltyService()
 const studentService = useStudentService()
+const { notifyCreateSuccess } = useActionToast()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
@@ -255,6 +256,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         ...(occurredAt ? { occurred_at: occurredAt } : {}),
         ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
       })
+      notifyCreateSuccess()
       open.value = false
       emit('created')
     })

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { School, ShieldAlert, Users } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const { deleteAllStudents: deleteAllStudentsRequest } = useStudents()
@@ -11,12 +10,10 @@ const showDeleteClassroomsConfirm = ref(false)
 
 async function deleteAllStudents(_: string) {
   await deleteAllStudentsRequest()
-  toast.success(t('dangerZone.deleteAllStudents.success'))
 }
 
 async function deleteAllClassrooms(_: string) {
   await deleteAllClassroomsRequest()
-  toast.success(t('dangerZone.deleteAllClassrooms.success'))
 }
 </script>
 
@@ -67,6 +64,7 @@ async function deleteAllClassrooms(_: string) {
       :title="t('dangerZone.deleteAllStudents.confirmTitle')"
       :message="t('dangerZone.deleteAllStudents.confirmMessage')"
       :warning-message="t('dangerZone.deleteAllStudents.confirmWarning')"
+      :success-message="t('dangerZone.deleteAllStudents.success')"
       :cancel-label="t('common.actions.cancel')"
       :confirm-label="t('dangerZone.deleteAllStudents.actionLabel')"
       confirm-variant="destructive"
@@ -80,6 +78,7 @@ async function deleteAllClassrooms(_: string) {
       :title="t('dangerZone.deleteAllClassrooms.confirmTitle')"
       :message="t('dangerZone.deleteAllClassrooms.confirmMessage')"
       :warning-message="t('dangerZone.deleteAllClassrooms.confirmWarning')"
+      :success-message="t('dangerZone.deleteAllClassrooms.success')"
       :cancel-label="t('common.actions.cancel')"
       :confirm-label="t('dangerZone.deleteAllClassrooms.actionLabel')"
       confirm-variant="destructive"

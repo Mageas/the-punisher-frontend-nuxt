@@ -19,6 +19,7 @@ const props = defineProps<{
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
+const { notifyUpdateSuccess } = useActionToast()
 
 const schema = toTypedSchema(
   zod.object({
@@ -57,6 +58,7 @@ const onSubmit = handleSubmit(async (values) => {
     if ('name' in deltaPayload) {
       await withSubmitLoading(async () => {
         await props.updateFn(item.id, values.name)
+        notifyUpdateSuccess()
         emit('updated')
       })
     }
