@@ -26,6 +26,8 @@ const modelValue = defineModel<string>({ default: '' })
 
 const { t } = useI18n()
 
+useGlobalErrorToast(() => props.addStudentError)
+
 function studentFullName(student: Student): string {
   return `${student.first_name} ${student.last_name}`
 }
@@ -59,10 +61,6 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
         {{ t('common.counts.student', studentCount) }}
       </p>
     </div>
-
-    <Alert v-if="addStudentError" variant="destructive" class="mb-4">
-      <AlertDescription>{{ addStudentError }}</AlertDescription>
-    </Alert>
 
     <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="onSubmit">
       <div class="flex-1">

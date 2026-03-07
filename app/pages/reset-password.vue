@@ -11,6 +11,8 @@ const route = useRoute()
 const { resetPassword, isAuthenticated } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
+useGlobalErrorToast(globalError)
+
 if (isAuthenticated.value) {
   await navigateTo('/')
 }
@@ -159,10 +161,6 @@ function onConfirmPasswordInput() {
       <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
         <Alert v-if="tokenLocalError || fieldErrors.token" variant="destructive" class="mb-4">
           <AlertDescription>{{ tokenLocalError || fieldErrors.token }}</AlertDescription>
-        </Alert>
-
-        <Alert v-if="globalError" variant="destructive" class="mb-4">
-          <AlertDescription>{{ globalError }}</AlertDescription>
         </Alert>
 
         <form class="space-y-4" @submit.prevent="onSubmit">

@@ -10,6 +10,8 @@ const { t } = useI18n()
 const { register, isAuthenticated, isRegisterAllowed } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
+useGlobalErrorToast(globalError)
+
 if (isAuthenticated.value) {
   await navigateTo('/')
 }
@@ -93,11 +95,6 @@ const registerSubtitle = computed(() =>
 
       <!-- Card -->
       <div v-if="registerAllowed" class="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive" class="mb-4">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
         <form class="space-y-4" @submit.prevent="onSubmit">
           <!-- Nom / Prénom -->
           <div class="space-y-2">

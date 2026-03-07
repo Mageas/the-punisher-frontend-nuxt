@@ -26,6 +26,9 @@ const {
   clearFieldError: clearResendFieldError,
 } = useApiErrors()
 
+useGlobalErrorToast(confirmGlobalError)
+useGlobalErrorToast(resendGlobalError)
+
 if (isAuthenticated.value) {
   await navigateTo('/')
 }
@@ -177,10 +180,6 @@ function onResendEmailInput() {
             </p>
           </div>
 
-          <Alert v-if="confirmGlobalError" variant="destructive">
-            <AlertDescription>{{ confirmGlobalError }}</AlertDescription>
-          </Alert>
-
           <Button type="submit" class="w-full cursor-pointer" :disabled="isConfirmLoading">
             {{ t('auth.confirmEmail.submit') }}
           </Button>
@@ -204,10 +203,6 @@ function onResendEmailInput() {
               {{ resendLocalError }}
             </p>
           </div>
-
-          <Alert v-if="resendGlobalError" variant="destructive" class="mt-3">
-            <AlertDescription>{{ resendGlobalError }}</AlertDescription>
-          </Alert>
 
           <Alert v-if="resendSuccess" class="mt-3">
             <AlertDescription>{{ resendSuccess }}</AlertDescription>
