@@ -3,7 +3,7 @@ interface ClassroomRef {
   name: string
 }
 
-export function resolvePenaltyClassroomSelection(
+export function resolveStudentClassroomSelection(
   classrooms: readonly ClassroomRef[],
   options?: {
     currentClassroomId?: string | null

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { resolvePenaltyClassroomSelection } from '../penalty-classroom'
+import { resolveStudentClassroomSelection } from '../student-classroom'
 
 const classrooms = [
   { id: 'class-1', name: '6A' },
   { id: 'class-2', name: '6B' },
 ]
 
-describe('resolvePenaltyClassroomSelection', () => {
+describe('resolveStudentClassroomSelection', () => {
   it('auto-selects the only classroom when the student has a single class', () => {
     expect(
-      resolvePenaltyClassroomSelection([{ id: 'class-1', name: '6A' }], {
+      resolveStudentClassroomSelection([{ id: 'class-1', name: '6A' }], {
         currentClassroomId: null,
         preferredClassroomId: null,
       }),
@@ -21,7 +21,7 @@ describe('resolvePenaltyClassroomSelection', () => {
 
   it('keeps the current classroom when it belongs to the selected student', () => {
     expect(
-      resolvePenaltyClassroomSelection(classrooms, {
+      resolveStudentClassroomSelection(classrooms, {
         currentClassroomId: 'class-2',
         preferredClassroomId: 'class-1',
       }),
@@ -33,7 +33,7 @@ describe('resolvePenaltyClassroomSelection', () => {
 
   it('falls back to the preferred classroom when the current one is invalid', () => {
     expect(
-      resolvePenaltyClassroomSelection(classrooms, {
+      resolveStudentClassroomSelection(classrooms, {
         currentClassroomId: 'class-3',
         preferredClassroomId: 'class-1',
       }),
@@ -45,7 +45,7 @@ describe('resolvePenaltyClassroomSelection', () => {
 
   it('returns an empty selection when no classroom can be resolved', () => {
     expect(
-      resolvePenaltyClassroomSelection(classrooms, {
+      resolveStudentClassroomSelection(classrooms, {
         currentClassroomId: null,
         preferredClassroomId: null,
       }),
