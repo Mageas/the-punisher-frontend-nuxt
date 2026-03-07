@@ -2,15 +2,15 @@
 import { Slot } from "reka-ui"
 import { useFormField } from "./useFormField"
 
-const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+const { hasVisibleError, formItemId, formDescriptionId, formMessageId } = useFormField()
 </script>
 
 <template>
   <Slot
     :id="formItemId"
     data-slot="form-control"
-    :aria-describedby="!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`"
-    :aria-invalid="!!error"
+    :aria-describedby="!hasVisibleError ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`"
+    :aria-invalid="hasVisibleError"
   >
     <slot />
   </Slot>

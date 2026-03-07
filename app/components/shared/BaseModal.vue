@@ -32,7 +32,7 @@ const { t } = useI18n()
 useGlobalErrorToast(() => props.globalError)
 
 function handleSubmit() {
-  if (props.canSubmit !== false && !props.submitting) {
+  if (!props.submitting) {
     emit('submit')
   }
 }
@@ -67,7 +67,7 @@ function onOpenAutoFocus(event: Event) {
             type="submit"
             class="cursor-pointer"
             :variant="destructive ? 'destructive' : 'default'"
-            :disabled="submitting || canSubmit === false"
+            :disabled="submitting"
           >
             <span
               v-if="submitting"

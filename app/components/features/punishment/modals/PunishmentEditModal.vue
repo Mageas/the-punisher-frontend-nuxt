@@ -144,7 +144,7 @@ const onSubmit = handleSubmit(async (formValues) => {
               @update:time="handleChangeTime"
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage name="occurred_at" />
         </FormItem>
       </FormField>
     </FormField>

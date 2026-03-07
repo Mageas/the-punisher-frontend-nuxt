@@ -7,11 +7,12 @@ const props = withDefaults(
   defineProps<{
     students: readonly Student[]
     studentCount: number
-    canAddStudent: boolean
+    submittingAddStudent?: boolean
     addStudentError?: string | null
     keepFocusOnStudentSelect?: boolean
   }>(),
   {
+    submittingAddStudent: false,
     addStudentError: null,
     keepFocusOnStudentSelect: false,
   },
@@ -25,6 +26,7 @@ const emit = defineEmits<{
 const modelValue = defineModel<string>({ default: '' })
 
 const { t } = useI18n()
+const hasAttemptedSubmit = ref(false)
 
 useGlobalErrorToast(() => props.addStudentError)
 
@@ -41,6 +43,12 @@ function formatBonusPoints(points: number): string {
 }
 
 function onSubmit() {
+  hasAttemptedSubmit.value = true
+
+  if (!modelValue.value) {
+    return
+  }
+
   emit('submitAdd')
 }
 
@@ -49,6 +57,17 @@ function onRemoveStudent(student: Student) {
 }
 
 const existingStudentIds = computed(() => props.students.map((student) => student.id))
+const localError = computed(() =>
+  hasAttemptedSubmit.value && !modelValue.value
+    ? t('apiErrors.details.validation_field_required')
+    : '',
+)
+
+watch(modelValue, (nextValue, previousValue) => {
+  if (nextValue || previousValue) {
+    hasAttemptedSubmit.value = false
+  }
+})
 </script>
 
 <template>
@@ -71,9 +90,12 @@ const existingStudentIds = computed(() => props.students.map((student) => studen
           :empty-text="t('common.empty.noStudents')"
           :keep-focus-on-select="props.keepFocusOnStudentSelect"
         />
+        <p v-if="localError" class="mt-2 text-sm text-destructive">
+          {{ localError }}
+        </p>
       </div>
 
-      <Button type="submit" class="cursor-pointer" :disabled="!canAddStudent">
+      <Button type="submit" class="cursor-pointer" :disabled="props.submittingAddStudent">
         <Plus class="w-4 h-4" />
         {{ t('common.actions.addStudent') }}
       </Button>

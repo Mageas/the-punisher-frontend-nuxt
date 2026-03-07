@@ -8,6 +8,7 @@ import {
 } from '~/types/api'
 import { Trash2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import { getScheduleSlotFormErrors } from '~/lib/schedule-slot-form'
 
 const props = defineProps<{
   scheduleSlot?: ScheduleSlot | null
@@ -29,6 +30,7 @@ const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
 
 const isEditMode = computed(() => !!props.scheduleSlot)
 const submitting = ref(false)
+const hasAttemptedSubmit = ref(false)
 
 const weekdayOptions: readonly Weekday[] = SCHEDULE_WEEKDAYS
 
@@ -49,6 +51,8 @@ const form = reactive({
 const selectedClassrooms = ref<{ id: string; name: string }[]>([])
 
 watch(open, (isOpen) => {
+  hasAttemptedSubmit.value = false
+
   if (!isOpen) return
 
   clearErrors()
@@ -95,14 +99,9 @@ const endTimeOptions = computed(() => {
   return timeOptions.value.filter((time) => time > form.start_time)
 })
 
-const canSubmit = computed(() => {
-  return (
-    form.weekday !== '' &&
-    form.start_time !== '' &&
-    form.end_time !== '' &&
-    form.start_time < form.end_time
-  )
-})
+const clientErrors = computed(() =>
+  hasAttemptedSubmit.value ? getScheduleSlotFormErrors(form, t) : {},
+)
 
 async function fetchClassroomOptions(options: { page: number; search?: string }) {
   const response = await classroomService.getClassrooms(options)
@@ -117,7 +116,13 @@ async function fetchClassroomOptions(options: { page: number; search?: string })
 }
 
 async function handleSubmit() {
-  if (!canSubmit.value || submitting.value) return
+  if (submitting.value) return
+
+  hasAttemptedSubmit.value = true
+
+  if (Object.keys(getScheduleSlotFormErrors(form, t)).length > 0) {
+    return
+  }
 
   submitting.value = true
   clearErrors()
@@ -164,7 +169,6 @@ function removeClassroom(id: string) {
     v-model:open="open"
     :title="isEditMode ? t('schedule.form.editTitle') : t('schedule.form.createTitle')"
     :submitting="submitting"
-    :can-submit="canSubmit"
     :submit-text="isEditMode ? t('common.actions.save') : t('common.actions.create')"
     hide-footer
     prevent-auto-focus
@@ -181,8 +185,8 @@ function removeClassroom(id: string) {
             {{ t(`schedule.weekdays.${day}`) }}
           </NativeSelectOption>
         </NativeSelect>
-        <p v-if="fieldErrors.weekday" class="text-sm text-destructive">
-          {{ fieldErrors.weekday }}
+        <p v-if="clientErrors.weekday || fieldErrors.weekday" class="text-sm text-destructive">
+          {{ clientErrors.weekday || fieldErrors.weekday }}
         </p>
       </div>
 
@@ -195,8 +199,11 @@ function removeClassroom(id: string) {
               {{ time }}
             </NativeSelectOption>
           </NativeSelect>
-          <p v-if="fieldErrors.start_time" class="text-sm text-destructive">
-            {{ fieldErrors.start_time }}
+          <p
+            v-if="clientErrors.start_time || fieldErrors.start_time"
+            class="text-sm text-destructive"
+          >
+            {{ clientErrors.start_time || fieldErrors.start_time }}
           </p>
         </div>
         <div class="space-y-2">
@@ -207,8 +214,8 @@ function removeClassroom(id: string) {
               {{ time }}
             </NativeSelectOption>
           </NativeSelect>
-          <p v-if="fieldErrors.end_time" class="text-sm text-destructive">
-            {{ fieldErrors.end_time }}
+          <p v-if="clientErrors.end_time || fieldErrors.end_time" class="text-sm text-destructive">
+            {{ clientErrors.end_time || fieldErrors.end_time }}
           </p>
         </div>
       </div>
@@ -287,8 +294,11 @@ function removeClassroom(id: string) {
             }
           "
         />
-        <p v-if="fieldErrors.classroom_ids" class="text-sm text-destructive">
-          {{ fieldErrors.classroom_ids }}
+        <p
+          v-if="clientErrors.classroom_ids || fieldErrors.classroom_ids"
+          class="text-sm text-destructive"
+        >
+          {{ clientErrors.classroom_ids || fieldErrors.classroom_ids }}
         </p>
       </div>
 
@@ -315,7 +325,7 @@ function removeClassroom(id: string) {
         >
           {{ t('common.actions.cancel') }}
         </Button>
-        <Button type="submit" class="cursor-pointer" :disabled="submitting || !canSubmit">
+        <Button type="submit" class="cursor-pointer" :disabled="submitting">
           <span
             v-if="submitting"
             class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"

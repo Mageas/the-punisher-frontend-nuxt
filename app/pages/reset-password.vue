@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { Skull } from 'lucide-vue-next'
+import {
+  getPasswordConfirmationError,
+  getPasswordFieldError,
+  hasClientValidationErrors,
+  MIN_PASSWORD_LENGTH,
+} from '~/lib/auth-form-validation'
 
 definePageMeta({
   layout: false,
@@ -24,8 +30,14 @@ const form = reactive({
 
 const resetToken = ref('')
 const isLoading = ref(false)
-const passwordMismatch = ref(false)
 const tokenLocalError = ref<string | null>(null)
+const hasAttemptedSubmit = ref(false)
+const localErrors = computed(() => ({
+  new_password: getPasswordFieldError(form.newPassword, t, { submitted: hasAttemptedSubmit.value }),
+  confirm_password: getPasswordConfirmationError(form.newPassword, form.confirmPassword, t, {
+    submitted: hasAttemptedSubmit.value,
+  }),
+}))
 
 function extractTokenFromHash(rawHash: string): string {
   const hash = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash
@@ -101,16 +113,15 @@ onMounted(() => {
 
 async function onSubmit() {
   clearErrors()
-  passwordMismatch.value = false
   tokenLocalError.value = null
+  hasAttemptedSubmit.value = true
 
-  if (!resetToken.value) {
+  if (!resetToken.value.trim()) {
     tokenLocalError.value = t('auth.resetPassword.tokenRequired')
     return
   }
 
-  if (form.newPassword !== form.confirmPassword) {
-    passwordMismatch.value = true
+  if (hasClientValidationErrors(localErrors.value)) {
     return
   }
 
@@ -139,7 +150,6 @@ function onNewPasswordInput() {
 
 function onConfirmPasswordInput() {
   clearFieldError('confirm_password')
-  passwordMismatch.value = false
 }
 </script>
 
@@ -171,11 +181,17 @@ function onConfirmPasswordInput() {
               v-model="form.newPassword"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!fieldErrors.new_password"
+              :aria-invalid="!!localErrors.new_password || !!fieldErrors.new_password"
               @input="onNewPasswordInput"
             />
-            <p v-if="fieldErrors.new_password" class="text-sm text-destructive">
-              {{ fieldErrors.new_password }}
+            <p
+              v-if="localErrors.new_password || fieldErrors.new_password"
+              class="text-sm text-destructive"
+            >
+              {{ localErrors.new_password || fieldErrors.new_password }}
+            </p>
+            <p v-else class="text-xs text-muted-foreground">
+              {{ t('auth.passwordRequirements.minLength', { count: MIN_PASSWORD_LENGTH }) }}
             </p>
           </div>
 
@@ -186,14 +202,14 @@ function onConfirmPasswordInput() {
               v-model="form.confirmPassword"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!fieldErrors.confirm_password || passwordMismatch"
+              :aria-invalid="!!localErrors.confirm_password || !!fieldErrors.confirm_password"
               @input="onConfirmPasswordInput"
             />
-            <p v-if="fieldErrors.confirm_password" class="text-sm text-destructive">
-              {{ fieldErrors.confirm_password }}
-            </p>
-            <p v-if="passwordMismatch" class="text-sm text-destructive">
-              {{ t('auth.passwordMismatch') }}
+            <p
+              v-if="localErrors.confirm_password || fieldErrors.confirm_password"
+              class="text-sm text-destructive"
+            >
+              {{ localErrors.confirm_password || fieldErrors.confirm_password }}
             </p>
           </div>
 

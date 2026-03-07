@@ -196,9 +196,28 @@ const stubs = {
       </div>
     `,
   }),
-  NextLessonSelector: {
-    template: '<div />',
-  },
+  NextLessonSelector: defineComponent({
+    props: {
+      lessons: {
+        type: Array,
+        default: () => [],
+      },
+    },
+    emits: ['select'],
+    template: `
+      <div>
+        <button
+          v-for="lesson in lessons"
+          :key="lesson.date + lesson.start_time"
+          data-testid="next-lesson-option"
+          type="button"
+          @click="$emit('select', lesson)"
+        >
+          {{ lesson.date }} {{ lesson.start_time }}
+        </button>
+      </div>
+    `,
+  }),
   DatePicker: defineComponent({
     props: ['modelValue', 'time'],
     template:
@@ -274,6 +293,10 @@ describe('PunishmentCreateModal', () => {
     await wrapper.setProps({ open: true })
     await flushPromises()
 
+    const [firstClassroomButton] = wrapper.findAll('[data-testid="student-classroom-option"]')
+    await firstClassroomButton?.trigger('click')
+    await flushPromises()
+
     currentValues.punishment_type_id = '55555555-5555-5555-5555-555555555555'
     currentValues.due_at = parseDate('2026-03-18')
     currentValues.due_at_time = '10:00'
@@ -288,7 +311,63 @@ describe('PunishmentCreateModal', () => {
       punishment_type_id: '55555555-5555-5555-5555-555555555555',
     })
     expect(payload).toHaveProperty('due_at')
+    expect(payload).not.toHaveProperty('occurred_at')
     expect(payload).not.toHaveProperty('classroom_id')
     expect(wrapper.emitted()).toHaveProperty('created')
+  })
+
+  it('requires an explicit classroom choice when the student belongs to multiple classes', async () => {
+    const wrapper = mount(PunishmentCreateModal, {
+      props: {
+        open: false,
+        preselectedStudentId: 'student-1',
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    await wrapper.setProps({ open: true })
+    await flushPromises()
+
+    currentValues.punishment_type_id = '55555555-5555-5555-5555-555555555555'
+    currentValues.due_at = parseDate('2026-03-18')
+    currentValues.due_at_time = '10:00'
+    currentValues.classroom_id = ''
+
+    await wrapper.get('#submit-btn').trigger('click')
+
+    expect(mockPunishmentService.createPunishment).not.toHaveBeenCalled()
+    expect(mockSetFieldError).toHaveBeenCalledWith(
+      'classroom_id',
+      'apiErrors.details.punishment_classroom_not_resolved',
+    )
+  })
+
+  it('clears due date errors after selecting a suggested next lesson', async () => {
+    const wrapper = mount(PunishmentCreateModal, {
+      props: {
+        open: false,
+        preselectedStudentId: 'student-1',
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    await wrapper.setProps({ open: true })
+    await flushPromises()
+
+    const [firstClassroomButton] = wrapper.findAll('[data-testid="student-classroom-option"]')
+    await firstClassroomButton?.trigger('click')
+    await flushPromises()
+
+    const [nextLessonButton] = wrapper.findAll('[data-testid="next-lesson-option"]')
+    await nextLessonButton?.trigger('click')
+
+    expect(mockSetFieldError).toHaveBeenCalledWith('due_at', undefined)
+    expect(mockSetFieldError).toHaveBeenCalledWith('due_at_time', undefined)
+    expect(mockSetFieldValue).toHaveBeenCalledWith('due_at', expect.anything(), false)
+    expect(mockSetFieldValue).toHaveBeenCalledWith('due_at_time', '10:00', false)
   })
 })
