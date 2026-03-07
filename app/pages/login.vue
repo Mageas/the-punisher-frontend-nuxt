@@ -11,6 +11,8 @@ const route = useRoute()
 const { login, isAuthenticated } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
+useGlobalErrorToast(globalError)
+
 if (isAuthenticated.value) {
   await navigateTo('/')
 }
@@ -61,11 +63,6 @@ async function onSubmit() {
         </Alert>
         <Alert v-if="showPasswordResetSuccess" class="mb-4">
           <AlertDescription>{{ t('auth.resetPassword.loginSuccess') }}</AlertDescription>
-        </Alert>
-
-        <!-- Global error -->
-        <Alert v-if="globalError" variant="destructive" class="mb-4">
-          <AlertDescription>{{ globalError }}</AlertDescription>
         </Alert>
 
         <form class="space-y-4" @submit.prevent="onSubmit">

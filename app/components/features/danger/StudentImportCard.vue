@@ -32,6 +32,8 @@ const globalError = ref<string | null>(null)
 const acceptedTypes = '.csv,.xlsx'
 const acceptedExtensions = ['.csv', '.xlsx']
 
+useGlobalErrorToast(globalError)
+
 function isAcceptedFile(file: File): boolean {
   const fileName = file.name.toLowerCase()
   return acceptedExtensions.some((extension) => fileName.endsWith(extension))
@@ -360,12 +362,6 @@ const displayedImportErrors = computed(() =>
         {{ t('dangerZone.importStudents.rowsFailed').toLowerCase() }}
       </div>
     </div>
-
-    <!-- Global error -->
-    <Alert v-if="globalError" variant="destructive">
-      <AlertTriangle class="size-4" />
-      <AlertTitle>{{ globalError }}</AlertTitle>
-    </Alert>
 
     <!-- Row-level errors -->
     <div v-if="displayedImportErrors.length > 0" class="space-y-2">

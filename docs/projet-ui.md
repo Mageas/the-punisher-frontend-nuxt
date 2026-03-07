@@ -254,3 +254,4 @@
 * **Modales (Pop-ups) :**
   * Utilisation systématique du composant `Dialog` de **Shadcn** pour toutes les actions de création (Ajouter un élève, Créer une règle, etc.) et d'édition.
   * Structure standard : Titre, Formulaire au centre, Boutons "Annuler/Valider" en bas à droite.
+  * **Erreurs globales de formulaire :** affichage via toast rouge, centré en haut, sans bloc d'erreur persistant dans le contenu du formulaire.

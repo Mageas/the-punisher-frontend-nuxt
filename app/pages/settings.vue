@@ -7,6 +7,8 @@ const { changePassword, logoutAll } = useAuth()
 const userStore = useUserStore()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 
+useGlobalErrorToast(globalError)
+
 const isSavingPassword = ref(false)
 const showLogoutAllConfirm = ref(false)
 const form = reactive({
@@ -66,10 +68,6 @@ async function logoutAllDevices(_: string) {
         variant="primary"
         content-class="space-y-4"
       >
-        <Alert v-if="globalError" variant="destructive" class="mb-6">
-          <AlertDescription>{{ globalError }}</AlertDescription>
-        </Alert>
-
         <form class="space-y-5" @submit.prevent="submitPasswordChange">
           <div class="space-y-2">
             <Label for="current-password">{{ t('userSettings.currentPassword') }}</Label>
