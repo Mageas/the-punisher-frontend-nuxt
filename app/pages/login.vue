@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { Skull } from 'lucide-vue-next'
+import {
+  getEmailFieldError,
+  getRequiredFieldError,
+  hasClientValidationErrors,
+} from '~/lib/auth-form-validation'
 
 definePageMeta({
   layout: false,
@@ -24,9 +29,23 @@ const form = reactive({
 const isLoading = ref(false)
 const showConfirmedSuccess = computed(() => route.query.confirmed === '1')
 const showPasswordResetSuccess = computed(() => route.query.reset === '1')
+const localErrors = ref({
+  email: '',
+  password: '',
+})
 
 async function onSubmit() {
   clearErrors()
+
+  localErrors.value = {
+    email: getEmailFieldError(form.email, t, { submitted: true }),
+    password: getRequiredFieldError(form.password, t, { submitted: true }),
+  }
+
+  if (hasClientValidationErrors(localErrors.value)) {
+    return
+  }
+
   isLoading.value = true
 
   try {
@@ -37,6 +56,16 @@ async function onSubmit() {
   } finally {
     isLoading.value = false
   }
+}
+
+function onEmailInput() {
+  clearFieldError('email')
+  localErrors.value.email = ''
+}
+
+function onPasswordInput() {
+  clearFieldError('password')
+  localErrors.value.password = ''
 }
 </script>
 
@@ -74,11 +103,11 @@ async function onSubmit() {
               v-model="form.email"
               type="email"
               :placeholder="t('auth.emailPlaceholder')"
-              :aria-invalid="!!fieldErrors.email"
-              @input="clearFieldError('email')"
+              :aria-invalid="!!localErrors.email || !!fieldErrors.email"
+              @input="onEmailInput"
             />
-            <p v-if="fieldErrors.email" class="text-sm text-destructive">
-              {{ fieldErrors.email }}
+            <p v-if="localErrors.email || fieldErrors.email" class="text-sm text-destructive">
+              {{ localErrors.email || fieldErrors.email }}
             </p>
           </div>
 
@@ -90,11 +119,11 @@ async function onSubmit() {
               v-model="form.password"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!fieldErrors.password"
-              @input="clearFieldError('password')"
+              :aria-invalid="!!localErrors.password || !!fieldErrors.password"
+              @input="onPasswordInput"
             />
-            <p v-if="fieldErrors.password" class="text-sm text-destructive">
-              {{ fieldErrors.password }}
+            <p v-if="localErrors.password || fieldErrors.password" class="text-sm text-destructive">
+              {{ localErrors.password || fieldErrors.password }}
             </p>
             <div class="flex justify-end">
               <NuxtLink

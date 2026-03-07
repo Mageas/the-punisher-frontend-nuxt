@@ -222,7 +222,7 @@
       * Type de punition et autres métadonnées affichés en zone secondaire.
     * **Statut :** "Échéance : [Date]" (si en attente) ou "Résolu le..." (si fait).
     * **Action :** Bouton `Check` (Cercle coché) pour valider la punition (Uniquement si en attente).
-    * **Création manuelle :** après sélection de l'élève, proposer les 5 prochains cours de sa classe sous `Échéance` pour préremplir la date; si l'élève a plusieurs classes, demander d'abord laquelle utiliser. Les blocs `Classe` et `Prochains cours` se replient après sélection et restent réouvrables.
+    * **Création manuelle :** après sélection de l'élève, proposer les 5 prochains cours de sa classe sous `Échéance` pour préremplir la date; si l'élève a plusieurs classes, demander d'abord laquelle utiliser et rendre cette sélection obligatoire. Les blocs `Classe` et `Prochains cours` se replient après sélection et restent réouvrables.
 
 ---
 
@@ -256,3 +256,6 @@
   * Utilisation systématique du composant `Dialog` de **Shadcn** pour toutes les actions de création (Ajouter un élève, Créer une règle, etc.) et d'édition.
   * Structure standard : Titre, Formulaire au centre, Boutons "Annuler/Valider" en bas à droite.
   * **Erreurs globales de formulaire :** affichage via toast rouge, centré en haut, sans bloc d'erreur persistant dans le contenu du formulaire.
+  * **Validation frontend :** le bouton de soumission reste cliquable hors chargement; la validation frontend s'exécute au clic sur "Valider" avant tout appel API.
+  * **Timing d'affichage :** hors champs mot de passe, aucune erreur inline n'apparaît avant la première tentative de soumission.
+  * **Champs mot de passe :** les règles frontend s'affichent en direct pendant la saisie sur les formulaires d'inscription, de changement et de réinitialisation de mot de passe (longueur minimale et confirmation), mais pas sur la connexion.

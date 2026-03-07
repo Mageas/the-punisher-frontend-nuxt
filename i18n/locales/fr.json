@@ -339,6 +339,9 @@
     "passwordPlaceholder": "••••••••",
     "passwordConfirm": "Confirmer le mot de passe",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "passwordRequirements": {
+      "minLength": "Le mot de passe doit contenir au moins {count} caractères."
+    },
     "forgotPasswordLink": "Mot de passe oublié ?",
     "registerClosed": "Les inscriptions sont fermées.",
     "registerClosedHelp": "La création de compte est désactivée pour le moment.",
@@ -577,7 +580,8 @@
       "classroomSearch": "Rechercher une classe...",
       "classroomEmpty": "Aucune classe trouvée.",
       "selectWeekday": "Sélectionner un jour...",
-      "noClassroomSelected": "Aucune classe sélectionnée"
+      "noClassroomSelected": "Aucune classe sélectionnée",
+      "endTimeAfterStart": "L'heure de fin doit être postérieure à l'heure de début."
     },
     "delete": {
       "title": "Supprimer le créneau",

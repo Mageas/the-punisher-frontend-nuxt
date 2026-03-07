@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { KeyRound, Monitor, ShieldCheck } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import {
+  getPasswordConfirmationError,
+  getPasswordFieldError,
+  getRequiredFieldError,
+  hasClientValidationErrors,
+  MIN_PASSWORD_LENGTH,
+} from '~/lib/auth-form-validation'
 
 const { t } = useI18n()
 const { changePassword, logoutAll } = useAuth()
@@ -11,20 +18,39 @@ useGlobalErrorToast(globalError)
 
 const isSavingPassword = ref(false)
 const showLogoutAllConfirm = ref(false)
+const hasAttemptedPasswordSubmit = ref(false)
 const form = reactive({
   currentPassword: '',
   newPassword: '',
   confirmPassword: '',
 })
+const localPasswordErrors = computed(() => ({
+  current_password: getRequiredFieldError(form.currentPassword, t, {
+    submitted: hasAttemptedPasswordSubmit.value,
+  }),
+  new_password: getPasswordFieldError(form.newPassword, t, {
+    submitted: hasAttemptedPasswordSubmit.value,
+  }),
+  confirm_password: getPasswordConfirmationError(form.newPassword, form.confirmPassword, t, {
+    submitted: hasAttemptedPasswordSubmit.value,
+  }),
+}))
 
 function clearPasswordForm() {
   form.currentPassword = ''
   form.newPassword = ''
   form.confirmPassword = ''
+  hasAttemptedPasswordSubmit.value = false
 }
 
 async function submitPasswordChange() {
   clearErrors()
+  hasAttemptedPasswordSubmit.value = true
+
+  if (hasClientValidationErrors(localPasswordErrors.value)) {
+    return
+  }
+
   isSavingPassword.value = true
 
   try {
@@ -76,11 +102,16 @@ async function logoutAllDevices(_: string) {
               v-model="form.currentPassword"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!fieldErrors.current_password"
+              :aria-invalid="
+                !!localPasswordErrors.current_password || !!fieldErrors.current_password
+              "
               @input="clearFieldError('current_password')"
             />
-            <p v-if="fieldErrors.current_password" class="text-sm text-destructive">
-              {{ fieldErrors.current_password }}
+            <p
+              v-if="localPasswordErrors.current_password || fieldErrors.current_password"
+              class="text-sm text-destructive"
+            >
+              {{ localPasswordErrors.current_password || fieldErrors.current_password }}
             </p>
           </div>
 
@@ -92,11 +123,17 @@ async function logoutAllDevices(_: string) {
                 v-model="form.newPassword"
                 type="password"
                 :placeholder="t('auth.passwordPlaceholder')"
-                :aria-invalid="!!fieldErrors.new_password"
+                :aria-invalid="!!localPasswordErrors.new_password || !!fieldErrors.new_password"
                 @input="clearFieldError('new_password')"
               />
-              <p v-if="fieldErrors.new_password" class="text-sm text-destructive">
-                {{ fieldErrors.new_password }}
+              <p
+                v-if="localPasswordErrors.new_password || fieldErrors.new_password"
+                class="text-sm text-destructive"
+              >
+                {{ localPasswordErrors.new_password || fieldErrors.new_password }}
+              </p>
+              <p v-else class="text-xs text-muted-foreground">
+                {{ t('auth.passwordRequirements.minLength', { count: MIN_PASSWORD_LENGTH }) }}
               </p>
             </div>
 
@@ -107,11 +144,16 @@ async function logoutAllDevices(_: string) {
                 v-model="form.confirmPassword"
                 type="password"
                 :placeholder="t('auth.passwordPlaceholder')"
-                :aria-invalid="!!fieldErrors.confirm_password"
+                :aria-invalid="
+                  !!localPasswordErrors.confirm_password || !!fieldErrors.confirm_password
+                "
                 @input="clearFieldError('confirm_password')"
               />
-              <p v-if="fieldErrors.confirm_password" class="text-sm text-destructive">
-                {{ fieldErrors.confirm_password }}
+              <p
+                v-if="localPasswordErrors.confirm_password || fieldErrors.confirm_password"
+                class="text-sm text-destructive"
+              >
+                {{ localPasswordErrors.confirm_password || fieldErrors.confirm_password }}
               </p>
             </div>
           </div>

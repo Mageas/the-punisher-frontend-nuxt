@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import { LockKeyhole, Skull } from 'lucide-vue-next'
+import {
+  getEmailFieldError,
+  getPasswordConfirmationError,
+  getPasswordFieldError,
+  getRequiredFieldError,
+  hasClientValidationErrors,
+  MIN_PASSWORD_LENGTH,
+} from '~/lib/auth-form-validation'
 
 definePageMeta({
   layout: false,
@@ -33,7 +41,16 @@ const form = reactive({
   passwordConfirm: '',
 })
 const isLoading = ref(false)
-const passwordMismatch = ref(false)
+const hasAttemptedSubmit = ref(false)
+const localErrors = computed(() => ({
+  last_name: getRequiredFieldError(form.lastName, t, { submitted: hasAttemptedSubmit.value }),
+  first_name: getRequiredFieldError(form.firstName, t, { submitted: hasAttemptedSubmit.value }),
+  email: getEmailFieldError(form.email, t, { submitted: hasAttemptedSubmit.value }),
+  password: getPasswordFieldError(form.password, t, { submitted: hasAttemptedSubmit.value }),
+  password_confirm: getPasswordConfirmationError(form.password, form.passwordConfirm, t, {
+    submitted: hasAttemptedSubmit.value,
+  }),
+}))
 
 async function onSubmit() {
   if (!registerAllowed.value) {
@@ -41,10 +58,9 @@ async function onSubmit() {
   }
 
   clearErrors()
-  passwordMismatch.value = false
+  hasAttemptedSubmit.value = true
 
-  if (form.password !== form.passwordConfirm) {
-    passwordMismatch.value = true
+  if (hasClientValidationErrors(localErrors.value)) {
     return
   }
 
@@ -104,11 +120,14 @@ const registerSubtitle = computed(() =>
               v-model="form.lastName"
               type="text"
               :placeholder="t('common.placeholders.lastName')"
-              :aria-invalid="!!fieldErrors.last_name"
+              :aria-invalid="!!localErrors.last_name || !!fieldErrors.last_name"
               @input="clearFieldError('last_name')"
             />
-            <p v-if="fieldErrors.last_name" class="text-sm text-destructive">
-              {{ fieldErrors.last_name }}
+            <p
+              v-if="localErrors.last_name || fieldErrors.last_name"
+              class="text-sm text-destructive"
+            >
+              {{ localErrors.last_name || fieldErrors.last_name }}
             </p>
           </div>
           <div class="space-y-2">
@@ -118,11 +137,14 @@ const registerSubtitle = computed(() =>
               v-model="form.firstName"
               type="text"
               :placeholder="t('common.placeholders.firstName')"
-              :aria-invalid="!!fieldErrors.first_name"
+              :aria-invalid="!!localErrors.first_name || !!fieldErrors.first_name"
               @input="clearFieldError('first_name')"
             />
-            <p v-if="fieldErrors.first_name" class="text-sm text-destructive">
-              {{ fieldErrors.first_name }}
+            <p
+              v-if="localErrors.first_name || fieldErrors.first_name"
+              class="text-sm text-destructive"
+            >
+              {{ localErrors.first_name || fieldErrors.first_name }}
             </p>
           </div>
 
@@ -134,11 +156,11 @@ const registerSubtitle = computed(() =>
               v-model="form.email"
               type="email"
               :placeholder="t('auth.emailPlaceholder')"
-              :aria-invalid="!!fieldErrors.email"
+              :aria-invalid="!!localErrors.email || !!fieldErrors.email"
               @input="clearFieldError('email')"
             />
-            <p v-if="fieldErrors.email" class="text-sm text-destructive">
-              {{ fieldErrors.email }}
+            <p v-if="localErrors.email || fieldErrors.email" class="text-sm text-destructive">
+              {{ localErrors.email || fieldErrors.email }}
             </p>
           </div>
 
@@ -150,11 +172,14 @@ const registerSubtitle = computed(() =>
               v-model="form.password"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="!!fieldErrors.password"
+              :aria-invalid="!!localErrors.password || !!fieldErrors.password"
               @input="clearFieldError('password')"
             />
-            <p v-if="fieldErrors.password" class="text-sm text-destructive">
-              {{ fieldErrors.password }}
+            <p v-if="localErrors.password || fieldErrors.password" class="text-sm text-destructive">
+              {{ localErrors.password || fieldErrors.password }}
+            </p>
+            <p v-else class="text-xs text-muted-foreground">
+              {{ t('auth.passwordRequirements.minLength', { count: MIN_PASSWORD_LENGTH }) }}
             </p>
           </div>
 
@@ -166,11 +191,10 @@ const registerSubtitle = computed(() =>
               v-model="form.passwordConfirm"
               type="password"
               :placeholder="t('auth.passwordPlaceholder')"
-              :aria-invalid="passwordMismatch"
-              @input="passwordMismatch = false"
+              :aria-invalid="!!localErrors.password_confirm"
             />
-            <p v-if="passwordMismatch" class="text-sm text-destructive">
-              {{ t('auth.passwordMismatch') }}
+            <p v-if="localErrors.password_confirm" class="text-sm text-destructive">
+              {{ localErrors.password_confirm }}
             </p>
           </div>
 

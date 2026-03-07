@@ -47,31 +47,41 @@ let classroomLookupRequestId = 0
 let nextLessonsRequestId = 0
 
 const schema = toTypedSchema(
-  zod.object({
-    student_lookup_classroom_id: zod.string().optional(),
-    classroom_id: zod.string().optional(),
-    student_id: zod
-      .string()
-      .min(1, t('apiErrors.details.validation_field_required'))
-      .uuid(
-        t('apiErrors.details.validation_malformed_parameter', {
-          value: 'UUID',
-        }),
-      ),
-    punishment_type_id: zod
-      .string()
-      .min(1, t('apiErrors.details.validation_field_required'))
-      .uuid(
-        t('apiErrors.details.validation_malformed_parameter', {
-          value: 'UUID',
-        }),
-      ),
-    due_at: zod.any().refine((val) => !!val, t('apiErrors.details.validation_field_required')),
-    due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
-    occurred_at: zod.any().optional(),
-    occurred_at_time: zod.string().optional(),
-    evaluation_label: zod.string().optional(),
-  }),
+  zod
+    .object({
+      student_lookup_classroom_id: zod.string().optional(),
+      classroom_id: zod.string().optional(),
+      student_id: zod
+        .string()
+        .min(1, t('apiErrors.details.validation_field_required'))
+        .uuid(
+          t('apiErrors.details.validation_malformed_parameter', {
+            value: 'UUID',
+          }),
+        ),
+      punishment_type_id: zod
+        .string()
+        .min(1, t('apiErrors.details.validation_field_required'))
+        .uuid(
+          t('apiErrors.details.validation_malformed_parameter', {
+            value: 'UUID',
+          }),
+        ),
+      due_at: zod.any().refine((val) => !!val, t('apiErrors.details.validation_field_required')),
+      due_at_time: zod.string().min(1, t('apiErrors.details.validation_field_required')),
+      occurred_at: zod.any().optional(),
+      occurred_at_time: zod.string().optional(),
+      evaluation_label: zod.string().optional(),
+    })
+    .superRefine((value, ctx) => {
+      if (selectedStudentClassrooms.value.length > 1 && !selectedStudentClassroomId.value) {
+        ctx.addIssue({
+          code: zod.ZodIssueCode.custom,
+          path: ['classroom_id'],
+          message: t('apiErrors.details.punishment_classroom_not_resolved'),
+        })
+      }
+    }),
 )
 
 function getInitialValues() {
@@ -104,11 +114,18 @@ const studentClassroomOptions = computed(() =>
     name: classroom.name,
   })),
 )
-const shouldShowStudentClassroomSelect = computed(() => selectedStudentClassrooms.value.length > 1)
+const requiresStudentClassroomSelection = computed(() => selectedStudentClassrooms.value.length > 1)
+const shouldShowStudentClassroomSelect = computed(() => requiresStudentClassroomSelection.value)
 const shouldShowNextLessonSuggestions = computed(
   () => !!values.student_id && (!!selectedStudentClassroomId.value || loadingNextLessons.value),
 )
-const canSubmit = computed(() => meta.value.valid && !loadingSelectedStudentClassrooms.value)
+const isStudentClassroomMissing = computed(
+  () => requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value,
+)
+const canSubmit = computed(
+  () =>
+    meta.value.valid && !loadingSelectedStudentClassrooms.value && !isStudentClassroomMissing.value,
+)
 const selectedNextLessonKey = computed(() =>
   resolveSelectedNextLessonKey(nextLessons.value, {
     dueAt: values.due_at as DateValue | undefined,
@@ -151,6 +168,8 @@ function applyNextLesson(lesson: NextLesson) {
 
   setFieldValue('due_at', dueSelection.dueAt, false)
   setFieldValue('due_at_time', dueSelection.dueAtTime, false)
+  setFieldError('due_at', undefined)
+  setFieldError('due_at_time', undefined)
   isNextLessonsDrawerOpen.value = false
 }
 
@@ -164,6 +183,7 @@ async function loadSelectedStudentClassrooms(studentId: string) {
     if (requestId !== classroomLookupRequestId) return
 
     selectedStudentClassrooms.value = student.classrooms
+    setFieldError('classroom_id', undefined)
 
     const { classroomId } = resolveStudentClassroomSelection(student.classrooms, {
       currentClassroomId: selectedStudentClassroomId.value,
@@ -177,6 +197,7 @@ async function loadSelectedStudentClassrooms(studentId: string) {
     if (requestId !== classroomLookupRequestId) return
 
     selectedStudentClassrooms.value = []
+    setFieldError('classroom_id', undefined)
     isStudentClassroomDrawerOpen.value = false
     selectedStudentClassroomId.value = hasPreselectedStudent.value
       ? ''
@@ -222,6 +243,7 @@ watch(
     classroomLookupRequestId += 1
     loadingSelectedStudentClassrooms.value = false
     selectedStudentClassrooms.value = []
+    setFieldError('classroom_id', undefined)
     isStudentClassroomDrawerOpen.value = false
     resetNextLessonsState()
     selectedStudentClassroomId.value = nextClassroomId || ''
@@ -239,6 +261,7 @@ watch(
       classroomLookupRequestId += 1
       loadingSelectedStudentClassrooms.value = false
       selectedStudentClassrooms.value = []
+      setFieldError('classroom_id', undefined)
       isStudentClassroomDrawerOpen.value = false
       resetNextLessonsState()
       selectedStudentClassroomId.value = hasPreselectedStudent.value
@@ -254,6 +277,10 @@ watch(
 
 watch(selectedStudentClassroomId, async (classroomId) => {
   if (!open.value) return
+
+  if (classroomId) {
+    setFieldError('classroom_id', undefined)
+  }
 
   if (!values.student_id || !classroomId) {
     resetNextLessonsState()
@@ -278,6 +305,7 @@ watch(open, async (isOpen) => {
     selectedStudentClassroomId.value = props.preselectedStudentId
       ? ''
       : (props.preselectedClassroomId ?? '')
+    setFieldError('classroom_id', undefined)
     resetNextLessonsState()
     resetForm({ values: getInitialValues() })
 
@@ -292,11 +320,18 @@ watch(open, async (isOpen) => {
   selectedStudentClassrooms.value = []
   isStudentClassroomDrawerOpen.value = false
   selectedStudentClassroomId.value = ''
+  setFieldError('classroom_id', undefined)
   resetNextLessonsState()
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
+
+  if (isStudentClassroomMissing.value) {
+    setFieldError('classroom_id', t('apiErrors.details.punishment_classroom_not_resolved'))
+    return
+  }
+
   try {
     const date = (formValues.due_at as DateValue).toDate(getLocalTimeZone())
     const [h, m] = formValues.due_at_time.split(':')
@@ -417,7 +452,7 @@ const onSubmit = handleSubmit(async (formValues) => {
               @update:time="handleChangeTime"
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage name="due_at" />
         </FormItem>
       </FormField>
     </FormField>
@@ -451,7 +486,7 @@ const onSubmit = handleSubmit(async (formValues) => {
               @update:time="handleChangeTime"
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage name="occurred_at" />
         </FormItem>
       </FormField>
     </FormField>

@@ -39,8 +39,6 @@ function studentFullName(student: Student): string {
   return `${student.first_name} ${student.last_name}`
 }
 
-const canAddStudent = computed(() => !!addStudentId.value && !submittingAddStudent.value)
-
 async function fetchAllClassroomStudents() {
   const all: Student[] = []
   let pageToLoad = 1
@@ -145,7 +143,7 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
         v-model="addStudentId"
         :students="classroomStudents"
         :student-count="classroom.student_count"
-        :can-add-student="canAddStudent"
+        :submitting-add-student="submittingAddStudent"
         :add-student-error="addStudentError"
         keep-focus-on-student-select
         @submit-add="addStudentToClassroom"
