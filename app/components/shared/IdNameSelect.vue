@@ -14,6 +14,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils'
 import type { IdNameOptionsFetcher } from '~/composables/useLazyIdNameOptions'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 interface IdNameOption {
   id: string
   name: string
@@ -57,6 +61,7 @@ const modelValue = defineModel<string>({ default: '' })
 const emit = defineEmits<{
   selectedOption: [option: IdNameOption | null]
 }>()
+const attrs = useAttrs()
 
 const open = ref(false)
 const searchQuery = ref('')
@@ -168,6 +173,7 @@ watch(
   <Popover v-model:open="open">
     <PopoverTrigger as-child>
       <Button
+        v-bind="attrs"
         variant="outline"
         role="combobox"
         :disabled="props.disabled"

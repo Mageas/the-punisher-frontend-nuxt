@@ -2,6 +2,10 @@
 import type { Student } from '~/types/api'
 import { computed } from 'vue'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{
   students?: readonly Student[]
   classroomId?: string | null
@@ -14,6 +18,7 @@ const props = defineProps<{
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
+const attrs = useAttrs()
 
 const { t } = useI18n()
 const studentService = useStudentService()
@@ -55,6 +60,7 @@ async function fetchStudentOptions(options: { page: number; search?: string }) {
 
 <template>
   <FilterIdNameSelect
+    v-bind="attrs"
     :key="String(resolvedOptionsScopeKey)"
     v-model="modelValue"
     :options="options"
