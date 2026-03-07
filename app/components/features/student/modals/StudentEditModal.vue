@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const studentService = useStudentService()
 
 const schema = toTypedSchema(
@@ -33,7 +34,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     first_name: props.firstName,
@@ -54,7 +55,8 @@ watch(open, (isOpen) => {
 })
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!props.studentId) return
+  const studentId = props.studentId
+  if (!studentId) return
   clearErrors()
   try {
     const initialPayload = {
@@ -64,8 +66,10 @@ const onSubmit = handleSubmit(async (values) => {
     const deltaPayload = buildDelta(initialPayload, values)
 
     if (Object.keys(deltaPayload).length > 0) {
-      await studentService.updateStudent(props.studentId, deltaPayload)
-      emit('updated')
+      await withSubmitLoading(async () => {
+        await studentService.updateStudent(studentId, deltaPayload)
+        emit('updated')
+      })
     }
 
     open.value = false
@@ -80,7 +84,7 @@ const onSubmit = handleSubmit(async (values) => {
     v-model:open="open"
     :title="t('modals.student.editTitle')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.save')"
     @submit="onSubmit"

@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 
 const schema = toTypedSchema(
   zod.object({
@@ -28,7 +29,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     name: props.item?.name ?? '',
@@ -47,14 +48,17 @@ watch(open, (isOpen) => {
 })
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!props.item?.id) return
+  const item = props.item
+  if (!item?.id) return
   clearErrors()
   try {
-    const deltaPayload = buildDelta({ name: props.item.name }, { name: values.name })
+    const deltaPayload = buildDelta({ name: item.name }, { name: values.name })
 
     if ('name' in deltaPayload) {
-      await props.updateFn(props.item.id, values.name)
-      emit('updated')
+      await withSubmitLoading(async () => {
+        await props.updateFn(item.id, values.name)
+        emit('updated')
+      })
     }
 
     open.value = false
@@ -69,7 +73,7 @@ const onSubmit = handleSubmit(async (values) => {
     v-model:open="open"
     :title="title"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.save')"
     @submit="onSubmit"

@@ -27,9 +27,9 @@ const open = defineModel<boolean>('open', { default: false })
 const { t } = useI18n()
 const classroomService = useClassroomService()
 const { fieldErrors, globalError, handleApiError, clearErrors } = useApiErrors()
+const { isPending: submitting, withPending: withSubmitting } = useApiActionState()
 
 const isEditMode = computed(() => !!props.scheduleSlot)
-const submitting = ref(false)
 const hasAttemptedSubmit = ref(false)
 
 const weekdayOptions: readonly Weekday[] = SCHEDULE_WEEKDAYS
@@ -124,17 +124,19 @@ async function handleSubmit() {
     return
   }
 
-  submitting.value = true
   clearErrors()
 
   try {
-    const savedSlot = await props.saveFn({
-      weekday: form.weekday as Weekday,
-      start_time: form.start_time,
-      end_time: form.end_time,
-      week_pattern: form.week_pattern,
-      classroom_ids: form.classroom_ids,
-    })
+    const savedSlot = await withSubmitting(() =>
+      props.saveFn({
+        weekday: form.weekday as Weekday,
+        start_time: form.start_time,
+        end_time: form.end_time,
+        week_pattern: form.week_pattern,
+        classroom_ids: form.classroom_ids,
+      }),
+    )
+
     open.value = false
     emit('saved', savedSlot)
   } catch (err) {
@@ -147,8 +149,6 @@ async function handleSubmit() {
       })
       clearErrors()
     }
-  } finally {
-    submitting.value = false
   }
 }
 
@@ -325,13 +325,9 @@ function removeClassroom(id: string) {
         >
           {{ t('common.actions.cancel') }}
         </Button>
-        <Button type="submit" class="cursor-pointer" :disabled="submitting">
-          <span
-            v-if="submitting"
-            class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-          />
+        <LoadingButton type="submit" class="cursor-pointer" :loading="submitting">
           {{ isEditMode ? t('common.actions.save') : t('common.actions.create') }}
-        </Button>
+        </LoadingButton>
       </div>
     </form>
   </BaseModal>

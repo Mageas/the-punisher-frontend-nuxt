@@ -19,7 +19,7 @@ if (isAuthenticated.value) {
 const form = reactive({
   email: '',
 })
-const isLoading = ref(false)
+const { isPending: isLoading, withPending: withForgotPasswordLoading } = useApiActionState()
 const localError = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
@@ -34,15 +34,13 @@ async function onSubmit() {
     return
   }
 
-  isLoading.value = true
-
   try {
-    await forgotPassword(email)
-    successMessage.value = t('auth.forgotPassword.success')
+    await withForgotPasswordLoading(async () => {
+      await forgotPassword(email)
+      successMessage.value = t('auth.forgotPassword.success')
+    })
   } catch (err) {
     handleApiError(err)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -91,9 +89,9 @@ function onEmailInput() {
             </p>
           </div>
 
-          <Button type="submit" class="w-full mt-2 cursor-pointer" :disabled="isLoading">
+          <LoadingButton type="submit" class="w-full mt-2 cursor-pointer" :loading="isLoading">
             {{ t('auth.forgotPassword.submit') }}
-          </Button>
+          </LoadingButton>
         </form>
       </div>
 

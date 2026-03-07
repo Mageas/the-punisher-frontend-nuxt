@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '~/components/ui/button'
+import LoadingButton from '~/components/shared/LoadingButton.vue'
 import {
   Dialog,
   DialogContent,
@@ -63,18 +64,14 @@ function onOpenAutoFocus(event: Event) {
           <Button type="button" variant="outline" class="cursor-pointer" @click="open = false">
             {{ cancelText || t('common.actions.cancel') }}
           </Button>
-          <Button
+          <LoadingButton
             type="submit"
             class="cursor-pointer"
             :variant="destructive ? 'destructive' : 'default'"
-            :disabled="submitting"
+            :loading="submitting"
           >
-            <span
-              v-if="submitting"
-              class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-            />
             {{ submitText || t('common.actions.submit') }}
-          </Button>
+          </LoadingButton>
         </DialogFooter>
       </form>
     </DialogContent>

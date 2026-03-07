@@ -29,7 +29,7 @@ const form = reactive({
 })
 
 const resetToken = ref('')
-const isLoading = ref(false)
+const { isPending: isLoading, withPending: withResetPasswordLoading } = useApiActionState()
 const tokenLocalError = ref<string | null>(null)
 const hasAttemptedSubmit = ref(false)
 const localErrors = computed(() => ({
@@ -125,22 +125,20 @@ async function onSubmit() {
     return
   }
 
-  isLoading.value = true
-
   try {
-    await resetPassword({
-      token: resetToken.value,
-      new_password: form.newPassword,
-      confirm_password: form.confirmPassword,
-    })
-    await navigateTo({
-      path: '/login',
-      query: { reset: '1' },
+    await withResetPasswordLoading(async () => {
+      await resetPassword({
+        token: resetToken.value,
+        new_password: form.newPassword,
+        confirm_password: form.confirmPassword,
+      })
+      await navigateTo({
+        path: '/login',
+        query: { reset: '1' },
+      })
     })
   } catch (err) {
     handleApiError(err)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -213,9 +211,9 @@ function onConfirmPasswordInput() {
             </p>
           </div>
 
-          <Button type="submit" class="w-full mt-2 cursor-pointer" :disabled="isLoading">
+          <LoadingButton type="submit" class="w-full mt-2 cursor-pointer" :loading="isLoading">
             {{ t('auth.resetPassword.submit') }}
-          </Button>
+          </LoadingButton>
         </form>
       </div>
 

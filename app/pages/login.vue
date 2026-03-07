@@ -26,7 +26,7 @@ const form = reactive({
   email: '',
   password: '',
 })
-const isLoading = ref(false)
+const { isPending: isLoading, withPending: withLoginLoading } = useApiActionState()
 const showConfirmedSuccess = computed(() => route.query.confirmed === '1')
 const showPasswordResetSuccess = computed(() => route.query.reset === '1')
 const localErrors = ref({
@@ -46,15 +46,13 @@ async function onSubmit() {
     return
   }
 
-  isLoading.value = true
-
   try {
-    await login(form.email, form.password)
-    await navigateTo('/')
+    await withLoginLoading(async () => {
+      await login(form.email, form.password)
+      await navigateTo('/')
+    })
   } catch (err) {
     handleApiError(err)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -136,9 +134,9 @@ function onPasswordInput() {
           </div>
 
           <!-- Submit -->
-          <Button type="submit" class="w-full mt-2 cursor-pointer" :disabled="isLoading">
+          <LoadingButton type="submit" class="w-full mt-2 cursor-pointer" :loading="isLoading">
             {{ t('common.actions.signIn') }}
-          </Button>
+          </LoadingButton>
         </form>
       </div>
 

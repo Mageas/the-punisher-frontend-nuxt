@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 
 const schema = toTypedSchema(
   zod.object({
@@ -27,7 +28,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     name: '',
@@ -44,9 +45,11 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (values) => {
   clearErrors()
   try {
-    await props.createFn(values.name)
-    open.value = false
-    emit('created')
+    await withSubmitLoading(async () => {
+      await props.createFn(values.name)
+      open.value = false
+      emit('created')
+    })
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
@@ -58,7 +61,7 @@ const onSubmit = handleSubmit(async (values) => {
     v-model:open="open"
     :title="title"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.create')"
     @submit="onSubmit"

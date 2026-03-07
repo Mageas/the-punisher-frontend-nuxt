@@ -25,7 +25,8 @@ const { kpis: classroomKpis, fetchKpis: fetchClassroomKpis } = useClassroomKpis(
 const classroom = ref<Classroom | null>(null)
 const classroomStudents = ref<Student[]>([])
 const loading = ref(false)
-const submittingAddStudent = ref(false)
+const { isPending: submittingAddStudent, withPending: withAddStudentSubmitting } =
+  useApiActionState()
 const addStudentId = ref('')
 
 const showEditModal = ref(false)
@@ -78,17 +79,16 @@ async function fetchClassroomProfile() {
 async function addStudentToClassroom() {
   if (!classroomId.value || !addStudentId.value) return
 
-  submittingAddStudent.value = true
   clearAddStudentErrors()
 
   try {
-    await classroomService.addStudentToClassroom(classroomId.value, addStudentId.value)
-    addStudentId.value = ''
-    await fetchClassroomProfile()
+    await withAddStudentSubmitting(async () => {
+      await classroomService.addStudentToClassroom(classroomId.value, addStudentId.value)
+      addStudentId.value = ''
+      await fetchClassroomProfile()
+    })
   } catch (err) {
     handleAddStudentError(err)
-  } finally {
-    submittingAddStudent.value = false
   }
 }
 

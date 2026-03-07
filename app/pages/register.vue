@@ -40,7 +40,7 @@ const form = reactive({
   password: '',
   passwordConfirm: '',
 })
-const isLoading = ref(false)
+const { isPending: isLoading, withPending: withRegisterLoading } = useApiActionState()
 const hasAttemptedSubmit = ref(false)
 const localErrors = computed(() => ({
   last_name: getRequiredFieldError(form.lastName, t, { submitted: hasAttemptedSubmit.value }),
@@ -64,27 +64,25 @@ async function onSubmit() {
     return
   }
 
-  isLoading.value = true
-
   try {
-    await register({
-      email: form.email,
-      password: form.password,
-      first_name: form.firstName,
-      last_name: form.lastName,
-    })
-
-    await navigateTo({
-      path: '/confirm-email',
-      query: {
+    await withRegisterLoading(async () => {
+      await register({
         email: form.email,
-        registered: '1',
-      },
+        password: form.password,
+        first_name: form.firstName,
+        last_name: form.lastName,
+      })
+
+      await navigateTo({
+        path: '/confirm-email',
+        query: {
+          email: form.email,
+          registered: '1',
+        },
+      })
     })
   } catch (err) {
     handleApiError(err)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -199,9 +197,9 @@ const registerSubtitle = computed(() =>
           </div>
 
           <!-- Submit -->
-          <Button type="submit" class="w-full mt-2 cursor-pointer" :disabled="isLoading">
+          <LoadingButton type="submit" class="w-full mt-2 cursor-pointer" :loading="isLoading">
             {{ t('auth.registerSubmit') }}
-          </Button>
+          </LoadingButton>
         </form>
       </div>
       <div v-else class="rounded-lg border border-border bg-card p-6 shadow-sm">

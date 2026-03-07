@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import StudentCreateModal from '../StudentCreateModal.vue'
-import { ref } from 'vue'
+import { nextTick, reactive, ref } from 'vue'
 
 // -- Mocks --
 const mockI18n = {
@@ -18,6 +18,8 @@ const mockApiErrors = {
 const mockStudentService = {
   createStudent: vi.fn(),
 }
+
+let shouldInvokeSubmitHandler = true
 
 vi.mock('#app', () => ({
   useNuxtApp: () => ({ $api: vi.fn() }),
@@ -41,7 +43,7 @@ vi.mock('vue-i18n', () => ({
 const stubs = {
   BaseModal: {
     template:
-      '<div><slot /><button id="submit-btn" @click="$emit(\'submit\')">Submit</button></div>',
+      '<div :data-submitting="String(!!submitting)"><slot /><button id="submit-btn" @click="$emit(\'submit\')">Submit</button></div>',
     props: ['open', 'title', 'globalError', 'submitting', 'canSubmit', 'submitText'],
   },
   FormField: {
@@ -73,8 +75,9 @@ vi.mock('vee-validate', async () => {
     ...original,
     useForm: () => ({
       handleSubmit: (fn: (values: unknown) => Promise<unknown>) => async (_e: unknown) => {
-        // Simple mock of handleSubmit that calls the provided function with some values
-        await fn({ first_name: 'John', last_name: 'Doe' })
+        if (shouldInvokeSubmitHandler) {
+          await fn({ first_name: 'John', last_name: 'Doe' })
+        }
       },
       isSubmitting: ref(false),
       resetForm: vi.fn(),
@@ -84,10 +87,17 @@ vi.mock('vee-validate', async () => {
   }
 })
 
+async function flushPromises() {
+  await nextTick()
+  await Promise.resolve()
+  await nextTick()
+}
+
 describe('StudentCreateModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockApiErrors.globalError.value = null
+    shouldInvokeSubmitHandler = true
   })
 
   it('renders correctly when open', () => {
@@ -121,6 +131,7 @@ describe('StudentCreateModal', () => {
 
     // Simulate form submission
     await wrapper.find('#submit-btn').trigger('click')
+    await flushPromises()
 
     expect(mockStudentService.createStudent).toHaveBeenCalled()
     expect(wrapper.emitted()).toHaveProperty('created')
@@ -140,7 +151,26 @@ describe('StudentCreateModal', () => {
     })
 
     await wrapper.find('#submit-btn').trigger('click')
+    await flushPromises()
 
     expect(mockApiErrors.setFormErrors).toHaveBeenCalledWith(expect.any(Function), error)
+  })
+
+  it('does not expose a loading state when validation blocks submission', async () => {
+    shouldInvokeSubmitHandler = false
+
+    const wrapper = mount(StudentCreateModal, {
+      props: {
+        open: true,
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    await wrapper.find('#submit-btn').trigger('click')
+
+    expect(mockStudentService.createStudent).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-submitting]').attributes('data-submitting')).toBe('false')
   })
 })

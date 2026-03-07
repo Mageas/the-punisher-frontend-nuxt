@@ -24,6 +24,7 @@ const props = withDefaults(
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const bonusService = useBonusService()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
@@ -55,19 +56,18 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } =
-  useForm({
-    validationSchema: schema,
-    initialValues: {
-      classroom_id: props.preselectedClassroomId ?? '',
-      student_id: props.preselectedStudentId ?? '',
-      bonus_type_id: '',
-      points: 1,
-      occurred_at: undefined as DateValue | undefined,
-      occurred_at_time: '08:00',
-      evaluation_label: '',
-    },
-  })
+const { handleSubmit, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    classroom_id: props.preselectedClassroomId ?? '',
+    student_id: props.preselectedStudentId ?? '',
+    bonus_type_id: '',
+    points: 1,
+    occurred_at: undefined as DateValue | undefined,
+    occurred_at_time: '08:00',
+    evaluation_label: '',
+  },
+})
 
 // When classroom changes, reset student selection
 watch(
@@ -110,15 +110,17 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     const evaluationLabel = formValues.evaluation_label?.trim()
 
-    await bonusService.createBonus({
-      student_id: formValues.student_id,
-      bonus_type_id: formValues.bonus_type_id,
-      points: formValues.points,
-      ...(occurredAt ? { occurred_at: occurredAt } : {}),
-      ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
+    await withSubmitLoading(async () => {
+      await bonusService.createBonus({
+        student_id: formValues.student_id,
+        bonus_type_id: formValues.bonus_type_id,
+        points: formValues.points,
+        ...(occurredAt ? { occurred_at: occurredAt } : {}),
+        ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
+      })
+      open.value = false
+      emit('created')
     })
-    open.value = false
-    emit('created')
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
@@ -130,7 +132,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.bonus.title')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.submit')"
     prevent-auto-focus

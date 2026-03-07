@@ -30,6 +30,7 @@ const props = withDefaults(
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const punishmentService = usePunishmentService()
 const studentService = useStudentService()
 const scheduleService = useScheduleService()
@@ -102,11 +103,10 @@ function getInitialValues() {
   }
 }
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, values, setFieldValue, meta } =
-  useForm({
-    validationSchema: schema,
-    initialValues: getInitialValues(),
-  })
+const { handleSubmit, resetForm, setFieldError, values, setFieldValue, meta } = useForm({
+  validationSchema: schema,
+  initialValues: getInitialValues(),
+})
 
 const studentClassroomOptions = computed(() =>
   selectedStudentClassrooms.value.map((classroom) => ({
@@ -350,15 +350,17 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     const evaluationLabel = formValues.evaluation_label?.trim()
 
-    await punishmentService.createPunishment({
-      student_id: formValues.student_id,
-      punishment_type_id: formValues.punishment_type_id,
-      due_at: dueAt,
-      ...(occurredAt ? { occurred_at: occurredAt } : {}),
-      ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
+    await withSubmitLoading(async () => {
+      await punishmentService.createPunishment({
+        student_id: formValues.student_id,
+        punishment_type_id: formValues.punishment_type_id,
+        due_at: dueAt,
+        ...(occurredAt ? { occurred_at: occurredAt } : {}),
+        ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
+      })
+      open.value = false
+      emit('created')
     })
-    open.value = false
-    emit('created')
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
@@ -370,7 +372,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.punishment.title')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="canSubmit"
     :submit-text="t('common.actions.submit')"
     prevent-auto-focus
