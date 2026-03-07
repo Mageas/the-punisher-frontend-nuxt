@@ -21,10 +21,6 @@ const { t } = useI18n()
 
 const sectionTitle = computed(() => props.title ?? t('common.titles.history'))
 const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('studentProfile.empty.history'))
-const currentPage = computed(() => props.page ?? 1)
-const currentTotalPages = computed(() => props.totalPages ?? 1)
-const paginationLoading = computed(() => props.loading ?? false)
-const paginationDisabled = computed(() => props.disabled ?? false)
 
 function eventDotClass(item: StudentHistoryItem): string {
   if (item.type === 'bonus') return 'bg-warning'
@@ -62,29 +58,16 @@ function eventDateTime(item: StudentHistoryItem): string {
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex min-w-0 items-center gap-3">
-        <h2 class="text-lg font-semibold">
-          {{ sectionTitle }}
-        </h2>
-        <SectionHeaderPagination
-          :page="currentPage"
-          :total-pages="currentTotalPages"
-          :loading="paginationLoading"
-          :disabled="paginationDisabled"
-          @update:page="emit('update:page', $event)"
-        />
-      </div>
-    </div>
+    <SectionHeaderRow
+      :title="sectionTitle"
+      :page="props.page"
+      :total-pages="props.totalPages"
+      :loading="props.loading"
+      :disabled="props.disabled"
+      @update:page="emit('update:page', $event)"
+    />
 
-    <div
-      v-if="history.length === 0"
-      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
-    >
-      {{ sectionEmptyLabel }}
-    </div>
-
-    <div v-else class="space-y-0">
+    <SectionListBlock :is-empty="history.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-0">
       <div v-for="(item, index) in history" :key="item.id" class="flex gap-4">
         <div class="flex flex-col items-center">
           <div class="timeline-dot mt-1.5 h-2 w-2 rounded-full" :class="eventDotClass(item)" />
@@ -195,6 +178,6 @@ function eventDateTime(item: StudentHistoryItem): string {
           </template>
         </div>
       </div>
-    </div>
+    </SectionListBlock>
   </div>
 </template>

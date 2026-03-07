@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { AlertCircle, Gavel, Star, Users } from 'lucide-vue-next'
 import type { DashboardKpis } from '~/types/api'
+import KpiCard from '~/components/shared/KpiCard.vue'
+import KpiCardGrid from '~/components/shared/KpiCardGrid.vue'
+import { formatRatio } from '~/lib/kpi-formatters'
 
 const props = defineProps<{
   kpis: DashboardKpis
 }>()
 
 const { t } = useI18n()
-
-function formatRatio(current: number, total: number): string {
-  return `${current} / ${total}`
-}
 
 const cards = computed(() => [
   {
@@ -53,23 +52,16 @@ const cards = computed(() => [
 </script>
 
 <template>
-  <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <div v-for="card in cards" :key="card.key" class="rounded-lg border border-border p-4 sm:p-6">
-      <div class="mb-2 flex items-center justify-between">
-        <p class="text-xs sm:text-sm font-medium text-muted-foreground">
-          {{ card.label }}
-        </p>
-        <component :is="card.icon" class="w-4 h-4" :class="card.iconClass" />
-      </div>
-      <p
-        class="text-xl sm:text-3xl font-bold tabular-nums whitespace-nowrap leading-none"
-        :class="card.valueClass"
-      >
-        {{ card.value }}
-      </p>
-      <p v-if="card.subtitle" class="mt-1 text-[11px] sm:text-xs text-muted-foreground">
-        {{ card.subtitle }}
-      </p>
-    </div>
-  </div>
+  <KpiCardGrid class="mb-8 sm:grid-cols-2 xl:grid-cols-4">
+    <KpiCard
+      v-for="card in cards"
+      :key="card.key"
+      :label="card.label"
+      :value="card.value"
+      :subtitle="card.subtitle"
+      :icon="card.icon"
+      :icon-class="card.iconClass"
+      :value-class="card.valueClass"
+    />
+  </KpiCardGrid>
 </template>

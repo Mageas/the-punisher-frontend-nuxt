@@ -165,6 +165,7 @@ const onSubmit = handleSubmit(async (formValues) => {
               :options-scope-key="values.classroom_id || '__all_students__'"
               :placeholder="t('common.placeholders.selectStudent')"
               :empty-text="t('common.empty.noStudents')"
+              :full-width="true"
               @update:model-value="handleChange"
             />
           </FormControl>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
-import { Star, AlertTriangle, Gavel } from 'lucide-vue-next'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
+import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMenu.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -21,15 +21,6 @@ const loading = ref(true)
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
-
-function formatRatio(current: number, total: number): string {
-  return `${current} / ${total}`
-}
-
-function formatPunishmentsProgress(total: number, pending: number, overdue: number): string {
-  const resolved = Math.max(0, total - pending)
-  return `${resolved} / ${total} (${overdue})`
-}
 
 async function fetchDashboard() {
   loading.value = true
@@ -92,22 +83,15 @@ if (initialData.value) {
             <ClassroomSelect v-model="selectedClassroomId" />
           </div>
           <div class="shrink-0">
-            <PageActionsMenu :create-label="t('common.actions.add')">
-              <template #create>
-                <DropdownMenuItem class="cursor-pointer" @click="showBonusModal = true">
-                  <Star class="w-4 h-4 text-warning" />
-                  {{ t('common.actions.addBonus') }}
-                </DropdownMenuItem>
-                <DropdownMenuItem class="cursor-pointer" @click="showPenaltyModal = true">
-                  <AlertTriangle class="w-4 h-4 text-warning" />
-                  {{ t('common.actions.addPenalty') }}
-                </DropdownMenuItem>
-                <DropdownMenuItem class="cursor-pointer" @click="showPunishmentModal = true">
-                  <Gavel class="w-4 h-4 text-danger" />
-                  {{ t('common.actions.addPunishment') }}
-                </DropdownMenuItem>
-              </template>
-            </PageActionsMenu>
+            <TrackingCreateMenu
+              :create-label="t('common.actions.add')"
+              :add-bonus-label="t('common.actions.addBonus')"
+              :add-penalty-label="t('common.actions.addPenalty')"
+              :add-punishment-label="t('common.actions.addPunishment')"
+              @create-bonus="showBonusModal = true"
+              @create-penalty="showPenaltyModal = true"
+              @create-punishment="showPunishmentModal = true"
+            />
           </div>
         </div>
       </template>

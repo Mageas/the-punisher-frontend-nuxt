@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { getLocalTimeZone, parseDate } from '@internationalized/date'
-import { Check, ChevronDown, Info } from 'lucide-vue-next'
+import { Check, Info } from 'lucide-vue-next'
+import ChoicePillsList from '~/components/shared/ChoicePillsList.vue'
+import CollapsedChoiceSummary from '~/components/shared/CollapsedChoiceSummary.vue'
+import ExpandableChoicePanel from '~/components/shared/ExpandableChoicePanel.vue'
+import ExpandableChoicePanelHeader from '~/components/shared/ExpandableChoicePanelHeader.vue'
 import type { NextLesson } from '~/types/api'
 import { getNextLessonSelectionKey } from '~/lib/punishment-next-lesson'
 
@@ -72,35 +76,24 @@ function selectLesson(lesson: NextLesson) {
 </script>
 
 <template>
-  <div class="rounded-lg border border-border/70 bg-muted/30">
-    <div v-if="shouldShowExpanded" class="p-3.5 space-y-3">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-start gap-2.5">
-          <Info class="size-4 mt-0.5 text-muted-foreground shrink-0" />
-          <div class="space-y-1">
-            <p class="text-sm font-medium text-foreground">
-              {{ props.title }}
-            </p>
-            <p class="text-sm text-muted-foreground leading-snug">
-              {{ props.hint }}
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          class="shrink-0 text-xs font-medium text-muted-foreground hover:text-foreground"
-          @click="open = false"
-        >
-          {{ t('common.actions.hide') }}
-        </button>
-      </div>
+  <ExpandableChoicePanel :expanded="shouldShowExpanded" tone="muted">
+    <template #expanded>
+      <ExpandableChoicePanelHeader
+        :title="props.title"
+        :hint="props.hint"
+        :hide-label="t('common.actions.hide')"
+        @hide="open = false"
+      >
+        <template #icon>
+          <Info class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+        </template>
+      </ExpandableChoicePanelHeader>
 
       <p v-if="props.loading" class="text-sm text-muted-foreground">
         {{ t('modals.punishment.nextLessonsLoading') }}
       </p>
 
-      <div v-else-if="props.lessons.length > 0" class="flex flex-wrap gap-2">
+      <ChoicePillsList v-else-if="props.lessons.length > 0">
         <button
           v-for="lesson in props.lessons"
           :key="getNextLessonSelectionKey(lesson)"
@@ -127,31 +120,23 @@ function selectLesson(lesson: NextLesson) {
             {{ formatLessonTime(lesson.start_time) }} - {{ formatLessonTime(lesson.end_time) }}
           </span>
         </button>
-      </div>
+      </ChoicePillsList>
 
       <p v-else class="text-sm text-muted-foreground">
         {{ props.emptyText }}
       </p>
-    </div>
+    </template>
 
-    <button
-      v-else
-      type="button"
-      class="flex w-full items-center justify-between gap-3 rounded-lg px-3.5 py-3 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      @click="open = true"
-    >
-      <div class="flex min-w-0 items-start gap-2.5">
-        <Info class="size-4 mt-0.5 text-muted-foreground shrink-0" />
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-foreground">
-            {{ t('common.actions.viewNextLessons') }}
-          </p>
-          <p v-if="selectedLessonLabel" class="text-sm text-muted-foreground">
-            {{ selectedLessonLabel }}
-          </p>
-        </div>
-      </div>
-      <ChevronDown class="size-4 shrink-0 text-muted-foreground" />
-    </button>
-  </div>
+    <template #collapsed>
+      <CollapsedChoiceSummary
+        :title="t('common.actions.viewNextLessons')"
+        :subtitle="selectedLessonLabel"
+        @click="open = true"
+      >
+        <template #icon>
+          <Info class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+        </template>
+      </CollapsedChoiceSummary>
+    </template>
+  </ExpandableChoicePanel>
 </template>

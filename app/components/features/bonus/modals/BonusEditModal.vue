@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { parseDate, getLocalTimeZone } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { Bonus } from '~/types/api'
 import { buildDelta } from '~/lib/delta'
-import {
-  parseApiDateTime,
-  serializeEditableDateTime,
-  toApiDateTimeString,
-  toTimeInputValue,
-} from '~/lib/date-time'
+import { toApiDateTimeString } from '~/lib/date-time'
 
 const emit = defineEmits<{
   updated: []
@@ -28,21 +22,20 @@ const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const bonusService = useBonusService()
 const { notifyUpdateSuccess } = useActionToast()
-const occurredAtTouched = ref(false)
-
-function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
-  const parsed = parseApiDateTime(dateTime)
-  if (!parsed) return undefined
-
-  const y = parsed.getFullYear()
-  const m = String(parsed.getMonth() + 1).padStart(2, '0')
-  const d = String(parsed.getDate()).padStart(2, '0')
-  return parseDate(`${y}-${m}-${d}`)
-}
 
 function getInitialOccurredAt(): string | null {
   return props.bonus?.occurred_at ?? props.bonus?.created_at ?? null
 }
+
+const {
+  getInitialOccurredAtFieldValues,
+  resetOccurredAtTouched,
+  handleOccurredAtDateChange,
+  handleOccurredAtTimeChange,
+  serializeOccurredAt,
+} = useEditableOccurredAt({
+  getInitialOccurredAt,
+})
 
 const schema = toTypedSchema(
   zod.object({
@@ -53,45 +46,31 @@ const schema = toTypedSchema(
   }),
 )
 
+function getInitialValues() {
+  return {
+    points: props.bonus?.points ?? 1,
+    ...getInitialOccurredAtFieldValues(),
+    evaluation_label: props.bonus?.evaluation_label ?? '',
+  }
+}
+
 const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = useForm({
   validationSchema: schema,
-  initialValues: {
-    points: props.bonus?.points ?? 1,
-    occurred_at: toDateValue(getInitialOccurredAt()),
-    occurred_at_time: toTimeInputValue(getInitialOccurredAt()),
-    evaluation_label: props.bonus?.evaluation_label ?? '',
-  },
+  initialValues: getInitialValues(),
 })
 
 watch(open, (isOpen) => {
   if (isOpen) {
     clearErrors()
-    occurredAtTouched.value = false
-
-    const initialOccurredAt = getInitialOccurredAt()
-
-    resetForm({
-      values: {
-        points: props.bonus?.points ?? 1,
-        occurred_at: toDateValue(initialOccurredAt),
-        occurred_at_time: toTimeInputValue(initialOccurredAt),
-        evaluation_label: props.bonus?.evaluation_label ?? '',
-      },
-    })
+    resetOccurredAtTouched()
+    resetForm({ values: getInitialValues() })
   }
 })
 
-function handleOccurredAtDateChange(
-  value: DateValue | undefined,
-  handleChangeDate: (value: DateValue | undefined) => void,
-) {
-  occurredAtTouched.value = true
-  handleChangeDate(value)
-}
-
-function handleOccurredAtTimeChange(value: string) {
-  occurredAtTouched.value = true
-  setFieldValue('occurred_at_time', value, false)
+function onOccurredAtTimeChange(value: string) {
+  handleOccurredAtTimeChange(value, (nextValue) => {
+    setFieldValue('occurred_at_time', nextValue, false)
+  })
 }
 
 const onSubmit = handleSubmit(async (formValues) => {
@@ -100,18 +79,14 @@ const onSubmit = handleSubmit(async (formValues) => {
 
   clearErrors()
   try {
-    const initialOccurredAt = getInitialOccurredAt()
-    const occurredAt = serializeEditableDateTime({
+    const occurredAt = serializeOccurredAt({
       dateValue: formValues.occurred_at as DateValue | undefined,
       timeValue: formValues.occurred_at_time,
-      timeZone: getLocalTimeZone(),
-      touched: occurredAtTouched.value,
-      initialApiValue: initialOccurredAt,
     })
 
     const initialPayload = {
       points: bonus.points,
-      occurred_at: toApiDateTimeString(initialOccurredAt) ?? undefined,
+      occurred_at: toApiDateTimeString(getInitialOccurredAt()) ?? undefined,
       evaluation_label: bonus.evaluation_label ?? '',
     }
 
@@ -165,35 +140,10 @@ const onSubmit = handleSubmit(async (formValues) => {
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="occurred_at">
-      <FormItem>
-        <FormLabel>{{ t('common.labels.occurredAt') }}</FormLabel>
-        <FormControl>
-          <DatePicker
-            :model-value="dateValue"
-            :time="values.occurred_at_time"
-            :placeholder="t('common.placeholders.selectOccurredDate')"
-            show-time
-            @update:model-value="(value) => handleOccurredAtDateChange(value, handleChangeDate)"
-            @update:time="handleOccurredAtTimeChange"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-
-    <FormField v-slot="{ componentField }" name="evaluation_label">
-      <FormItem>
-        <FormLabel>{{ t('common.labels.evaluationLabel') }}</FormLabel>
-        <FormControl>
-          <Input
-            v-bind="componentField"
-            type="text"
-            :placeholder="t('common.placeholders.evaluationLabel')"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+    <EventMetadataFormFields
+      :occurred-at-time="values.occurred_at_time"
+      :on-occurred-at-date-change="handleOccurredAtDateChange"
+      :on-occurred-at-time-change="onOccurredAtTimeChange"
+    />
   </BaseModal>
 </template>

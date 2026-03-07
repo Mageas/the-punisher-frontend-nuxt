@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { AlertTriangle, Gavel, Pencil, Star, Trash2 } from 'lucide-vue-next'
+import { Pencil, Trash2 } from 'lucide-vue-next'
 import type { Student, StudentKpis } from '~/types/api'
-import { getInitials } from '~/lib/utils'
+import { computeTotalPages, formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
+import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMenu.vue'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
 const { t } = useI18n()
@@ -71,22 +72,6 @@ const showDeleteModal = ref(false)
 const showBonusCreateModal = ref(false)
 const showPenaltyCreateModal = ref(false)
 const showPunishmentCreateModal = ref(false)
-
-const initials = computed(() => getInitials(student.value?.first_name, student.value?.last_name))
-
-function formatRatio(current: number, total: number): string {
-  return `${current} / ${total}`
-}
-
-function formatPunishmentsProgress(total: number, pending: number, overdue: number): string {
-  const resolved = Math.max(0, total - pending)
-  return `${resolved} / ${total} (${overdue})`
-}
-
-function computeTotalPages(total: number, itemsPerPage: number): number {
-  if (itemsPerPage <= 0) return 1
-  return Math.max(1, Math.ceil(total / itemsPerPage))
-}
 
 const punishmentsTotalPages = computed(() =>
   computeTotalPages(punishmentsTotal.value, punishmentsPerPage.value),
@@ -188,11 +173,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex items-center gap-4">
-            <div
-              class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-xl font-semibold shrink-0"
-            >
-              {{ initials }}
-            </div>
+            <StudentAvatar :first-name="student.first_name" :last-name="student.last_name" size="xl" />
             <div class="min-w-0">
               <h1 class="text-2xl font-bold tracking-tight">
                 {{ student.first_name }} {{ student.last_name }}
@@ -217,21 +198,16 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
             </div>
           </div>
 
-          <PageActionsMenu :create-label="t('common.actions.add')" align="end">
-            <template #create>
-              <DropdownMenuItem class="cursor-pointer" @click="showBonusCreateModal = true">
-                <Star class="w-4 h-4 text-warning" />
-                {{ t('studentProfile.actions.addBonus') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="showPenaltyCreateModal = true">
-                <AlertTriangle class="w-4 h-4 text-warning" />
-                {{ t('studentProfile.actions.addPenalty') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="showPunishmentCreateModal = true">
-                <Gavel class="w-4 h-4 text-danger" />
-                {{ t('studentProfile.actions.addPunishment') }}
-              </DropdownMenuItem>
-            </template>
+          <TrackingCreateMenu
+            :create-label="t('common.actions.add')"
+            :add-bonus-label="t('studentProfile.actions.addBonus')"
+            :add-penalty-label="t('studentProfile.actions.addPenalty')"
+            :add-punishment-label="t('studentProfile.actions.addPunishment')"
+            align="end"
+            @create-bonus="showBonusCreateModal = true"
+            @create-penalty="showPenaltyCreateModal = true"
+            @create-punishment="showPunishmentCreateModal = true"
+          >
             <template #manage>
               <DropdownMenuItem class="cursor-pointer" @click="showEditModal = true">
                 <Pencil class="w-4 h-4" />
@@ -246,7 +222,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
                 {{ t('common.actions.delete') }}
               </DropdownMenuItem>
             </template>
-          </PageActionsMenu>
+          </TrackingCreateMenu>
         </div>
       </div>
 

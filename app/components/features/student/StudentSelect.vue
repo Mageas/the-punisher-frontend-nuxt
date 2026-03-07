@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Student } from '~/types/api'
+import { toStudentOption } from '~/composables/useTrackedEntityFilterOptions'
 import { computed } from 'vue'
 
 defineOptions({
@@ -12,25 +13,25 @@ const props = defineProps<{
   excludeIds?: readonly string[]
   optionsScopeKey?: string | number | boolean | null
   placeholder?: string
+  searchPlaceholder?: string
   emptyText?: string
   selectedName?: string
   keepFocusOnSelect?: boolean
+  fullWidth?: boolean
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
 const attrs = useAttrs()
 
 const { t } = useI18n()
-const studentService = useStudentService()
-const classroomService = useClassroomService()
+const { fetchStudentOptions: fetchTrackedStudentOptions } = useTrackedEntityFilterOptions({
+  classroomId: computed(() => props.classroomId),
+})
 
 const options = computed(() =>
   (props.students ?? [])
     .filter((student) => !(props.excludeIds ?? []).includes(student.id))
-    .map((student) => ({
-      id: student.id,
-      name: `${student.first_name} ${student.last_name}`,
-    })),
+    .map(toStudentOption),
 )
 
 const shouldUseRemoteOptions = computed(() => props.students === undefined)
@@ -41,35 +42,28 @@ const resolvedOptionsScopeKey = computed(
 )
 
 async function fetchStudentOptions(options: { page: number; search?: string }) {
-  const classroomId = props.classroomId || undefined
-  const response = classroomId
-    ? await classroomService.getClassroomStudents(classroomId, options)
-    : await studentService.getStudents(options)
+  const response = await fetchTrackedStudentOptions(options)
 
   return {
     ...response,
-    data: response.data
-      .filter((student) => !(props.excludeIds ?? []).includes(student.id))
-      .map((student) => ({
-        id: student.id,
-        name: `${student.first_name} ${student.last_name}`,
-      })),
+    data: response.data.filter((student) => !(props.excludeIds ?? []).includes(student.id)),
   }
 }
 </script>
 
 <template>
-  <FilterIdNameSelect
+  <EntityRemoteSelect
     v-bind="attrs"
     :key="String(resolvedOptionsScopeKey)"
     v-model="modelValue"
     :options="options"
     :fetch-options="shouldUseRemoteOptions ? fetchStudentOptions : undefined"
     :options-scope-key="resolvedOptionsScopeKey"
-    :selected-label="props.selectedName"
+    :selected-name="props.selectedName"
     :placeholder="props.placeholder ?? t('common.placeholders.selectStudent')"
-    :search-placeholder="props.placeholder ?? t('common.placeholders.selectStudent')"
+    :search-placeholder="props.searchPlaceholder ?? props.placeholder"
     :empty-text="props.emptyText ?? t('common.empty.noStudents')"
     :keep-focus-on-select="props.keepFocusOnSelect"
+    :full-width="props.fullWidth ?? true"
   />
 </template>

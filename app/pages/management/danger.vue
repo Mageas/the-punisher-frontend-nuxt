@@ -21,15 +21,12 @@ async function deleteAllClassrooms(_: string) {
   <div class="mx-auto max-w-3xl">
     <PageHeaderBar>
       <template #left>
-        <div class="flex items-center gap-3">
-          <div class="flex size-10 items-center justify-center rounded-lg bg-destructive-bg-subtle">
-            <ShieldAlert class="size-5 text-destructive" />
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight">{{ t('common.titles.dangerZone') }}</h1>
-            <p class="text-sm text-muted-foreground">{{ t('dangerZone.description') }}</p>
-          </div>
-        </div>
+        <IconPageHeading
+          :icon="ShieldAlert"
+          :title="t('common.titles.dangerZone')"
+          :description="t('dangerZone.description')"
+          tone="danger"
+        />
       </template>
     </PageHeaderBar>
 

@@ -94,10 +94,7 @@ function resolveSubMinutePrecision(value: string | null | undefined): {
 /**
  * Format an API datetime for a time-only input (`HH:mm`), hiding seconds.
  */
-export function toTimeInputValue(
-  value: string | null | undefined,
-  fallbackTime = '08:00',
-): string {
+export function toTimeInputValue(value: string | null | undefined, fallbackTime = '08:00'): string {
   const parsed = parseApiDateTime(value)
   if (!parsed) return fallbackTime
 

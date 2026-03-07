@@ -16,114 +16,68 @@ const { t } = useI18n()
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
 const displayedDate = computed(() => props.occurredAt ?? props.createdAt)
+const formattedPoints = computed(() => `+${props.points}`)
+const pointsBadgeClass = computed(() =>
+  props.usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning',
+)
+const secondaryLine = computed(() => {
+  if (hasStudentName.value) {
+    if (displayedDate.value) {
+      return `${props.bonusTypeName} - ${formatDate(displayedDate.value)}`
+    }
 
-function formatPoints(points: number): string {
-  return `+${points}`
-}
+    return props.bonusTypeName
+  }
+
+  if (!displayedDate.value) return ''
+  return formatDate(displayedDate.value)
+})
+const stateLabel = computed(() =>
+  props.usedAt ? t('common.states.used') : t('common.states.available'),
+)
+const stateDescription = computed(() => {
+  if (!props.usedAt) return undefined
+  return t('bonuses.usedAt', { date: formatDate(props.usedAt) })
+})
 </script>
 
 <template>
-  <div class="rounded-lg border border-border p-4" :class="{ 'opacity-60': usedAt }">
-    <!-- Mobile: vertical layout -->
-    <div class="flex items-start gap-3 sm:hidden">
+  <ResponsiveEventCardLayout :dimmed="Boolean(props.usedAt)">
+    <template #icon>
       <div
-        class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+        :class="pointsBadgeClass"
       >
-        {{ formatPoints(points) }}
+        {{ formattedPoints }}
       </div>
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium">
-          <template v-if="hasStudentName">
-            <NuxtLink
-              v-if="props.studentId"
-              :to="`/students/${props.studentId}`"
-              class="transition-colors hover:text-primary hover:underline underline-offset-4"
-            >
-              {{ studentFirstName }} {{ studentLastName }}
-            </NuxtLink>
-            <template v-else> {{ studentFirstName }} {{ studentLastName }} </template>
-          </template>
-          <template v-else>
-            {{ bonusTypeName }}
-          </template>
-        </p>
-        <p class="mt-0.5 text-xs text-muted-foreground">
-          <template v-if="hasStudentName">
-            {{ bonusTypeName }}
-            <template v-if="displayedDate"> — {{ formatDate(displayedDate) }}</template>
-          </template>
-          <template v-else-if="displayedDate">
-            {{ formatDate(displayedDate) }}
-          </template>
-        </p>
-        <div class="mt-2 flex items-center justify-between">
-          <div>
-            <Badge
-              variant="outline"
-              :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
-            >
-              {{ usedAt ? t('common.states.used') : t('common.states.available') }}
-            </Badge>
-            <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
-              {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}
-            </p>
-          </div>
-          <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
-            <slot name="actions" />
-          </div>
-        </div>
-      </div>
-    </div>
+    </template>
 
-    <!-- Desktop: horizontal layout -->
-    <div class="hidden items-center gap-4 sm:flex">
-      <div
-        class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        :class="usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning'"
-      >
-        {{ formatPoints(points) }}
-      </div>
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium">
-          <template v-if="hasStudentName">
-            <NuxtLink
-              v-if="props.studentId"
-              :to="`/students/${props.studentId}`"
-              class="transition-colors hover:text-primary hover:underline underline-offset-4"
-            >
-              {{ studentFirstName }} {{ studentLastName }}
-            </NuxtLink>
-            <template v-else> {{ studentFirstName }} {{ studentLastName }} </template>
-          </template>
-          <template v-else>
-            {{ bonusTypeName }}
-          </template>
-        </p>
-        <p class="mt-0.5 text-xs text-muted-foreground">
-          <template v-if="hasStudentName">
-            {{ bonusTypeName }}
-            <template v-if="displayedDate"> — {{ formatDate(displayedDate) }}</template>
-          </template>
-          <template v-else-if="displayedDate">
-            {{ formatDate(displayedDate) }}
-          </template>
-        </p>
-      </div>
-      <div class="text-right">
-        <Badge
-          variant="outline"
-          :class="usedAt ? 'text-muted-foreground' : 'text-success border-success-border'"
-        >
-          {{ usedAt ? t('common.states.used') : t('common.states.available') }}
-        </Badge>
-        <p v-if="usedAt" class="mt-1 text-xs text-muted-foreground">
-          {{ t('bonuses.usedAt', { date: formatDate(usedAt) }) }}
-        </p>
-      </div>
-      <div v-if="$slots.actions" class="flex shrink-0 items-center gap-1">
-        <slot name="actions" />
-      </div>
-    </div>
-  </div>
+    <template #title>
+      <StudentEventTitle
+        :fallback-label="props.bonusTypeName"
+        :student-id="props.studentId"
+        :student-first-name="props.studentFirstName"
+        :student-last-name="props.studentLastName"
+      />
+    </template>
+
+    <template #meta>
+      <StudentEventMeta v-if="secondaryLine">
+        {{ secondaryLine }}
+      </StudentEventMeta>
+    </template>
+
+    <template #status>
+      <StudentEventStatus
+        :label="stateLabel"
+        :description="stateDescription"
+        :tone="props.usedAt ? 'muted' : 'success'"
+        desktop-align-right
+      />
+    </template>
+
+    <template v-if="$slots.actions" #actions>
+      <slot name="actions" />
+    </template>
+  </ResponsiveEventCardLayout>
 </template>

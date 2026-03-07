@@ -171,7 +171,6 @@ describe('RuleCreateModal', () => {
       mode: 'at',
       due_at_mode: 'days',
       due_at_after_days: 7,
-      due_at_after_lessons: null,
       name: 'Retard -> Retenue',
       is_active: true,
     })
@@ -208,14 +207,13 @@ describe('RuleCreateModal', () => {
       mode: 'at',
       due_at_mode: 'days',
       due_at_after_days: 7,
-      due_at_after_lessons: null,
       name: 'Règle personnalisée',
       is_active: true,
     })
     expect(wrapper.emitted()).toHaveProperty('created')
   })
 
-  it('sends the next_lessons payload and nulls due_at_after_days', async () => {
+  it('sends the next_lessons payload with only due_at_after_lessons', async () => {
     mockFormValues = {
       name: 'Au prochain cours',
       penalty_type_id: 'penalty-1',
@@ -245,7 +243,6 @@ describe('RuleCreateModal', () => {
       threshold: 3,
       mode: 'every',
       due_at_mode: 'next_lessons',
-      due_at_after_days: null,
       due_at_after_lessons: 2,
       name: 'Au prochain cours',
       is_active: true,

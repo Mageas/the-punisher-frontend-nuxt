@@ -37,10 +37,6 @@ const sectionTitle = computed(() => props.title ?? t('studentProfile.availableBo
 const sectionEmptyLabel = computed(
   () => props.emptyLabel ?? t('studentProfile.empty.availableBonuses'),
 )
-const currentPage = computed(() => props.page ?? 1)
-const currentTotalPages = computed(() => props.totalPages ?? 1)
-const paginationLoading = computed(() => props.loading ?? false)
-const paginationDisabled = computed(() => props.disabled ?? false)
 
 function openUseBonusModal(id: string) {
   if (!hasConsumeAction.value) return
@@ -60,35 +56,19 @@ function onUsed() {
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex min-w-0 items-center gap-2">
-        <h2 class="text-lg font-semibold">
-          {{ sectionTitle }}
-        </h2>
-        <SectionHeaderPagination
-          :page="currentPage"
-          :total-pages="currentTotalPages"
-          :loading="paginationLoading"
-          :disabled="paginationDisabled"
-          @update:page="emit('update:page', $event)"
-        />
-      </div>
-      <KpiInfoBadge
-        v-if="props.badgeText"
-        :text="props.badgeText"
-        :help-text="props.badgeHelpText"
-        badge-class="text-muted-foreground"
-      />
-    </div>
+    <SectionHeaderRow
+      :title="sectionTitle"
+      :page="props.page"
+      :total-pages="props.totalPages"
+      :loading="props.loading"
+      :disabled="props.disabled"
+      :badge-text="props.badgeText"
+      :badge-help-text="props.badgeHelpText"
+      badge-class="text-muted-foreground"
+      @update:page="emit('update:page', $event)"
+    />
 
-    <div
-      v-if="bonuses.length === 0"
-      class="rounded-lg border border-border p-6 text-sm text-muted-foreground"
-    >
-      {{ sectionEmptyLabel }}
-    </div>
-
-    <div v-else class="space-y-2">
+    <SectionListBlock :is-empty="bonuses.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-2">
       <BonusCard
         v-for="bonus in bonuses"
         :key="bonus.id"
@@ -110,7 +90,7 @@ function onUsed() {
           </Button>
         </template>
       </BonusCard>
-    </div>
+    </SectionListBlock>
 
     <BonusUseModal
       v-if="hasConsumeAction"
