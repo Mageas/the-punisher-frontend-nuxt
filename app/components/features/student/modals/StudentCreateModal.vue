@@ -11,6 +11,7 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const studentService = useStudentService()
 
 const schema = toTypedSchema(
@@ -26,7 +27,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     first_name: '',
@@ -44,9 +45,11 @@ watch(open, (isOpen) => {
 const onSubmit = handleSubmit(async (values) => {
   clearErrors()
   try {
-    await studentService.createStudent(values)
-    open.value = false
-    emit('created')
+    await withSubmitLoading(async () => {
+      await studentService.createStudent(values)
+      open.value = false
+      emit('created')
+    })
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
@@ -58,7 +61,7 @@ const onSubmit = handleSubmit(async (values) => {
     v-model:open="open"
     :title="t('modals.student.title')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.submit')"
     @submit="onSubmit"

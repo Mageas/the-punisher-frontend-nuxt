@@ -95,10 +95,10 @@ watch(modelValue, (nextValue, previousValue) => {
         </p>
       </div>
 
-      <Button type="submit" class="cursor-pointer" :disabled="props.submittingAddStudent">
+      <LoadingButton type="submit" class="cursor-pointer" :loading="props.submittingAddStudent">
         <Plus class="w-4 h-4" />
         {{ t('common.actions.addStudent') }}
-      </Button>
+      </LoadingButton>
     </form>
   </div>
 

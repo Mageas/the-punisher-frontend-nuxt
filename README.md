@@ -15,6 +15,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Type Management:** Customizable types for bonuses, penalties, and punishments.
 - **Authentication:** Secure teacher login/registration with token rotation, email confirmation, and forgot/reset password flows.
 - **User Security Settings:** Dedicated user settings page to change password and revoke all active sessions.
+- **Form Submission UX:** Submit buttons show an animated spinner and become non-clickable only while the API request is actually running, never on client-side validation failures.
 - **Internationalization:** Full French (fr-FR) support.
 
 ## 🛠 Tech Stack
@@ -35,10 +36,10 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## 📁 Architecture
 
 - `app/components/features`: Domain-specific components grouped by feature.
-- `app/components/shared`: Reusable cross-feature building blocks (for example `SectionHeaderPagination`).
+- `app/components/shared`: Reusable cross-feature building blocks (for example `SectionHeaderPagination` and `LoadingButton` for pending form actions).
 - `app/components/ui`: Reusable UI primitives (Shadcn).
 - `app/services`: API communication layer. **All API calls must go through services.**
-- `app/composables`: Reusable business logic and state orchestration.
+- `app/composables`: Reusable business logic and state orchestration, including `useApiActionState` to scope loading states to real API calls after frontend validation passes.
 - `app/types/api`: TypeScript definitions for API responses and payloads.
 - `i18n/locales/fr.json`: Locale messages with shared keys centralized under `common.*` (`actions`, `labels`, `placeholders`, `states`, `titles`, etc.) and feature-specific keys kept only for domain wording.
 

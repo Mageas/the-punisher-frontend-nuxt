@@ -13,6 +13,7 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const ruleService = useRuleService()
 const nullableDueField = (min: number, max?: number) =>
   zod.preprocess(
@@ -72,20 +73,19 @@ const schema = toTypedSchema(
     }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, setFieldValue, values, meta } =
-  useForm({
-    validationSchema: schema,
-    initialValues: {
-      name: '',
-      penalty_type_id: '',
-      resulting_punishment_type_id: '',
-      threshold: 3,
-      mode: 'at' as RuleMode,
-      due_at_mode: 'days' as RuleDueAtMode,
-      due_at_after_days: 7,
-      due_at_after_lessons: null as number | null,
-    },
-  })
+const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    name: '',
+    penalty_type_id: '',
+    resulting_punishment_type_id: '',
+    threshold: 3,
+    mode: 'at' as RuleMode,
+    due_at_mode: 'days' as RuleDueAtMode,
+    due_at_after_days: 7,
+    due_at_after_lessons: null as number | null,
+  },
+})
 
 const selectedPenaltyTypeName = ref('')
 const selectedPunishmentTypeName = ref('')
@@ -150,9 +150,11 @@ const onSubmit = handleSubmit(async (formValues) => {
     const customName = formValues.name?.trim() ?? ''
     const resolvedName = (customName || generatedRuleName.value).substring(0, 120)
 
-    await ruleService.createRule(buildRulePayload({ ...formValues, name: resolvedName }, true))
-    open.value = false
-    emit('created')
+    await withSubmitLoading(async () => {
+      await ruleService.createRule(buildRulePayload({ ...formValues, name: resolvedName }, true))
+      open.value = false
+      emit('created')
+    })
   } catch (err) {
     setFormErrors(setFieldError, err)
   }
@@ -164,7 +166,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.rule.title')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.create')"
     prevent-auto-focus

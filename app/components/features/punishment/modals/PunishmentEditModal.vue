@@ -20,6 +20,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const punishmentService = usePunishmentService()
 
 function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
@@ -53,7 +54,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     occurred_at: toDateValue(getInitialOccurredAt()),
@@ -79,7 +80,8 @@ watch(open, (isOpen) => {
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
-  if (!props.punishment?.id) return
+  const punishment = props.punishment
+  if (!punishment?.id) return
 
   clearErrors()
   try {
@@ -94,7 +96,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     const initialPayload = {
       occurred_at: toApiDateTimeString(getInitialOccurredAt()) ?? undefined,
-      evaluation_label: props.punishment.evaluation_label ?? '',
+      evaluation_label: punishment.evaluation_label ?? '',
     }
 
     const currentPayload = {
@@ -105,8 +107,10 @@ const onSubmit = handleSubmit(async (formValues) => {
     const deltaPayload = buildDelta(initialPayload, currentPayload)
 
     if (Object.keys(deltaPayload).length > 0) {
-      await punishmentService.updatePunishment(props.punishment.id, deltaPayload)
-      emit('updated')
+      await withSubmitLoading(async () => {
+        await punishmentService.updatePunishment(punishment.id, deltaPayload)
+        emit('updated')
+      })
     }
 
     open.value = false
@@ -121,7 +125,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.punishment.editTitle')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.save')"
     prevent-auto-focus

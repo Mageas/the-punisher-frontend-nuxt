@@ -20,6 +20,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const bonusService = useBonusService()
 
 function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
@@ -54,7 +55,7 @@ const schema = toTypedSchema(
   }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, meta } = useForm({
+const { handleSubmit, resetForm, setFieldError, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     points: props.bonus?.points ?? 1,
@@ -82,7 +83,8 @@ watch(open, (isOpen) => {
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
-  if (!props.bonus?.id) return
+  const bonus = props.bonus
+  if (!bonus?.id) return
 
   clearErrors()
   try {
@@ -96,9 +98,9 @@ const onSubmit = handleSubmit(async (formValues) => {
     }
 
     const initialPayload = {
-      points: props.bonus.points,
+      points: bonus.points,
       occurred_at: toApiDateTimeString(getInitialOccurredAt()) ?? undefined,
-      evaluation_label: props.bonus.evaluation_label ?? '',
+      evaluation_label: bonus.evaluation_label ?? '',
     }
 
     const currentPayload = {
@@ -110,8 +112,10 @@ const onSubmit = handleSubmit(async (formValues) => {
     const deltaPayload = buildDelta(initialPayload, currentPayload)
 
     if (Object.keys(deltaPayload).length > 0) {
-      await bonusService.updateBonus(props.bonus.id, deltaPayload)
-      emit('updated')
+      await withSubmitLoading(async () => {
+        await bonusService.updateBonus(bonus.id, deltaPayload)
+        emit('updated')
+      })
     }
 
     open.value = false
@@ -126,7 +130,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.bonus.editTitle')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.save')"
     prevent-auto-focus

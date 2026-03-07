@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
+const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const ruleService = useRuleService()
 const nullableDueField = (min: number, max?: number) =>
   zod.preprocess(
@@ -75,20 +76,19 @@ const schema = toTypedSchema(
     }),
 )
 
-const { handleSubmit, isSubmitting, resetForm, setFieldError, setFieldValue, values, meta } =
-  useForm({
-    validationSchema: schema,
-    initialValues: {
-      name: props.rule?.name ?? '',
-      penalty_type_id: props.rule?.penalty_type_id ?? '',
-      resulting_punishment_type_id: props.rule?.resulting_punishment_type_id ?? '',
-      threshold: props.rule?.threshold ?? 3,
-      mode: (props.rule?.mode ?? 'at') as RuleMode,
-      due_at_mode: (props.rule?.due_at_mode ?? 'days') as RuleDueAtMode,
-      due_at_after_days: props.rule?.due_at_after_days ?? 7,
-      due_at_after_lessons: props.rule?.due_at_after_lessons ?? null,
-    },
-  })
+const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    name: props.rule?.name ?? '',
+    penalty_type_id: props.rule?.penalty_type_id ?? '',
+    resulting_punishment_type_id: props.rule?.resulting_punishment_type_id ?? '',
+    threshold: props.rule?.threshold ?? 3,
+    mode: (props.rule?.mode ?? 'at') as RuleMode,
+    due_at_mode: (props.rule?.due_at_mode ?? 'days') as RuleDueAtMode,
+    due_at_after_days: props.rule?.due_at_after_days ?? 7,
+    due_at_after_lessons: props.rule?.due_at_after_lessons ?? null,
+  },
+})
 
 const modeOptions = computed(() => [
   { id: 'at', name: t('rules.modes.at') },
@@ -137,34 +137,37 @@ watch(
 )
 
 const onSubmit = handleSubmit(async (formValues) => {
-  if (!props.rule?.id) return
+  const rule = props.rule
+  if (!rule?.id) return
   clearErrors()
   try {
     const initialPayload = buildRulePayload(
       {
-        name: props.rule.name,
-        penalty_type_id: props.rule.penalty_type_id,
-        resulting_punishment_type_id: props.rule.resulting_punishment_type_id,
-        threshold: props.rule.threshold,
-        mode: props.rule.mode,
-        due_at_mode: props.rule.due_at_mode,
-        due_at_after_days: props.rule.due_at_after_days,
-        due_at_after_lessons: props.rule.due_at_after_lessons,
+        name: rule.name,
+        penalty_type_id: rule.penalty_type_id,
+        resulting_punishment_type_id: rule.resulting_punishment_type_id,
+        threshold: rule.threshold,
+        mode: rule.mode,
+        due_at_mode: rule.due_at_mode,
+        due_at_after_days: rule.due_at_after_days,
+        due_at_after_lessons: rule.due_at_after_lessons,
       },
-      props.rule.is_active,
+      rule.is_active,
     )
     const currentPayload = buildRulePayload(
       {
         ...formValues,
         name: formValues.name.trim(),
       },
-      props.rule.is_active,
+      rule.is_active,
     )
     const deltaPayload = buildDelta(initialPayload, currentPayload)
 
     if (Object.keys(deltaPayload).length > 0) {
-      await ruleService.updateRule(props.rule.id, deltaPayload)
-      emit('updated')
+      await withSubmitLoading(async () => {
+        await ruleService.updateRule(rule.id, deltaPayload)
+        emit('updated')
+      })
     }
 
     open.value = false
@@ -179,7 +182,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     v-model:open="open"
     :title="t('modals.rule.editTitle')"
     :global-error="globalError"
-    :submitting="isSubmitting"
+    :submitting="submitLoading"
     :can-submit="meta.valid"
     :submit-text="t('common.actions.save')"
     prevent-auto-focus

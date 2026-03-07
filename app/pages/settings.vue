@@ -13,10 +13,10 @@ const { t } = useI18n()
 const { changePassword, logoutAll } = useAuth()
 const userStore = useUserStore()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
+const { isPending: isSavingPassword, withPending: withPasswordSave } = useApiActionState()
 
 useGlobalErrorToast(globalError)
 
-const isSavingPassword = ref(false)
 const showLogoutAllConfirm = ref(false)
 const hasAttemptedPasswordSubmit = ref(false)
 const form = reactive({
@@ -51,16 +51,14 @@ async function submitPasswordChange() {
     return
   }
 
-  isSavingPassword.value = true
-
   try {
-    await changePassword(form.currentPassword, form.newPassword, form.confirmPassword)
-    clearPasswordForm()
-    toast.success(t('userSettings.passwordUpdated'))
+    await withPasswordSave(async () => {
+      await changePassword(form.currentPassword, form.newPassword, form.confirmPassword)
+      clearPasswordForm()
+      toast.success(t('userSettings.passwordUpdated'))
+    })
   } catch (err) {
     handleApiError(err)
-  } finally {
-    isSavingPassword.value = false
   }
 }
 
@@ -159,9 +157,9 @@ async function logoutAllDevices(_: string) {
           </div>
 
           <div class="flex justify-end pt-2">
-            <Button type="submit" class="cursor-pointer" :disabled="isSavingPassword">
+            <LoadingButton type="submit" class="cursor-pointer" :loading="isSavingPassword">
               {{ t('userSettings.savePassword') }}
-            </Button>
+            </LoadingButton>
           </div>
         </form>
       </ActionPanelCard>

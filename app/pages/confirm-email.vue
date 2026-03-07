@@ -41,8 +41,8 @@ const resendForm = reactive({
   email: '',
 })
 
-const isConfirmLoading = ref(false)
-const isResendLoading = ref(false)
+const { isPending: isConfirmLoading, withPending: withConfirmLoading } = useApiActionState()
+const { isPending: isResendLoading, withPending: withResendLoading } = useApiActionState()
 const confirmLocalError = ref<string | null>(null)
 const resendLocalError = ref<string | null>(null)
 const resendSuccess = ref<string | null>(null)
@@ -85,18 +85,16 @@ async function onConfirmEmail() {
     return
   }
 
-  isConfirmLoading.value = true
-
   try {
-    await confirmEmail(token)
-    await navigateTo({
-      path: '/login',
-      query: { confirmed: '1' },
+    await withConfirmLoading(async () => {
+      await confirmEmail(token)
+      await navigateTo({
+        path: '/login',
+        query: { confirmed: '1' },
+      })
     })
   } catch (err) {
     handleConfirmApiError(err)
-  } finally {
-    isConfirmLoading.value = false
   }
 }
 
@@ -111,15 +109,13 @@ async function onResendEmail() {
     return
   }
 
-  isResendLoading.value = true
-
   try {
-    await resendConfirmationEmail(email)
-    resendSuccess.value = t('auth.confirmEmail.resendSuccess')
+    await withResendLoading(async () => {
+      await resendConfirmationEmail(email)
+      resendSuccess.value = t('auth.confirmEmail.resendSuccess')
+    })
   } catch (err) {
     handleResendApiError(err)
-  } finally {
-    isResendLoading.value = false
   }
 }
 
@@ -180,9 +176,9 @@ function onResendEmailInput() {
             </p>
           </div>
 
-          <Button type="submit" class="w-full cursor-pointer" :disabled="isConfirmLoading">
+          <LoadingButton type="submit" class="w-full cursor-pointer" :loading="isConfirmLoading">
             {{ t('auth.confirmEmail.submit') }}
-          </Button>
+          </LoadingButton>
         </form>
 
         <div class="pt-3 border-t border-border">
@@ -208,15 +204,15 @@ function onResendEmailInput() {
             <AlertDescription>{{ resendSuccess }}</AlertDescription>
           </Alert>
 
-          <Button
+          <LoadingButton
             type="button"
             variant="link"
             class="px-0 mt-2 cursor-pointer"
-            :disabled="isResendLoading"
+            :loading="isResendLoading"
             @click="onResendEmail"
           >
             {{ t('auth.confirmEmail.resendLink') }}
-          </Button>
+          </LoadingButton>
         </div>
       </div>
 
