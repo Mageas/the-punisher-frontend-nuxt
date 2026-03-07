@@ -29,6 +29,7 @@ export interface Penalty {
 export interface PenaltyCreateData {
   student_id: string
   penalty_type_id: string
+  classroom_id?: string
   occurred_at?: string
   evaluation_label?: string
 }

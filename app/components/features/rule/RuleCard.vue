@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight, Pencil, Trash2 } from 'lucide-vue-next'
-import type { RuleMode } from '~/types/api'
+import type { RuleDueAtMode, RuleMode } from '~/types/api'
 
 const props = withDefaults(
   defineProps<{
@@ -8,7 +8,9 @@ const props = withDefaults(
     penaltyTypeName: string
     punishmentTypeName: string
     threshold: number
-    dueAtAfterDays: number
+    dueAtMode: RuleDueAtMode
+    dueAtAfterDays: number | null
+    dueAtAfterLessons: number | null
     mode: RuleMode
     isActive: boolean
     toggling?: boolean
@@ -27,6 +29,13 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const modeLabel = computed(() => t(`rules.modes.${props.mode}`))
+const dueLabel = computed(() => {
+  if (props.dueAtMode === 'next_lessons') {
+    return t('rules.dueAfterLessons', props.dueAtAfterLessons ?? 0)
+  }
+
+  return t('rules.dueAfterDays', props.dueAtAfterDays ?? 0)
+})
 
 const onUpdateModelValue = (value: boolean) => {
   emit('toggleActive', value)
@@ -64,7 +73,7 @@ const onUpdateModelValue = (value: boolean) => {
           {{ t('rules.threshold', { count: props.threshold }) }}
         </span>
         <span class="text-xs text-muted-foreground">
-          {{ t('rules.dueAfterDays', props.dueAtAfterDays) }}
+          {{ dueLabel }}
         </span>
       </div>
     </div>

@@ -28,7 +28,7 @@ describe('useApiErrors', () => {
   })
 
   it('handles field validation errors', () => {
-    const { fieldErrors, handleApiError } = useApiErrors()
+    const { fieldErrors, globalError, handleApiError } = useApiErrors()
     const apiError = {
       statusCode: 422,
       data: {
@@ -45,6 +45,7 @@ describe('useApiErrors', () => {
 
     expect(fieldErrors.value.email).toBe('apiErrors.details.validation_min_length:5')
     expect(fieldErrors.value.password).toBe('apiErrors.details.validation_required')
+    expect(globalError.value).toBe(null)
   })
 
   it('handles global errors', () => {
@@ -60,6 +61,24 @@ describe('useApiErrors', () => {
     handleApiError(apiError)
 
     expect(globalError.value).toBe('apiErrors.messages.invalid_credentials')
+  })
+
+  it('keeps a global message for non-validation field errors', () => {
+    const { fieldErrors, globalError, handleApiError } = useApiErrors()
+
+    handleApiError({
+      statusCode: 409,
+      data: {
+        error: 'punishment_classroom_not_resolved',
+        error_code: 409,
+        error_details: [{ field: 'classroom_id', error: 'punishment_classroom_not_resolved' }],
+      },
+    })
+
+    expect(fieldErrors.value.classroom_id).toBe(
+      'apiErrors.details.punishment_classroom_not_resolved',
+    )
+    expect(globalError.value).toBe('apiErrors.messages.punishment_classroom_not_resolved')
   })
 
   it('falls back to internal_error if no translation exists', () => {

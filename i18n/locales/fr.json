@@ -52,6 +52,7 @@
       "lastName": "Dupont",
       "points": "1.00",
       "schoolYear": "ex: 2025-2026",
+      "selectClass": "Sélectionner une classe",
       "searchClassroom": "Rechercher une classe...",
       "searchStudent": "Rechercher un élève...",
       "searchType": "Rechercher un type...",
@@ -257,7 +258,10 @@
     "penalty": {
       "title": "Nouvelle pénalité",
       "editTitle": "Modifier la pénalité",
-      "penaltyType": "Type de pénalité"
+      "penaltyType": "Type de pénalité",
+      "studentClassroom": "Classe de l'élève",
+      "studentClassroomRequired": "Classe de l'élève (obligatoire)",
+      "studentClassroomPickHint": "Cet élève est inscrit dans plusieurs classes. Sélectionnez celle concernée par cette pénalité."
     },
     "bonus": {
       "title": "Nouveau bonus",
@@ -276,7 +280,10 @@
       "namePlaceholder": "Laisser vide pour générer automatiquement",
       "penaltyType": "Déclencheur (type de pénalité)",
       "punishmentType": "Conséquence (type de punition)",
-      "dueAtAfterDays": "Délai (jours pour effectuer)"
+      "triggerMode": "Mode de déclenchement",
+      "dueAtMode": "Mode d'échéance",
+      "dueAtAfterDays": "Délai (jours pour effectuer)",
+      "dueAtAfterLessons": "Nombre de prochains cours"
     },
     "student": {
       "title": "Nouvel élève",
@@ -360,6 +367,7 @@
     "messages": {
       "internal_error": "Une erreur interne est survenue.",
       "invalid_request_body": "Le corps de la requête est invalide.",
+      "not_found": "Ressource introuvable.",
       "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
       "register_not_allowed": "L'inscription n'est pas autorisée.",
       "malformed_parameter": "Un paramètre est mal formé.",
@@ -391,6 +399,8 @@
       "punishment_type_not_found": "Type de punition introuvable.",
       "punishment_not_found": "Punition introuvable.",
       "punishment_already_resolved": "Cette punition est déjà marquée comme résolue.",
+      "punishment_classroom_not_resolved": "Impossible de déterminer la classe à utiliser pour calculer la punition automatique.",
+      "rule_due_at_not_computable": "Impossible de calculer l'échéance automatique à partir de l'emploi du temps.",
       "bonus_already_used": "Ce bonus a déjà été consommé.",
       "classroom_not_found": "Classe introuvable.",
       "student_classroom_relation_exists": "Cet élève est déjà assigné à cette classe.",
@@ -429,7 +439,8 @@
       "validation_unknown_field": "Champ inconnu.",
       "validation_password_confirmation_mismatch": "La confirmation du mot de passe ne correspond pas.",
       "validation_malformed_parameter": "Paramètre invalide. Attendu: {value}.",
-      "validation_one_of": "Valeur invalide. Valeurs autorisées: {value}."
+      "validation_one_of": "Valeur invalide. Valeurs autorisées: {value}.",
+      "punishment_classroom_not_resolved": "Sélectionnez la classe concernée pour calculer la punition automatique."
     },
     "importContext": {
       "field": {
@@ -469,10 +480,15 @@
     "defaultName": "Règle automatique",
     "threshold": "Seuil : {count}",
     "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
+    "dueAfterLessons": "Échéance : au prochain cours | Échéance : après {count} cours",
     "modes": {
       "at": "Au seuil exact",
       "every": "À chaque multiple",
       "after": "À partir de"
+    },
+    "dueModes": {
+      "days": "Jours",
+      "next_lessons": "Prochains cours"
     }
   },
   "typeManagement": {

@@ -92,6 +92,10 @@ export function useApiErrors() {
       for (const detail of apiError.error_details) {
         fieldErrors.value[detail.field] = translateDetail(detail)
       }
+
+      if (apiError.error !== 'validation_failed') {
+        globalError.value = translateError(apiError.error)
+      }
     }
 
     // Global error (always set for non-field errors, or as a fallback)
