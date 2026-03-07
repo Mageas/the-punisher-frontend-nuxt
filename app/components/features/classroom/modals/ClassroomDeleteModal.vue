@@ -23,6 +23,7 @@ const message = computed(() => t('modals.delete.classroomMessage', { name: props
     :action-fn="props.deleteFn"
     :title="t('modals.delete.title')"
     :message="message"
+    :success-message="t('common.feedback.deleteSuccess')"
     :cancel-label="t('common.actions.cancel')"
     :confirm-label="t('common.actions.delete')"
     confirm-variant="destructive"

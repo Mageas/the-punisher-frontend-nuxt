@@ -3,6 +3,7 @@ import type { Classroom, Student } from '~/types/api'
 
 const { t } = useI18n()
 const classroomService = useClassroomService()
+const { notifyAddSuccess } = useActionToast()
 
 definePageMeta({
   path: '/classes/:classroomId',
@@ -86,6 +87,7 @@ async function addStudentToClassroom() {
       await classroomService.addStudentToClassroom(classroomId.value, addStudentId.value)
       addStudentId.value = ''
       await fetchClassroomProfile()
+      notifyAddSuccess()
     })
   } catch (err) {
     handleAddStudentError(err)

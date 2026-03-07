@@ -18,6 +18,7 @@ const props = defineProps<{
 const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
+const { notifyCreateSuccess } = useActionToast()
 
 const schema = toTypedSchema(
   zod.object({
@@ -47,6 +48,7 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     await withSubmitLoading(async () => {
       await props.createFn(values.name)
+      notifyCreateSuccess()
       open.value = false
       emit('created')
     })

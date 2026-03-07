@@ -15,6 +15,7 @@ const {
   deleteRule,
 } = useRules()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
+const { notifyUpdateSuccess } = useActionToast()
 
 const safeItemsPerPage = computed(() => itemPerPage.value || 10)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
@@ -45,6 +46,7 @@ async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   try {
     await updateRule(rule.id, { is_active: nextIsActive })
     await reload(page.value)
+    notifyUpdateSuccess()
   } catch (err) {
     handleApiError(err)
   } finally {

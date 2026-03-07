@@ -15,6 +15,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const ruleService = useRuleService()
+const { notifyCreateSuccess } = useActionToast()
 const nullableDueField = (min: number, max?: number) =>
   zod.preprocess(
     (value) => {
@@ -152,6 +153,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
     await withSubmitLoading(async () => {
       await ruleService.createRule(buildRulePayload({ ...formValues, name: resolvedName }, true))
+      notifyCreateSuccess()
       open.value = false
       emit('created')
     })

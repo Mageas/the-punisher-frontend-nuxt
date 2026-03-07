@@ -20,6 +20,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const classroomService = useClassroomService()
+const { notifyUpdateSuccess } = useActionToast()
 
 const schema = toTypedSchema(
   zod.object({
@@ -73,6 +74,7 @@ const onSubmit = handleSubmit(async (values) => {
     if (Object.keys(deltaPayload).length > 0) {
       await withSubmitLoading(async () => {
         await classroomService.updateClassroom(classroomId, deltaPayload)
+        notifyUpdateSuccess()
         emit('updated')
       })
     }

@@ -1,6 +1,14 @@
 # 💀 The Punisher UI
 
-## 1. Sidebar (Navigation)
+## 1. Convention globale
+
+*Feedback utilisateur après action.*
+  * **Succès :** toute création, modification, suppression et action validée associée (`ajout`, `retrait`, `consommation`, `résolution`) affiche un toast vert en bas à droite.
+  * **Erreurs :** les erreurs d'action restent affichées inline ou via toast rouge centré en haut selon l'écran.
+
+---
+
+## 2. Sidebar (Navigation)
 
 ### A. Groupe : Général
 
@@ -65,7 +73,7 @@
 
 ---
 
-## 2. Pages & Layouts
+## 3. Pages & Layouts
 
 ### 🖥️ Tableau de bord (Dashboard)
 
@@ -250,7 +258,7 @@
 
 ---
 
-## 3. Composants Globaux
+## 4. Composants Globaux
 
 * **Modales (Pop-ups) :**
   * Utilisation systématique du composant `Dialog` de **Shadcn** pour toutes les actions de création (Ajouter un élève, Créer une règle, etc.) et d'édition.

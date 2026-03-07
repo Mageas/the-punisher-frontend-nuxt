@@ -14,6 +14,7 @@ const props = withDefaults(
     actionFn: (id: string) => Promise<void>
     title: string
     message: string
+    successMessage?: string
     warningMessage?: string
     cancelLabel: string
     confirmLabel: string
@@ -78,6 +79,14 @@ async function confirm() {
   clearErrors()
   try {
     await props.actionFn(props.itemId)
+
+    if (props.successMessage) {
+      toast.success(props.successMessage, {
+        position: 'bottom-right',
+        richColors: true,
+      })
+    }
+
     open.value = false
     emit('confirmed')
   } catch (err) {

@@ -20,6 +20,7 @@ const { t } = useI18n()
 const { globalError, setFormErrors, clearErrors } = useApiErrors()
 const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActionState()
 const ruleService = useRuleService()
+const { notifyUpdateSuccess } = useActionToast()
 const nullableDueField = (min: number, max?: number) =>
   zod.preprocess(
     (value) => {
@@ -166,6 +167,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     if (Object.keys(deltaPayload).length > 0) {
       await withSubmitLoading(async () => {
         await ruleService.updateRule(rule.id, deltaPayload)
+        notifyUpdateSuccess()
         emit('updated')
       })
     }

@@ -20,6 +20,7 @@ const props = defineProps<{
     :action-fn="props.deleteFn"
     :title="t('schedule.delete.title')"
     :message="t('schedule.delete.message')"
+    :success-message="t('common.feedback.deleteSuccess')"
     :cancel-label="t('common.actions.cancel')"
     :confirm-label="t('common.actions.delete')"
     confirm-variant="destructive"

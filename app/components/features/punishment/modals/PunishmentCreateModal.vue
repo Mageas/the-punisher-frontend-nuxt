@@ -34,6 +34,7 @@ const { isPending: submitLoading, withPending: withSubmitLoading } = useApiActio
 const punishmentService = usePunishmentService()
 const studentService = useStudentService()
 const scheduleService = useScheduleService()
+const { notifyCreateSuccess } = useActionToast()
 
 const hasPreselectedStudent = computed(() => !!props.preselectedStudentId)
 const hasPreselectedClassroom = computed(() => !!props.preselectedClassroomId)
@@ -358,6 +359,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         ...(occurredAt ? { occurred_at: occurredAt } : {}),
         ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
       })
+      notifyCreateSuccess()
       open.value = false
       emit('created')
     })

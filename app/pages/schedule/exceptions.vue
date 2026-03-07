@@ -7,6 +7,7 @@ import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
 const scheduleService = useScheduleService()
+const { notifyCreateSuccess, notifyUpdateSuccess } = useActionToast()
 const {
   fieldErrors: exceptionFieldErrors,
   globalError: exceptionError,
@@ -118,6 +119,7 @@ async function saveException(type: 'vacation' | 'public_holiday') {
       exceptions.value = exceptions.value.map((exception) =>
         exception.id === updatedException.id ? updatedException : exception,
       )
+      notifyUpdateSuccess()
     } else {
       const createdException = await scheduleService.createScheduleException({
         type,
@@ -126,6 +128,7 @@ async function saveException(type: 'vacation' | 'public_holiday') {
       })
 
       exceptions.value.push(createdException)
+      notifyCreateSuccess()
     }
 
     clearSelection()
@@ -325,6 +328,7 @@ await fetchScheduleExceptions()
       :action-fn="deleteException"
       :title="t('schedule.exceptions.deleteTitle')"
       :message="t('schedule.exceptions.deleteMessage')"
+      :success-message="t('common.feedback.deleteSuccess')"
       :cancel-label="t('common.actions.cancel')"
       :confirm-label="t('common.actions.delete')"
       confirm-variant="destructive"

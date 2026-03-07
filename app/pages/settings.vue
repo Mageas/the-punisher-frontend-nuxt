@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { KeyRound, Monitor, ShieldCheck } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import {
   getPasswordConfirmationError,
   getPasswordFieldError,
@@ -14,6 +13,7 @@ const { changePassword, logoutAll } = useAuth()
 const userStore = useUserStore()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 const { isPending: isSavingPassword, withPending: withPasswordSave } = useApiActionState()
+const { notifyUpdateSuccess } = useActionToast()
 
 useGlobalErrorToast(globalError)
 
@@ -55,7 +55,7 @@ async function submitPasswordChange() {
     await withPasswordSave(async () => {
       await changePassword(form.currentPassword, form.newPassword, form.confirmPassword)
       clearPasswordForm()
-      toast.success(t('userSettings.passwordUpdated'))
+      notifyUpdateSuccess(t('userSettings.passwordUpdated'))
     })
   } catch (err) {
     handleApiError(err)
