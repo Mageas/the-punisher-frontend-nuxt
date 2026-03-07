@@ -5,18 +5,26 @@ import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
-const props = withDefaults(defineProps<{
-  placeholder?: string
-  showTime?: boolean
-  class?: HTMLAttributes['class']
-}>(), {
-  placeholder: undefined,
-  showTime: false,
+defineOptions({
+  inheritAttrs: false,
 })
+
+const props = withDefaults(
+  defineProps<{
+    placeholder?: string
+    showTime?: boolean
+    class?: HTMLAttributes['class']
+  }>(),
+  {
+    placeholder: undefined,
+    showTime: false,
+  },
+)
 
 const modelValue = defineModel<DateValue>()
 const time = defineModel<string>('time', { default: '08:00' })
 
+const attrs = useAttrs()
 const openPopover = ref(false)
 
 const df = new DateFormatter('fr-FR', { dateStyle: 'long' })
@@ -60,6 +68,7 @@ function onDateSelect(value: DateValue | undefined) {
   <Popover v-model:open="openPopover">
     <PopoverTrigger as-child>
       <Button
+        v-bind="attrs"
         variant="outline"
         :class="cn(
           'w-full justify-start text-left font-normal cursor-pointer',

@@ -2,6 +2,10 @@
 import type { Classroom } from '~/types/api'
 import { computed } from 'vue'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{
   classrooms?: readonly Classroom[]
   fullWidth?: boolean
@@ -9,6 +13,7 @@ const props = defineProps<{
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
+const attrs = useAttrs()
 
 const { t } = useI18n()
 const classroomService = useClassroomService()
@@ -38,6 +43,7 @@ async function fetchClassroomOptions(options: { page: number; search?: string })
 <template>
   <div :class="props.fullWidth ? 'w-full' : 'basis-full md:basis-auto md:w-[200px]'">
     <FilterIdNameSelect
+      v-bind="attrs"
       v-model="modelValue"
       :options="options"
       :fetch-options="shouldUseRemoteOptions ? fetchClassroomOptions : undefined"

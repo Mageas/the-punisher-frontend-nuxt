@@ -338,25 +338,20 @@ const onSubmit = handleSubmit(async (formValues) => {
     </FormField>
 
     <FormField v-slot="{ value: dateValue, handleChange: handleChangeDate }" name="occurred_at">
-      <FormField
-        v-slot="{ value: timeValue, handleChange: handleChangeTime }"
-        name="occurred_at_time"
-      >
-        <FormItem>
-          <FormLabel>{{ t('common.labels.occurredAt') }}</FormLabel>
-          <FormControl>
-            <DatePicker
-              :model-value="dateValue"
-              :time="timeValue"
-              :placeholder="t('common.placeholders.selectOccurredDate')"
-              show-time
-              @update:model-value="handleChangeDate"
-              @update:time="handleChangeTime"
-            />
-          </FormControl>
-          <FormMessage name="occurred_at" />
-        </FormItem>
-      </FormField>
+      <FormItem>
+        <FormLabel>{{ t('common.labels.occurredAt') }}</FormLabel>
+        <FormControl>
+          <DatePicker
+            :model-value="dateValue"
+            :time="values.occurred_at_time"
+            :placeholder="t('common.placeholders.selectOccurredDate')"
+            show-time
+            @update:model-value="handleChangeDate"
+            @update:time="(value) => setFieldValue('occurred_at_time', value, false)"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
     </FormField>
 
     <FormField v-slot="{ componentField }" name="evaluation_label">

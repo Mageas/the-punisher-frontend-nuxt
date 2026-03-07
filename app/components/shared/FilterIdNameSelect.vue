@@ -3,6 +3,10 @@ import { computed } from 'vue'
 import { X } from 'lucide-vue-next'
 import type { IdNameOptionsFetcher } from '~/composables/useLazyIdNameOptions'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 interface IdNameOption {
   id: string
   name: string
@@ -49,6 +53,7 @@ const modelValue = defineModel<string>({ default: '' })
 const emit = defineEmits<{
   selectedOption: [option: IdNameOption | null]
 }>()
+const attrs = useAttrs()
 
 const resolvedSearchPlaceholder = computed(() => props.searchPlaceholder ?? props.placeholder)
 const shouldShowClearButton = computed(() => {
@@ -81,6 +86,7 @@ function clear() {
       </Button>
     </div>
     <IdNameSelect
+      v-bind="attrs"
       v-model="modelValue"
       :options="props.options"
       :fetch-options="props.fetchOptions"
