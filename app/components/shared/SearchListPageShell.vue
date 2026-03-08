@@ -62,6 +62,8 @@ const shouldShowPagination = computed(() => props.showPagination ?? props.total 
       <slot />
     </div>
 
+    <slot name="modals" />
+
     <CustomPagination
       v-if="shouldShowPagination"
       class="mt-4"

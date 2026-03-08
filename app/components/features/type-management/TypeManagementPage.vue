@@ -139,26 +139,28 @@ await reload()
       />
     </div>
 
-    <TypeCreateModal
-      v-model:open="showCreateModal"
-      :title="props.createTitle"
-      :placeholder="props.createPlaceholder"
-      :create-fn="handleCreate"
-      @created="onCreated"
-    />
-    <TypeEditModal
-      v-model:open="showEditModal"
-      :item="typeToEdit"
-      :title="props.editTitle"
-      :update-fn="handleUpdate"
-      @updated="onUpdated"
-    />
-    <TypeDeleteModal
-      v-model:open="showDeleteModal"
-      :type-id="typeToDeleteId"
-      :delete-fn="handleDelete"
-      :message="props.deleteMessage"
-      @confirmed="onDeleteConfirmed"
-    />
+    <template #modals>
+      <TypeCreateModal
+        v-model:open="showCreateModal"
+        :title="props.createTitle"
+        :placeholder="props.createPlaceholder"
+        :create-fn="handleCreate"
+        @created="onCreated"
+      />
+      <TypeEditModal
+        v-model:open="showEditModal"
+        :item="typeToEdit"
+        :title="props.editTitle"
+        :update-fn="handleUpdate"
+        @updated="onUpdated"
+      />
+      <TypeDeleteModal
+        v-model:open="showDeleteModal"
+        :type-id="typeToDeleteId"
+        :delete-fn="handleDelete"
+        :message="props.deleteMessage"
+        @confirmed="onDeleteConfirmed"
+      />
+    </template>
   </SearchListPageShell>
 </template>

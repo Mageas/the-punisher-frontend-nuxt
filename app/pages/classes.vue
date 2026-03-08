@@ -189,6 +189,8 @@ await reload()
       </NuxtLink>
     </div>
 
-    <ClassroomCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <template #modals>
+      <ClassroomCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    </template>
   </SearchListPageShell>
 </template>
