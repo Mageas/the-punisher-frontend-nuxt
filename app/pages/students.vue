@@ -76,6 +76,8 @@ if (students.value.length === 0 && !loading.value) {
       <StudentListItem v-for="student in students" :key="student.id" :student="student" />
     </div>
 
-    <StudentCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <template #modals>
+      <StudentCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    </template>
   </SearchListPageShell>
 </template>
