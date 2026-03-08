@@ -3,9 +3,11 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, markRaw } from 'vue'
 import IconPageHeading from '../IconPageHeading.vue'
 
-const IconStub = markRaw(defineComponent({
-  template: '<svg data-testid="heading-icon" />',
-}))
+const IconStub = markRaw(
+  defineComponent({
+    template: '<svg data-testid="heading-icon" />',
+  }),
+)
 
 describe('IconPageHeading', () => {
   it('renders the icon, title and description with the default tone', () => {

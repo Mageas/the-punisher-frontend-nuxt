@@ -63,7 +63,10 @@ export function resolveRuleFormName(customName: string | null | undefined, gener
   return (trimmedName || generatedName).slice(0, RULE_NAME_MAX_LENGTH)
 }
 
-function getRequiredRuleDueValue(value: number | null, field: 'due_at_after_days' | 'due_at_after_lessons') {
+function getRequiredRuleDueValue(
+  value: number | null,
+  field: 'due_at_after_days' | 'due_at_after_lessons',
+) {
   if (value === null) {
     throw new Error(`Rule payload requires "${field}" when its mode is selected.`)
   }

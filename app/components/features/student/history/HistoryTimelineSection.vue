@@ -67,7 +67,11 @@ function eventDateTime(item: StudentHistoryItem): string {
       @update:page="emit('update:page', $event)"
     />
 
-    <SectionListBlock :is-empty="history.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-0">
+    <SectionListBlock
+      :is-empty="history.length === 0"
+      :empty-label="sectionEmptyLabel"
+      list-class="space-y-0"
+    >
       <div v-for="(item, index) in history" :key="item.id" class="flex gap-4">
         <div class="flex flex-col items-center">
           <div class="timeline-dot mt-1.5 h-2 w-2 rounded-full" :class="eventDotClass(item)" />

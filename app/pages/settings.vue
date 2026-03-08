@@ -38,7 +38,8 @@ const localPasswordErrors = computed(() => ({
 }))
 
 const displayedPasswordErrors = computed(() => ({
-  current_password: localPasswordErrors.value.current_password || fieldErrors.value.current_password,
+  current_password:
+    localPasswordErrors.value.current_password || fieldErrors.value.current_password,
   new_password: localPasswordErrors.value.new_password || fieldErrors.value.new_password,
   confirm_password:
     localPasswordErrors.value.confirm_password || fieldErrors.value.confirm_password,
@@ -105,7 +106,9 @@ async function logoutAllDevices(_: string) {
             :new-password-error="displayedPasswordErrors.new_password"
             :confirm-password-error="displayedPasswordErrors.confirm_password"
             :password-placeholder="t('auth.passwordPlaceholder')"
-            :new-password-hint="t('auth.passwordRequirements.minLength', { count: MIN_PASSWORD_LENGTH })"
+            :new-password-hint="
+              t('auth.passwordRequirements.minLength', { count: MIN_PASSWORD_LENGTH })
+            "
             @clear-field-error="clearFieldError"
           />
 

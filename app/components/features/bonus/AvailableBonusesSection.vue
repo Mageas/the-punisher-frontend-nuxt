@@ -68,7 +68,11 @@ function onUsed() {
       @update:page="emit('update:page', $event)"
     />
 
-    <SectionListBlock :is-empty="bonuses.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-2">
+    <SectionListBlock
+      :is-empty="bonuses.length === 0"
+      :empty-label="sectionEmptyLabel"
+      list-class="space-y-2"
+    >
       <BonusCard
         v-for="bonus in bonuses"
         :key="bonus.id"

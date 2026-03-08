@@ -20,11 +20,7 @@ const studentOptionsScopeKey = computed(() => props.lookupClassroomId || '__all_
 </script>
 
 <template>
-  <FormField
-    v-if="props.showClassroomLookup"
-    v-slot="{ value }"
-    name="student_lookup_classroom_id"
-  >
+  <FormField v-if="props.showClassroomLookup" v-slot="{ value }" name="student_lookup_classroom_id">
     <FormItem>
       <FormLabel>{{ t('common.labels.classroom') }}</FormLabel>
       <FormControl>

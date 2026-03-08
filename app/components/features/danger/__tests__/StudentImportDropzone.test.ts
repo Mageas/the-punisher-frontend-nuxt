@@ -44,9 +44,7 @@ describe('StudentImportDropzone', () => {
 
     await input.trigger('change')
 
-    expect(wrapper.emitted('file-selected')).toEqual([[
-      file,
-    ]])
+    expect(wrapper.emitted('file-selected')).toEqual([[file]])
   })
 
   it('renders the selected file row and forwards clear/import actions', async () => {

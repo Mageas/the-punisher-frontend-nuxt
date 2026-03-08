@@ -12,15 +12,19 @@ interface UseResolvedStudentClassroomSelectionOptions<
 > {
   open: Readonly<Ref<boolean>>
   values: TValues
-  setFieldValue: (field: 'classroom_id' | 'student_id', value: string, shouldValidate?: boolean) => void
+  setFieldValue: (
+    field: 'classroom_id' | 'student_id',
+    value: string,
+    shouldValidate?: boolean,
+  ) => void
   setFieldError: (field: 'classroom_id', message: string | undefined) => void
   preselectedStudentId?: MaybeRefOrGetter<string | null | undefined>
   preselectedClassroomId?: MaybeRefOrGetter<string | null | undefined>
 }
 
-export function useResolvedStudentClassroomSelection<TValues extends StudentClassroomSelectionValues>(
-  options: UseResolvedStudentClassroomSelectionOptions<TValues>,
-) {
+export function useResolvedStudentClassroomSelection<
+  TValues extends StudentClassroomSelectionValues,
+>(options: UseResolvedStudentClassroomSelectionOptions<TValues>) {
   const studentService = useStudentService()
 
   const hasPreselectedStudent = computed(() => Boolean(toValue(options.preselectedStudentId)))
@@ -39,7 +43,9 @@ export function useResolvedStudentClassroomSelection<TValues extends StudentClas
       name: classroom.name,
     })),
   )
-  const requiresStudentClassroomSelection = computed(() => selectedStudentClassrooms.value.length > 1)
+  const requiresStudentClassroomSelection = computed(
+    () => selectedStudentClassrooms.value.length > 1,
+  )
   const shouldShowStudentClassroomSelect = computed(() => requiresStudentClassroomSelection.value)
   const isStudentClassroomMissing = computed(
     () => requiresStudentClassroomSelection.value && !selectedStudentClassroomId.value,

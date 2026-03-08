@@ -15,8 +15,7 @@ describe('TrackingCreateMenu', () => {
         stubs: {
           PageActionsMenu: {
             props: ['createLabel', 'align'],
-            template:
-              '<div data-testid="page-actions-menu"><slot name="create" /></div>',
+            template: '<div data-testid="page-actions-menu"><slot name="create" /></div>',
           },
           DropdownMenuItem: {
             template: '<button type="button"><slot /></button>',
@@ -56,8 +55,7 @@ describe('TrackingCreateMenu', () => {
         stubs: {
           PageActionsMenu: {
             props: ['createLabel', 'align'],
-            template:
-              '<div><slot name="create" /><slot name="manage" /></div>',
+            template: '<div><slot name="create" /><slot name="manage" /></div>',
           },
           DropdownMenuItem: {
             template: '<button type="button"><slot /></button>',

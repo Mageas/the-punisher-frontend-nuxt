@@ -29,7 +29,10 @@ const iconClasses: Record<IconPageHeadingTone, string> = {
 <template>
   <div class="flex items-center gap-3" data-testid="icon-page-heading">
     <div
-      :class="['flex size-10 items-center justify-center rounded-lg', iconWrapperClasses[props.tone]]"
+      :class="[
+        'flex size-10 items-center justify-center rounded-lg',
+        iconWrapperClasses[props.tone],
+      ]"
       data-testid="icon-page-heading-icon-wrapper"
     >
       <component :is="props.icon" :class="['size-5', iconClasses[props.tone]]" />

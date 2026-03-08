@@ -32,11 +32,9 @@ function createSelection(options?: {
     ...options?.values,
   })
   const setFieldError = vi.fn()
-  const setFieldValue = vi.fn(
-    (field: 'classroom_id' | 'student_id', value: string) => {
-      values[field] = value
-    },
-  )
+  const setFieldValue = vi.fn((field: 'classroom_id' | 'student_id', value: string) => {
+    values[field] = value
+  })
 
   const selection = useResolvedStudentClassroomSelection({
     open: ref(options?.open ?? true),
@@ -106,8 +104,10 @@ describe('useResolvedStudentClassroomSelection', () => {
   })
 
   it('ignores stale classroom lookups from previous student selections', async () => {
-    let resolveFirst: ((value: { classrooms: { id: string; name: string }[] }) => void) | null = null
-    let resolveSecond: ((value: { classrooms: { id: string; name: string }[] }) => void) | null = null
+    let resolveFirst: ((value: { classrooms: { id: string; name: string }[] }) => void) | null =
+      null
+    let resolveSecond: ((value: { classrooms: { id: string; name: string }[] }) => void) | null =
+      null
 
     mockStudentService.getStudentById.mockImplementation((studentId: string) => {
       if (studentId === 'student-1') {

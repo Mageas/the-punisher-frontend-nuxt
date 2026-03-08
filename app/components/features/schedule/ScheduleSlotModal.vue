@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  type ScheduleSlot,
-  type ScheduleSlotCreateData,
-  type Weekday,
-} from '~/types/api'
+import type { ScheduleSlot, ScheduleSlotCreateData, Weekday } from '~/types/api'
 import { Trash2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 

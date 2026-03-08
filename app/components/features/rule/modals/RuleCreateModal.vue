@@ -21,10 +21,11 @@ const ruleService = useRuleService()
 const { notifyCreateSuccess } = useActionToast()
 const schema = useRuleFormSchema({ allowEmptyName: true })
 
-const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = useForm<RuleFormValues>({
-  validationSchema: schema,
-  initialValues: getRuleFormInitialValues(),
-})
+const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } =
+  useForm<RuleFormValues>({
+    validationSchema: schema,
+    initialValues: getRuleFormInitialValues(),
+  })
 
 const { modeOptions, dueAtModeOptions, getInitialValues } = useRuleFormState({
   values,

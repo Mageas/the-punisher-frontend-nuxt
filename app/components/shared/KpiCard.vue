@@ -26,7 +26,7 @@ const props = withDefaults(
       <p class="text-xs font-medium text-muted-foreground sm:text-sm">
         {{ props.label }}
       </p>
-      <component v-if="props.icon" :is="props.icon" :class="cn('h-4 w-4', props.iconClass)" />
+      <component :is="props.icon" v-if="props.icon" :class="cn('h-4 w-4', props.iconClass)" />
     </div>
 
     <p

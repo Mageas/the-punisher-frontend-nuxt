@@ -102,7 +102,9 @@ describe('useScheduleSlotForm', () => {
     expect(formState.form.start_time).toBe('10:00')
     expect(formState.form.end_time).toBe('10:55')
     expect(formState.validateForm()).toBe(false)
-    expect(formState.clientErrors.value.classroom_ids).toBe('apiErrors.details.validation_field_required')
+    expect(formState.clientErrors.value.classroom_ids).toBe(
+      'apiErrors.details.validation_field_required',
+    )
 
     formState.addClassroom({ id: 'class-2', name: '5B' })
     expect(formState.validateForm()).toBe(true)

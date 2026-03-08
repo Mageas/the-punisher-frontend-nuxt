@@ -116,6 +116,9 @@ const displayedImportErrors = computed(() =>
 
     <StudentImportSummary v-if="importSummary" :summary="importSummary" />
 
-    <StudentImportErrorsTable v-if="displayedImportErrors.length > 0" :errors="displayedImportErrors" />
+    <StudentImportErrorsTable
+      v-if="displayedImportErrors.length > 0"
+      :errors="displayedImportErrors"
+    />
   </ActionPanelCard>
 </template>

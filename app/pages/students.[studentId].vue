@@ -173,7 +173,11 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       <div class="mb-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex items-center gap-4">
-            <StudentAvatar :first-name="student.first_name" :last-name="student.last_name" size="xl" />
+            <StudentAvatar
+              :first-name="student.first_name"
+              :last-name="student.last_name"
+              size="xl"
+            />
             <div class="min-w-0">
               <h1 class="text-2xl font-bold tracking-tight">
                 {{ student.first_name }} {{ student.last_name }}

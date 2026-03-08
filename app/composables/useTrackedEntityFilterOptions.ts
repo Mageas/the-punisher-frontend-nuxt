@@ -1,8 +1,5 @@
 import type { MaybeRefOrGetter } from 'vue'
-import type {
-  PaginatedResponse,
-  Student,
-} from '~/types/api'
+import type { PaginatedResponse, Student } from '~/types/api'
 import type { IdNameOption, IdNameOptionsFetcher } from './useLazyIdNameOptions'
 
 type IdNameFetchRequest = Parameters<IdNameOptionsFetcher>[0]
