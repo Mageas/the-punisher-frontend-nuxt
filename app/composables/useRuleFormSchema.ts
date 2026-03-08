@@ -36,14 +36,20 @@ export function useRuleFormSchema(options: UseRuleFormSchemaOptions = {}) {
   const nameField = options.allowEmptyName
     ? zod
         .string()
-        .max(RULE_NAME_MAX_LENGTH, t('apiErrors.details.validation_max_length', { value: RULE_NAME_MAX_LENGTH }))
+        .max(
+          RULE_NAME_MAX_LENGTH,
+          t('apiErrors.details.validation_max_length', { value: RULE_NAME_MAX_LENGTH }),
+        )
         .refine((value) => value.trim().length === 0 || value.trim().length >= 2, {
           message: t('apiErrors.details.validation_min_length', { value: 2 }),
         })
     : zod
         .string()
         .min(2, t('apiErrors.details.validation_min_length', { value: 2 }))
-        .max(RULE_NAME_MAX_LENGTH, t('apiErrors.details.validation_max_length', { value: RULE_NAME_MAX_LENGTH }))
+        .max(
+          RULE_NAME_MAX_LENGTH,
+          t('apiErrors.details.validation_max_length', { value: RULE_NAME_MAX_LENGTH }),
+        )
 
   return toTypedSchema(
     zod
@@ -55,7 +61,10 @@ export function useRuleFormSchema(options: UseRuleFormSchemaOptions = {}) {
           .min(1, t('apiErrors.details.validation_field_required')),
         threshold: zod.coerce
           .number()
-          .min(RULE_THRESHOLD_MIN, t('apiErrors.details.validation_min_length', { value: RULE_THRESHOLD_MIN })),
+          .min(
+            RULE_THRESHOLD_MIN,
+            t('apiErrors.details.validation_min_length', { value: RULE_THRESHOLD_MIN }),
+          ),
         mode: zod.enum(['at', 'every', 'after'] as const),
         due_at_mode: zod.enum(['days', 'next_lessons'] as const),
         due_at_after_days: nullableDueField(RULE_DUE_AT_AFTER_DAYS_MIN),

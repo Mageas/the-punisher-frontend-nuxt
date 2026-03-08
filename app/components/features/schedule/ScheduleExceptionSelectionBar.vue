@@ -82,9 +82,7 @@ const borderClass = computed(() =>
               </p>
               <p class="text-sm font-medium leading-tight">
                 {{ props.startLabel }}
-                <template v-if="props.endLabel">
-                  — {{ props.endLabel }}
-                </template>
+                <template v-if="props.endLabel"> — {{ props.endLabel }} </template>
               </p>
               <p v-if="props.hasCompleteSelection" class="text-xs text-muted-foreground">
                 {{ t('schedule.exceptions.dayCount', props.dayCount) }}

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import type { Rule } from '~/types/api'
-import { buildRuleUpdatePayload, getRuleFormInitialValues, type RuleFormValues } from '~/lib/rule-form'
+import {
+  buildRuleUpdatePayload,
+  getRuleFormInitialValues,
+  type RuleFormValues,
+} from '~/lib/rule-form'
 
 const emit = defineEmits<{
   updated: []
@@ -20,10 +24,11 @@ const ruleService = useRuleService()
 const { notifyUpdateSuccess } = useActionToast()
 const schema = useRuleFormSchema()
 
-const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } = useForm<RuleFormValues>({
-  validationSchema: schema,
-  initialValues: getRuleFormInitialValues(props.rule),
-})
+const { handleSubmit, resetForm, setFieldError, setFieldValue, values, meta } =
+  useForm<RuleFormValues>({
+    validationSchema: schema,
+    initialValues: getRuleFormInitialValues(props.rule),
+  })
 
 const { modeOptions, dueAtModeOptions, getInitialValues } = useRuleFormState({
   values,

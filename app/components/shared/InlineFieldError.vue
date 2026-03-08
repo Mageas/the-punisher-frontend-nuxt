@@ -5,11 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <p
-    v-if="props.message"
-    class="text-sm text-destructive"
-    data-testid="inline-field-error"
-  >
+  <p v-if="props.message" class="text-sm text-destructive" data-testid="inline-field-error">
     {{ props.message }}
   </p>
 </template>

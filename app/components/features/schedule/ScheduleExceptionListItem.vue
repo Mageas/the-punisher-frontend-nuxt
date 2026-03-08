@@ -51,7 +51,10 @@ const endLabel = computed(() => formatExceptionDate(props.exception.end_date))
 </script>
 
 <template>
-  <div class="flex items-center gap-3 rounded-lg border bg-card p-3" data-testid="schedule-exception-item">
+  <div
+    class="flex items-center gap-3 rounded-lg border bg-card p-3"
+    data-testid="schedule-exception-item"
+  >
     <div :class="['h-2 w-2 shrink-0 rounded-full', dotClass]" />
 
     <div class="min-w-0 flex-1">
@@ -68,9 +71,7 @@ const endLabel = computed(() => formatExceptionDate(props.exception.end_date))
         <template v-if="isSingleDay">
           {{ startLabel }}
         </template>
-        <template v-else>
-          {{ startLabel }} — {{ endLabel }}
-        </template>
+        <template v-else> {{ startLabel }} — {{ endLabel }} </template>
       </p>
     </div>
 

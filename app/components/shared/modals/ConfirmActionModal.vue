@@ -26,6 +26,7 @@ const props = withDefaults(
     confirmVariant: 'default',
     errorMode: 'inline',
     lockDurationSeconds: 0,
+    successMessage: undefined,
     warningMessage: undefined,
   },
 )

@@ -15,11 +15,7 @@ const evaluationLabelPlaceholder = computed(
     <FormItem>
       <FormLabel>{{ t('common.labels.evaluationLabel') }}</FormLabel>
       <FormControl>
-        <Input
-          v-bind="componentField"
-          type="text"
-          :placeholder="evaluationLabelPlaceholder"
-        />
+        <Input v-bind="componentField" type="text" :placeholder="evaluationLabelPlaceholder" />
       </FormControl>
       <FormMessage />
     </FormItem>

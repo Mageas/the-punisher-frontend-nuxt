@@ -2,11 +2,7 @@ export function formatRatio(current: number, total: number): string {
   return `${current} / ${total}`
 }
 
-export function formatPunishmentsProgress(
-  total: number,
-  pending: number,
-  overdue: number,
-): string {
+export function formatPunishmentsProgress(total: number, pending: number, overdue: number): string {
   const resolved = Math.max(0, total - pending)
   return `${resolved} / ${total} (${overdue})`
 }

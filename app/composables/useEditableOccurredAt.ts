@@ -45,10 +45,7 @@ export function useEditableOccurredAt(options: EditableOccurredAtOptions) {
     handleChangeDate(value)
   }
 
-  function handleOccurredAtTimeChange(
-    value: string,
-    setOccurredAtTime: (value: string) => void,
-  ) {
+  function handleOccurredAtTimeChange(value: string, setOccurredAtTime: (value: string) => void) {
     occurredAtTouched.value = true
     setOccurredAtTime(value)
   }

@@ -46,8 +46,5 @@ const emit = defineEmits<{
     :selected-name="props.punishmentTypeSelectedName"
     @selected-option="emit('punishmentTypeSelected', $event)"
   />
-  <RuleDueModeFields
-    :due-at-mode="props.dueAtMode"
-    :due-at-mode-options="props.dueAtModeOptions"
-  />
+  <RuleDueModeFields :due-at-mode="props.dueAtMode" :due-at-mode-options="props.dueAtModeOptions" />
 </template>

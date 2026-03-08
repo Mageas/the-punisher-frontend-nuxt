@@ -80,7 +80,11 @@ function onResolved() {
       @update:page="emit('update:page', $event)"
     />
 
-    <SectionListBlock :is-empty="punishments.length === 0" :empty-label="sectionEmptyLabel" list-class="space-y-2">
+    <SectionListBlock
+      :is-empty="punishments.length === 0"
+      :empty-label="sectionEmptyLabel"
+      list-class="space-y-2"
+    >
       <PunishmentCard
         v-for="punishment in punishments"
         :key="punishment.id"
