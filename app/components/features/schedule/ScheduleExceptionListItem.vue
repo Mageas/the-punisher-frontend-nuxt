@@ -36,7 +36,7 @@ const typeLabel = computed(() =>
 )
 
 const dotClass = computed(() =>
-  props.exception.type === 'vacation' ? 'bg-emerald-500' : 'bg-rose-500',
+  props.exception.type === 'vacation' ? 'bg-schedule-vacation' : 'bg-schedule-holiday',
 )
 
 const startLabel = computed(() => {

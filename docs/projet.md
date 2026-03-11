@@ -39,6 +39,7 @@ Une application web simple qui automatise la logique disciplinaire :
 * Composants réutilisables, accessibles et modernes.
 
 * **Styling :** [Tailwind CSS]().
+* Aucune couleur Tailwind hardcodée : toutes les couleurs sont définies via des CSS custom properties dans `app/assets/css/tailwind.css` (`:root` / `.dark`), mappées dans `@theme inline`. Cela permet de créer des thèmes en surchargeant simplement les variables.
 * **Langage :** TypeScript (recommandé pour le typage des retours API).
 
 ### Communication Backend (API)

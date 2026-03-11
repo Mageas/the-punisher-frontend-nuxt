@@ -2,8 +2,8 @@
 const { t } = useI18n()
 
 const items = [
-  { key: 'vacation', dotClass: 'bg-emerald-500' },
-  { key: 'publicHoliday', dotClass: 'bg-rose-500' },
+  { key: 'vacation', dotClass: 'bg-schedule-vacation' },
+  { key: 'publicHoliday', dotClass: 'bg-schedule-holiday' },
 ] as const
 </script>
 
