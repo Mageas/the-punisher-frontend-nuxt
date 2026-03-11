@@ -2,6 +2,7 @@
 import type { DashboardResponse } from '~/types/api'
 import {
   createLatestOnlyAsyncRunner,
+  reloadDashboardSectionsOnClassroomChange,
   resetDashboardSectionPageOnCreate,
   type DashboardSectionKey,
 } from '~/lib/dashboard-page'
@@ -10,6 +11,8 @@ import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMen
 
 const { t } = useI18n()
 const nuxtApp = useNuxtApp()
+const route = useRoute()
+const router = useRouter()
 
 // Services
 const dashboardService = useDashboardService()
@@ -135,7 +138,12 @@ async function onPunishmentResolved() {
 watch(selectedClassroomId, async (nextClassroomId, previousClassroomId) => {
   if (nextClassroomId === previousClassroomId) return
 
-  await loadAllData({ classroomId: nextClassroomId })
+  await reloadDashboardSectionsOnClassroomChange({
+    classroomId: nextClassroomId,
+    query: route.query,
+    loadAllData,
+    replaceQuery: (query) => router.replace({ query }),
+  })
 })
 
 if (import.meta.server || !nuxtApp.isHydrating) {

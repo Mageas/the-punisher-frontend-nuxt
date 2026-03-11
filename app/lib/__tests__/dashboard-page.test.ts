@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createLatestOnlyAsyncRunner, resetDashboardSectionPageOnCreate } from '../dashboard-page'
+import {
+  createLatestOnlyAsyncRunner,
+  getDashboardSectionPageResetQuery,
+  reloadDashboardSectionsOnClassroomChange,
+  resetDashboardSectionPageOnCreate,
+} from '../dashboard-page'
 
 describe('dashboard-page.ts', () => {
   it('returns only the latest resolved value', async () => {
@@ -95,5 +100,81 @@ describe('dashboard-page.ts', () => {
     expect(gotoPage.bonuses).not.toHaveBeenCalled()
     expect(gotoPage.penalties).not.toHaveBeenCalled()
     expect(gotoPage.punishments).not.toHaveBeenCalled()
+  })
+
+  it('removes dashboard section page params when the classroom changes', () => {
+    const resetQuery = getDashboardSectionPageResetQuery({
+      punishments_page: '2',
+      bonuses_page: '3',
+      penalties_page: '4',
+      search: 'alice',
+    })
+
+    expect(resetQuery).toEqual({
+      search: 'alice',
+    })
+  })
+
+  it('returns nothing when no dashboard section page param needs reset', () => {
+    const resetQuery = getDashboardSectionPageResetQuery({
+      search: 'alice',
+    })
+
+    expect(resetQuery).toBeUndefined()
+  })
+
+  it('reloads all dashboard sections on page 1 before clearing section query params', async () => {
+    const calls: string[] = []
+    const loadAllData = vi.fn().mockImplementation(async () => {
+      calls.push('loadAllData')
+    })
+    const replaceQuery = vi.fn().mockImplementation(async () => {
+      calls.push('replaceQuery')
+    })
+
+    await reloadDashboardSectionsOnClassroomChange({
+      classroomId: 'class-2',
+      query: {
+        punishments_page: '2',
+        bonuses_page: '3',
+        penalties_page: '4',
+        search: 'alice',
+      },
+      loadAllData,
+      replaceQuery,
+    })
+
+    expect(loadAllData).toHaveBeenCalledWith({
+      classroomId: 'class-2',
+      bonusesPage: 1,
+      penaltiesPage: 1,
+      punishmentsPage: 1,
+    })
+    expect(replaceQuery).toHaveBeenCalledWith({
+      search: 'alice',
+    })
+    expect(calls).toEqual(['loadAllData', 'replaceQuery'])
+  })
+
+  it('still reloads all dashboard sections on page 1 when no query cleanup is needed', async () => {
+    const loadAllData = vi.fn().mockResolvedValue(undefined)
+    const replaceQuery = vi.fn().mockResolvedValue(undefined)
+
+    await reloadDashboardSectionsOnClassroomChange({
+      classroomId: 'class-2',
+      query: {
+        search: 'alice',
+      },
+      loadAllData,
+      replaceQuery,
+    })
+
+    expect(loadAllData).toHaveBeenCalledWith({
+      classroomId: 'class-2',
+      bonusesPage: 1,
+      penaltiesPage: 1,
+      punishmentsPage: 1,
+    })
+    expect(replaceQuery).not.toHaveBeenCalled()
   })
 })
