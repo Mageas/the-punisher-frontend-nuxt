@@ -6,6 +6,7 @@ type PenaltySectionQueryOptions = Record<string, PenaltySectionQueryValue>
 interface UsePenaltiesSectionOptions<TFilters extends PenaltySectionQueryOptions> {
   source: (options?: TFilters & { page?: number }) => Promise<PaginatedResponse<Penalty>>
   filterKeys: (keyof TFilters & string)[]
+  filterQueryKeys?: Partial<Record<keyof TFilters & string, string>>
   defaultFilters?: Partial<TFilters>
   stateKey: string
 }
@@ -16,6 +17,7 @@ export function usePenaltiesSection<TFilters extends PenaltySectionQueryOptions>
   const paginated = usePaginatedCollection<Penalty, TFilters>(options.source, {
     pageKey: 'penalties_page',
     filterKeys: options.filterKeys,
+    filterQueryKeys: options.filterQueryKeys,
     defaultFilters: options.defaultFilters,
     stateKey: options.stateKey,
   })

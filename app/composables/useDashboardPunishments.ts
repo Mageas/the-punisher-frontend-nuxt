@@ -3,6 +3,7 @@ import { toValue } from 'vue'
 
 type DashboardPunishmentsFilters = {
   state?: 'pending' | 'resolved'
+  overdue?: 'true' | 'false'
 }
 
 /**
@@ -18,8 +19,11 @@ export function useDashboardPunishments(classroomId: MaybeRefOrGetter<string>) {
         classroom_id: toValue(classroomId) || undefined,
         item_per_page: DASHBOARD_SECTION_PAGE_SIZE,
       }),
-    filterKeys: ['state'],
-    defaultFilters: { state: 'pending' },
+    filterKeys: ['state', 'overdue'],
+    filterQueryKeys: {
+      state: 'punishments_state',
+      overdue: 'punishments_overdue',
+    },
     stateKey: 'paginated:dashboard:punishments',
   })
 

@@ -32,6 +32,11 @@ export interface PaginatedCollectionOptions<TFilters> {
    */
   filterKeys?: (keyof TFilters & string)[]
   /**
+   * Optional mapping between filter keys and URL query parameter names.
+   * When omitted, the filter key itself is used as the query parameter name.
+   */
+  filterQueryKeys?: Partial<Record<keyof TFilters & string, string>>
+  /**
    * Default filter values.
    */
   defaultFilters?: Partial<TFilters>
@@ -53,6 +58,9 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
 
   const pageKey = options.pageKey === undefined ? 'page' : options.pageKey
   const filterKeys = options.filterKeys || []
+  const filterQueryKeys = (options.filterQueryKeys || {}) as Partial<
+    Record<keyof TFilters & string, string>
+  >
   const defaultFilters = (options.defaultFilters || {}) as Partial<TFilters>
   const stateKey = createScopedStateKey(options.stateKey || 'paginated-collection')
 
@@ -86,6 +94,10 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
     }
   }
 
+  function getFilterQueryKey(key: keyof TFilters & string): string {
+    return filterQueryKeys[key] ?? key
+  }
+
   /**
    * Extract state from current URL
    */
@@ -110,7 +122,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
     }
 
     for (const key of filterKeys) {
-      const queryValue = getQueryStringValue(query[key])
+      const queryValue = getQueryStringValue(query[getFilterQueryKey(key)])
       if (queryValue !== undefined) {
         // @ts-expect-error - dynamic key assignment
         newState.filters[key] = queryValue
@@ -186,12 +198,17 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
     // Handle Filters
     const newFilters = { ...filters, ...(updates.filters || {}) }
     for (const key of filterKeys) {
+      const queryKey = getFilterQueryKey(key)
       const val = newFilters[key]
-      if (val !== undefined && val !== null && val !== '' && val !== defaultFilters[key]) {
-        nextQuery[key] = String(val)
-      } else {
+      if (queryKey !== key) {
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete nextQuery[key]
+      }
+      if (val !== undefined && val !== null && val !== '' && val !== defaultFilters[key]) {
+        nextQuery[queryKey] = String(val)
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete nextQuery[queryKey]
       }
     }
 

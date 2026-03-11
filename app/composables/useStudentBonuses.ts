@@ -20,7 +20,10 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
         item_per_page: PROFILE_SECTION_PAGE_SIZE,
       }),
     filterKeys: ['search', 'state'],
-    defaultFilters: { state: 'unused' },
+    filterQueryKeys: {
+      search: 'bonuses_search',
+      state: 'bonuses_state',
+    },
     stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
   })
 

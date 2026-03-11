@@ -4,6 +4,15 @@ import type { Student, StudentKpis } from '~/types/api'
 import { computeTotalPages, formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
 import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMenu.vue'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import {
+  mapBonusApiFiltersToSectionFilter,
+  mapBonusSectionFilterToApiFilters,
+  mapPunishmentApiFiltersToSectionFilter,
+  mapPunishmentSectionFilterToApiFilters,
+  type BonusSectionFilter,
+  type PunishmentSectionFilter,
+  useTrackingOverviewSectionFilters,
+} from '~/composables/useTrackingOverviewSectionFilters'
 
 const { t } = useI18n()
 const studentService = useStudentService()
@@ -24,26 +33,30 @@ const kpis = ref<StudentKpis | null>(null)
 const loadingProfile = ref(false)
 
 const {
-  punishments: pendingPunishments,
+  punishments: punishmentsSectionItems,
   loading: loadingPunishments,
   page: punishmentsPage,
   previousPage: previousPunishmentsPage,
   totalCount: punishmentsTotal,
   itemPerPage: punishmentsPerPage,
+  filters: punishmentsSectionFilters,
   fetchPunishments,
   gotoPage: gotoPunishmentsPage,
+  applyFilters: applyPunishmentsSectionFilters,
   resolvePunishment: resolvePunishmentApi,
 } = useStudentPunishments(studentId)
 
 const {
-  bonuses: availableBonuses,
+  bonuses: bonusesSectionItems,
   loading: loadingBonuses,
   page: bonusesPage,
   previousPage: previousBonusesPage,
   totalCount: bonusesTotal,
   itemPerPage: bonusesPerPage,
+  filters: bonusesSectionFilters,
   fetchBonuses,
   gotoPage: gotoBonusesPage,
+  applyFilters: applyBonusesSectionFilters,
   useBonus: useBonusApi,
 } = useStudentBonuses(studentId)
 
@@ -72,6 +85,22 @@ const showDeleteModal = ref(false)
 const showBonusCreateModal = ref(false)
 const showPenaltyCreateModal = ref(false)
 const showPunishmentCreateModal = ref(false)
+
+const { bonusesFilterOptions, punishmentsFilterOptions } = useTrackingOverviewSectionFilters()
+
+const bonusesFilter = computed<BonusSectionFilter>({
+  get: () => mapBonusApiFiltersToSectionFilter(bonusesSectionFilters),
+  set: (value) => {
+    void applyBonusesSectionFilters(mapBonusSectionFilterToApiFilters(value))
+  },
+})
+
+const punishmentsFilter = computed<PunishmentSectionFilter>({
+  get: () => mapPunishmentApiFiltersToSectionFilter(punishmentsSectionFilters),
+  set: (value) => {
+    void applyPunishmentsSectionFilters(mapPunishmentSectionFilterToApiFilters(value))
+  },
+})
 
 const punishmentsTotalPages = computed(() =>
   computeTotalPages(punishmentsTotal.value, punishmentsPerPage.value),
@@ -129,7 +158,7 @@ async function onActionConfirmed() {
 async function onPunishmentResolved() {
   await loadAllData()
 
-  if (pendingPunishments.value.length === 0 && previousPunishmentsPage.value !== null) {
+  if (punishmentsSectionItems.value.length === 0 && previousPunishmentsPage.value !== null) {
     await gotoPunishmentsPage(previousPunishmentsPage.value)
   }
 }
@@ -137,7 +166,7 @@ async function onPunishmentResolved() {
 async function onBonusUsed() {
   await loadAllData()
 
-  if (availableBonuses.value.length === 0 && previousBonusesPage.value !== null) {
+  if (bonusesSectionItems.value.length === 0 && previousBonusesPage.value !== null) {
     await gotoBonusesPage(previousBonusesPage.value)
   }
 }
@@ -148,6 +177,14 @@ async function onDeleteConfirmed() {
 
 async function onCreated() {
   await loadAllData()
+}
+
+function updateBonusesFilter(value: string) {
+  bonusesFilter.value = value as BonusSectionFilter
+}
+
+function updatePunishmentsFilter(value: string) {
+  punishmentsFilter.value = value as PunishmentSectionFilter
 }
 
 await loadAllData()
@@ -231,8 +268,8 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       </div>
 
       <div class="mb-8 space-y-4">
-        <PendingPunishmentsSection
-          :punishments="pendingPunishments"
+        <PunishmentsSection
+          :punishments="punishmentsSectionItems"
           :show-count="true"
           :badge-text="
             formatPunishmentsProgress(
@@ -245,23 +282,29 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
           :page="punishmentsPage"
           :total-pages="punishmentsTotalPages"
           :loading="loadingPunishments"
+          :filter-options="punishmentsFilterOptions"
+          :filter-value="punishmentsFilter"
           :resolve-fn="resolvePunishment"
           @resolved="onPunishmentResolved"
           @update:page="gotoPunishmentsPage($event)"
+          @update:filter-value="updatePunishmentsFilter"
         />
       </div>
 
       <div class="mb-8 space-y-4">
-        <AvailableBonusesSection
-          :bonuses="availableBonuses"
+        <BonusesSection
+          :bonuses="bonusesSectionItems"
           :badge-text="formatRatio(kpis.available_bonus_points, kpis.total_bonus_points)"
           :badge-help-text="t('common.kpiPopover.bonusAvailability')"
           :page="bonusesPage"
           :total-pages="bonusesTotalPages"
           :loading="loadingBonuses"
+          :filter-options="bonusesFilterOptions"
+          :filter-value="bonusesFilter"
           :use-fn="useBonus"
           @used="onBonusUsed"
           @update:page="gotoBonusesPage($event)"
+          @update:filter-value="updateBonusesFilter"
         />
       </div>
 

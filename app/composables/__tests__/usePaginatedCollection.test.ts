@@ -121,6 +121,34 @@ describe('usePaginatedCollection', () => {
     })
   })
 
+  it('supports custom filter query keys', async () => {
+    mockRoute.query = {
+      bonuses_state: 'used',
+    }
+
+    const fetcher = vi.fn().mockResolvedValue({
+      data: [],
+      page: 1,
+      item_per_page: 10,
+      total_count: 0,
+      next_page: null,
+      previous_page: null,
+    })
+
+    const { filters, applyFilters } = usePaginatedCollection(fetcher, {
+      filterKeys: ['state'],
+      filterQueryKeys: { state: 'bonuses_state' },
+    })
+
+    expect(filters.state).toBe('used')
+
+    await applyFilters({ state: 'unused' })
+
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      query: { bonuses_state: 'unused' },
+    })
+  })
+
   it('ignores stale concurrent responses and keeps the latest page state', async () => {
     const resolvers = new Map<
       number,

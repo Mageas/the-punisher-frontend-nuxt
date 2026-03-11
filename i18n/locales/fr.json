@@ -122,6 +122,23 @@
       "students": "Élèves",
       "userSettings": "Paramètres utilisateur"
     },
+    "filters": {
+      "penalties": {
+        "recent": "Dernières pénalités",
+        "all": "Toutes les pénalités"
+      },
+      "bonuses": {
+        "available": "Bonus disponibles",
+        "used": "Bonus utilisés",
+        "all": "Tous les bonus"
+      },
+      "punishments": {
+        "pending": "Punitions en attente",
+        "all": "Toutes les punitions",
+        "overdue": "Punitions en retard",
+        "resolved": "Punitions résolues"
+      }
+    },
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant",

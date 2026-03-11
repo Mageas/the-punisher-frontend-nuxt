@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CircleCheck } from 'lucide-vue-next'
+import type { SectionFilterOption } from '~/types/ui'
 
 interface PendingPunishment {
   id: string
@@ -9,6 +10,7 @@ interface PendingPunishment {
   triggering_rule_id?: string | null
   triggering_rule_name?: string | null
   due_at?: string | null
+  resolved_at?: string | null
   student_first_name?: string
   student_last_name?: string
 }
@@ -27,11 +29,14 @@ const props = defineProps<{
   totalPages?: number
   loading?: boolean
   disabled?: boolean
+  filterOptions?: SectionFilterOption[]
+  filterValue?: string
 }>()
 
 const emit = defineEmits<{
   resolved: []
   'update:page': [value: number]
+  'update:filterValue': [value: string]
 }>()
 
 const { t } = useI18n()
@@ -40,10 +45,8 @@ const showResolveModal = ref(false)
 const punishmentToResolveId = ref<string | null>(null)
 
 const hasResolveAction = computed(() => typeof props.resolveFn === 'function')
-const sectionTitle = computed(() => props.title ?? t('common.titles.pendingPunishments'))
-const sectionEmptyLabel = computed(
-  () => props.emptyLabel ?? t('studentProfile.empty.pendingPunishments'),
-)
+const sectionTitle = computed(() => props.title ?? t('common.titles.punishments'))
+const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('common.empty.noPunishments'))
 const useCompactMode = computed(() => props.compact ?? false)
 const showCountBadge = computed(() => props.showCount ?? false)
 const displayedBadgeText = computed(
@@ -77,7 +80,10 @@ function onResolved() {
       :badge-text="showCountBadge ? displayedBadgeText : undefined"
       :badge-help-text="props.badgeHelpText"
       badge-class="border-danger-border text-danger"
+      :filter-options="props.filterOptions"
+      :filter-value="props.filterValue"
       @update:page="emit('update:page', $event)"
+      @update:filter-value="emit('update:filterValue', $event)"
     />
 
     <SectionListBlock
@@ -93,12 +99,13 @@ function onResolved() {
         :triggering-rule-id="punishment.triggering_rule_id"
         :triggering-rule-name="punishment.triggering_rule_name"
         :due-at="punishment.due_at"
+        :resolved-at="punishment.resolved_at"
         :student-id="punishment.student_id"
         :student-first-name="punishment.student_first_name"
         :student-last-name="punishment.student_last_name"
         :compact="useCompactMode"
       >
-        <template v-if="hasResolveAction" #actions>
+        <template v-if="hasResolveAction && !punishment.resolved_at" #actions>
           <Button
             variant="ghost"
             size="icon-sm"

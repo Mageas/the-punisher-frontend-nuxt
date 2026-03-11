@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
-import PendingPunishmentsSection from '../PendingPunishmentsSection.vue'
+import PunishmentsSection from '../PunishmentsSection.vue'
 
 const mockI18n = {
   t: (key: string) =>
     ({
-      'common.titles.pendingPunishments': 'Punitions en attente',
-      'studentProfile.empty.pendingPunishments': 'Aucune punition en attente.',
+      'common.titles.punishments': 'Punitions',
+      'common.empty.noPunishments': 'Aucune punition trouvée.',
       'common.actions.resolve': 'Résoudre',
     })[key] ?? key,
 }
@@ -72,10 +72,10 @@ const ButtonStub = defineComponent({
   template: '<button type="button"><slot /></button>',
 })
 
-describe('PendingPunishmentsSection', () => {
-  it('uses shared defaults and re-emits resolve/pagination events', async () => {
+describe('PunishmentsSection', () => {
+  it('uses generic defaults and re-emits resolve/pagination events', async () => {
     const resolveFn = vi.fn()
-    const wrapper = mount(PendingPunishmentsSection, {
+    const wrapper = mount(PunishmentsSection, {
       props: {
         punishments: [
           {
@@ -109,11 +109,11 @@ describe('PendingPunishmentsSection', () => {
     const modal = wrapper.getComponent(PunishmentResolveModalStub)
 
     expect(header.props()).toMatchObject({
-      title: 'Punitions en attente',
+      title: 'Punitions',
       badgeText: '1 / 4',
     })
     expect(list.props()).toMatchObject({
-      emptyLabel: 'Aucune punition en attente.',
+      emptyLabel: 'Aucune punition trouvée.',
       listClass: 'space-y-2',
     })
     expect(card.props()).toMatchObject({
@@ -130,5 +130,32 @@ describe('PendingPunishmentsSection', () => {
 
     expect(wrapper.emitted('update:page')).toEqual([[2]])
     expect(wrapper.emitted('resolved')).toEqual([[]])
+  })
+
+  it('does not render a resolve action for already resolved punishments', () => {
+    const wrapper = mount(PunishmentsSection, {
+      props: {
+        punishments: [
+          {
+            id: 'punishment-1',
+            punishment_type_name: 'Retenue',
+            automated: true,
+            resolved_at: '2026-03-09T10:00:00Z',
+          },
+        ],
+        resolveFn: vi.fn(),
+      },
+      global: {
+        stubs: {
+          SectionHeaderRow: SectionHeaderRowStub,
+          SectionListBlock: SectionListBlockStub,
+          PunishmentCard: PunishmentCardStub,
+          PunishmentResolveModal: PunishmentResolveModalStub,
+          Button: ButtonStub,
+        },
+      },
+    })
+
+    expect(wrapper.findComponent(ButtonStub).exists()).toBe(false)
   })
 })

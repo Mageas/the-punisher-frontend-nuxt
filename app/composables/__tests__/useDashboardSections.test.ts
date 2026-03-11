@@ -91,7 +91,6 @@ describe('dashboard sections pagination', () => {
     expect(mockPunishmentService.getPunishments).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 2,
-        state: 'pending',
         classroom_id: 'class-1',
         item_per_page: 5,
       }),
@@ -99,7 +98,6 @@ describe('dashboard sections pagination', () => {
     expect(mockBonusService.getBonuses).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 3,
-        state: 'unused',
         classroom_id: 'class-1',
         item_per_page: 5,
       }),
@@ -146,10 +144,28 @@ describe('dashboard sections pagination', () => {
     expect(mockPunishmentService.getPunishments).toHaveBeenLastCalledWith(
       expect.objectContaining({
         page: 2,
-        state: 'pending',
         classroom_id: 'class-2',
         item_per_page: 5,
       }),
     )
+  })
+
+  it('syncs dashboard section filters with dedicated query keys', async () => {
+    const classroomId = ref('class-1')
+    const { applyFilters: applyBonusesFilters } = useDashboardBonuses(classroomId)
+    const { applyFilters: applyPunishmentsFilters } = useDashboardPunishments(classroomId)
+
+    await applyBonusesFilters({ state: 'used' })
+    await applyPunishmentsFilters({ state: 'pending', overdue: 'true' })
+
+    expect(mockRouter.push).toHaveBeenNthCalledWith(1, {
+      query: { bonuses_state: 'used' },
+    })
+    expect(mockRouter.push).toHaveBeenNthCalledWith(2, {
+      query: {
+        punishments_overdue: 'true',
+        punishments_state: 'pending',
+      },
+    })
   })
 })
