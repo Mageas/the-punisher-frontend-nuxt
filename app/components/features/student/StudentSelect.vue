@@ -18,6 +18,7 @@ const props = defineProps<{
   selectedName?: string
   keepFocusOnSelect?: boolean
   fullWidth?: boolean
+  wrapperClass?: string
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
@@ -42,11 +43,24 @@ const resolvedOptionsScopeKey = computed(
 )
 
 async function fetchStudentOptions(options: { page: number; search?: string }) {
-  const response = await fetchTrackedStudentOptions(options)
+  let response = await fetchTrackedStudentOptions(options)
+  let filteredOptions = response.data.filter(
+    (student) => !(props.excludeIds ?? []).includes(student.id),
+  )
+
+  while (filteredOptions.length === 0 && response.next_page !== null) {
+    response = await fetchTrackedStudentOptions({
+      ...options,
+      page: response.next_page,
+    })
+    filteredOptions = response.data.filter(
+      (student) => !(props.excludeIds ?? []).includes(student.id),
+    )
+  }
 
   return {
     ...response,
-    data: response.data.filter((student) => !(props.excludeIds ?? []).includes(student.id)),
+    data: filteredOptions,
   }
 }
 </script>
@@ -65,5 +79,6 @@ async function fetchStudentOptions(options: { page: number; search?: string }) {
     :empty-text="props.emptyText ?? t('common.empty.noStudents')"
     :keep-focus-on-select="props.keepFocusOnSelect"
     :full-width="props.fullWidth ?? true"
+    :wrapper-class="props.wrapperClass"
   />
 </template>

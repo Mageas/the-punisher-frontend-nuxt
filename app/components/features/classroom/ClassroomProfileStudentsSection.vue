@@ -77,21 +77,27 @@ watch(modelValue, (nextValue, previousValue) => {
       </p>
     </div>
 
-    <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="onSubmit">
-      <div class="flex-1">
+    <form class="flex w-full flex-col gap-2 sm:flex-row sm:items-start" @submit.prevent="onSubmit">
+      <div class="min-w-0 flex-1">
         <StudentSelect
           v-model="modelValue"
           :exclude-ids="existingStudentIds"
           :placeholder="t('classProfile.students.searchPlaceholder')"
           :empty-text="t('common.empty.noStudents')"
           :keep-focus-on-select="props.keepFocusOnStudentSelect"
+          :full-width="true"
+          wrapper-class="w-full"
         />
         <p v-if="localError" class="mt-2 text-sm text-destructive">
           {{ localError }}
         </p>
       </div>
 
-      <LoadingButton type="submit" class="cursor-pointer" :loading="props.submittingAddStudent">
+      <LoadingButton
+        type="submit"
+        class="cursor-pointer sm:self-start"
+        :loading="props.submittingAddStudent"
+      >
         <Plus class="w-4 h-4" />
         {{ t('common.actions.addStudent') }}
       </LoadingButton>
