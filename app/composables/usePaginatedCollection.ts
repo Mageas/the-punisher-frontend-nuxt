@@ -68,6 +68,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
   const totalCount = useState<number>(`${stateKey}:total-count`, () => 0)
   const nextPage = useState<number | null>(`${stateKey}:next-page`, () => null)
   const previousPage = useState<number | null>(`${stateKey}:previous-page`, () => null)
+  let latestRequestId = 0
 
   function getQueryStringValue(value: unknown): string | undefined {
     if (typeof value === 'string') return value
@@ -128,6 +129,7 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
    * Main action to fetch data based on current state.
    */
   async function fetchPage(overrideOptions?: Partial<TFilters> & { page?: number }) {
+    const requestId = ++latestRequestId
     loading.value = true
     error.value = null
     try {
@@ -139,6 +141,10 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
 
       const res = await source(fetchParams)
 
+      if (requestId !== latestRequestId) {
+        return
+      }
+
       items.value = res.data
       page.value = res.page
       itemPerPage.value = res.item_per_page
@@ -146,10 +152,16 @@ export function usePaginatedCollection<TItem, TFilters extends QueryOptions = Qu
       nextPage.value = res.next_page
       previousPage.value = res.previous_page
     } catch (err: unknown) {
+      if (requestId !== latestRequestId) {
+        return
+      }
+
       error.value = err
       throw err
     } finally {
-      loading.value = false
+      if (requestId === latestRequestId) {
+        loading.value = false
+      }
     }
   }
 

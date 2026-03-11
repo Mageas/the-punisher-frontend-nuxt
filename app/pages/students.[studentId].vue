@@ -231,7 +231,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       </div>
 
       <div class="mb-8 space-y-4">
-        <HistoryPendingPunishmentsSection
+        <PendingPunishmentsSection
           :punishments="pendingPunishments"
           :show-count="true"
           :badge-text="
@@ -252,7 +252,7 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       </div>
 
       <div class="mb-8 space-y-4">
-        <HistoryAvailableBonusesSection
+        <AvailableBonusesSection
           :bonuses="availableBonuses"
           :badge-text="formatRatio(kpis.available_bonus_points, kpis.total_bonus_points)"
           :badge-help-text="t('common.kpiPopover.bonusAvailability')"
@@ -266,8 +266,10 @@ watch(studentId, async (nextStudentId, previousStudentId) => {
       </div>
 
       <div class="mb-8 space-y-4">
-        <HistoryPenaltiesSection
+        <PenaltiesSection
           :penalties="penalties"
+          :title="t('common.titles.penalties')"
+          :empty-label="t('studentProfile.empty.penalties')"
           :badge-text="formatRatio(kpis.penalty_count, kpis.total_penalty_count)"
           :badge-help-text="t('common.kpiPopover.studentPenaltiesProgress')"
           :page="penaltiesPage"

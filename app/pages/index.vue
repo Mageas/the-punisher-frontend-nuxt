@@ -1,68 +1,145 @@
 <script setup lang="ts">
 import type { DashboardResponse } from '~/types/api'
-import { formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
+import {
+  createLatestOnlyAsyncRunner,
+  resetDashboardSectionPageOnCreate,
+  type DashboardSectionKey,
+} from '~/lib/dashboard-page'
+import { computeTotalPages, formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
 import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMenu.vue'
 
 const { t } = useI18n()
-const route = useRoute()
+const nuxtApp = useNuxtApp()
 
 // Services
 const dashboardService = useDashboardService()
-const punishmentService = usePunishmentService()
 
 // Classroom filter
 const selectedClassroomId = ref<string>('')
 
 // Dashboard data
-const dashboard = ref<DashboardResponse | null>(null)
-const loading = ref(true)
+const dashboard = useState<DashboardResponse | null>('dashboard:data', () => null)
+const runLatestDashboardFetch = createLatestOnlyAsyncRunner<DashboardResponse>()
+
+const {
+  punishments: pendingPunishments,
+  loading: loadingPunishments,
+  page: punishmentsPage,
+  previousPage: previousPunishmentsPage,
+  totalCount: punishmentsTotal,
+  itemPerPage: punishmentsPerPage,
+  fetchPunishments,
+  gotoPage: gotoPunishmentsPage,
+  resolvePunishment: resolvePunishmentApi,
+} = useDashboardPunishments(selectedClassroomId)
+
+const {
+  bonuses: availableBonuses,
+  loading: loadingBonuses,
+  page: bonusesPage,
+  totalCount: bonusesTotal,
+  itemPerPage: bonusesPerPage,
+  fetchBonuses,
+  gotoPage: gotoBonusesPage,
+} = useDashboardBonuses(selectedClassroomId)
+
+const {
+  penalties,
+  loading: loadingPenalties,
+  page: penaltiesPage,
+  totalCount: penaltiesTotal,
+  itemPerPage: penaltiesPerPage,
+  fetchPenalties,
+  gotoPage: gotoPenaltiesPage,
+} = useDashboardPenalties(selectedClassroomId)
+
+const penaltiesTotalPages = computed(() =>
+  computeTotalPages(penaltiesTotal.value, penaltiesPerPage.value),
+)
+const bonusesTotalPages = computed(() =>
+  computeTotalPages(bonusesTotal.value, bonusesPerPage.value),
+)
+const punishmentsTotalPages = computed(() =>
+  computeTotalPages(punishmentsTotal.value, punishmentsPerPage.value),
+)
 
 // Modal states
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
 
-async function fetchDashboard() {
-  loading.value = true
+async function fetchDashboard(classroomId = selectedClassroomId.value) {
+  const response = await runLatestDashboardFetch(() =>
+    dashboardService.getDashboard({
+      classroomId: classroomId || undefined,
+    }),
+  )
 
-  try {
-    dashboard.value = await dashboardService.getDashboard({
-      classroomId: selectedClassroomId.value || undefined,
-    })
-  } finally {
-    loading.value = false
+  if (response) {
+    dashboard.value = response
   }
 }
 
 async function resolvePunishment(id: string) {
-  await punishmentService.resolvePunishment(id, {})
+  await resolvePunishmentApi(id)
+}
+
+async function loadAllData(options?: {
+  classroomId?: string
+  bonusesPage?: number
+  penaltiesPage?: number
+  punishmentsPage?: number
+}) {
+  await Promise.all([
+    fetchDashboard(options?.classroomId ?? selectedClassroomId.value),
+    fetchPunishments(
+      options?.punishmentsPage !== undefined ? { page: options.punishmentsPage } : undefined,
+    ),
+    fetchBonuses(options?.bonusesPage !== undefined ? { page: options.bonusesPage } : undefined),
+    fetchPenalties(
+      options?.penaltiesPage !== undefined ? { page: options.penaltiesPage } : undefined,
+    ),
+  ])
 }
 
 // Refresh dashboard after modal creation
-async function onModalCreated() {
-  await fetchDashboard()
+async function onModalCreated(section: DashboardSectionKey) {
+  const pages = {
+    bonuses: bonusesPage.value,
+    penalties: penaltiesPage.value,
+    punishments: punishmentsPage.value,
+  }
+  const gotoPage = {
+    bonuses: gotoBonusesPage,
+    penalties: gotoPenaltiesPage,
+    punishments: gotoPunishmentsPage,
+  }
+  const didResetPage = await resetDashboardSectionPageOnCreate(section, pages, gotoPage)
+
+  await loadAllData({
+    bonusesPage: didResetPage && section === 'bonuses' ? 1 : undefined,
+    penaltiesPage: didResetPage && section === 'penalties' ? 1 : undefined,
+    punishmentsPage: didResetPage && section === 'punishments' ? 1 : undefined,
+  })
+}
+
+async function onPunishmentResolved() {
+  await loadAllData()
+
+  if (pendingPunishments.value.length === 0 && previousPunishmentsPage.value !== null) {
+    await gotoPunishmentsPage(previousPunishmentsPage.value)
+  }
 }
 
 // Watch filter changes
-watch(selectedClassroomId, async () => {
-  await fetchDashboard()
+watch(selectedClassroomId, async (nextClassroomId, previousClassroomId) => {
+  if (nextClassroomId === previousClassroomId) return
+
+  await loadAllData({ classroomId: nextClassroomId })
 })
 
-const { data: initialData } = await useAsyncData(
-  () => `dashboard:initial:${route.fullPath}`,
-  async () => {
-    return dashboardService.getDashboard({
-      classroomId: selectedClassroomId.value || undefined,
-    })
-  },
-  {
-    server: true,
-  },
-)
-
-if (initialData.value) {
-  dashboard.value = initialData.value
-  loading.value = false
+if (import.meta.server || !nuxtApp.isHydrating) {
+  await loadAllData()
 }
 </script>
 
@@ -103,24 +180,44 @@ if (initialData.value) {
 
       <!-- Historique Récent (Split View) -->
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <DashboardRecentPenalties
-          :penalties="dashboard.recent_penalties"
+        <PenaltiesSection
+          :penalties="penalties"
+          :title="t('common.titles.recentPenalties')"
+          :empty-label="t('common.empty.noPenalties')"
           :badge-text="`${dashboard.kpis.penalty_count}`"
           :badge-help-text="t('common.kpiPopover.dashboardRecentPenalties')"
+          :page="penaltiesPage"
+          :total-pages="penaltiesTotalPages"
+          :loading="loadingPenalties"
+          list-class="space-y-3"
+          show-student-details
+          @update:page="gotoPenaltiesPage($event)"
         />
-        <DashboardRecentBonuses
-          :bonuses="dashboard.recent_bonuses"
+        <AvailableBonusesSection
+          :bonuses="availableBonuses"
+          :title="t('common.titles.recentBonuses')"
+          :empty-label="t('common.empty.noBonuses')"
           :badge-text="
             formatRatio(dashboard.kpis.available_bonus_points, dashboard.kpis.total_bonus_points)
           "
           :badge-help-text="t('common.kpiPopover.bonusAvailability')"
+          :page="bonusesPage"
+          :total-pages="bonusesTotalPages"
+          :loading="loadingBonuses"
+          list-class="space-y-3"
+          show-student-details
+          @update:page="gotoBonusesPage($event)"
         />
       </div>
 
       <!-- Punitions en attente -->
       <div class="mt-8">
-        <DashboardPendingPunishments
-          :punishments="dashboard.pending_punishments"
+        <PendingPunishmentsSection
+          :punishments="pendingPunishments"
+          :title="t('common.titles.pendingPunishments')"
+          :empty-label="t('common.empty.noPunishments')"
+          :show-count="true"
+          compact
           :badge-text="
             formatPunishmentsProgress(
               dashboard.kpis.total_punishment_count,
@@ -129,8 +226,12 @@ if (initialData.value) {
             )
           "
           :badge-help-text="t('common.kpiPopover.pendingPunishmentsProgress')"
+          :page="punishmentsPage"
+          :total-pages="punishmentsTotalPages"
+          :loading="loadingPunishments"
           :resolve-fn="resolvePunishment"
-          @resolved="onModalCreated"
+          @resolved="onPunishmentResolved"
+          @update:page="gotoPunishmentsPage($event)"
         />
       </div>
     </template>
@@ -139,17 +240,17 @@ if (initialData.value) {
     <BonusCreateModal
       v-model:open="showBonusModal"
       :preselected-classroom-id="selectedClassroomId || null"
-      @created="onModalCreated"
+      @created="onModalCreated('bonuses')"
     />
     <PenaltyCreateModal
       v-model:open="showPenaltyModal"
       :preselected-classroom-id="selectedClassroomId || null"
-      @created="onModalCreated"
+      @created="onModalCreated('penalties')"
     />
     <PunishmentCreateModal
       v-model:open="showPunishmentModal"
       :preselected-classroom-id="selectedClassroomId || null"
-      @created="onModalCreated"
+      @created="onModalCreated('punishments')"
     />
   </div>
 </template>

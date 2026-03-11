@@ -103,6 +103,7 @@
       * "Punitions en attente" → `punitions résolues / total (punitions en retard)`.
   * **Historique Récent (Split View) :**
     * *N'affiche que les événements liés à la sélection.*
+    * Pagination inline par section, comme sur le profil élève (`penalties_page`, `bonuses_page`, `punishments_page`, `item_per_page=5`).
     * **Colonne Gauche (Dernières Pénalités) :**
       * Header : "Dernières pénalités" + badge KPI.
       * Plus de badge "Récent".
