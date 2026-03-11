@@ -69,6 +69,53 @@
 
   /* Interactive hover */
   --color-secondary-hover: var(--secondary-hover);
+
+  /* Destructive foreground */
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Overlay backdrop */
+  --color-overlay: var(--overlay);
+  --color-overlay-blur: var(--overlay-blur);
+  --color-overlay-heavy: var(--overlay-heavy);
+
+  /* Schedule: every-week pattern */
+  --color-schedule-weekly: var(--schedule-weekly);
+  --color-schedule-weekly-bg-subtle: var(--schedule-weekly-bg-subtle);
+  --color-schedule-weekly-bg-subtle-hover: var(--schedule-weekly-bg-subtle-hover);
+  --color-schedule-weekly-border: var(--schedule-weekly-border);
+  --color-schedule-weekly-drag: var(--schedule-weekly-drag);
+
+  /* Schedule: selection/editing bar borders */
+  --color-schedule-selecting-border: var(--schedule-selecting-border);
+  --color-schedule-editing-border: var(--schedule-editing-border);
+
+  /* Schedule: vacation exception */
+  --color-schedule-vacation: var(--schedule-vacation);
+  --color-schedule-vacation-bg: var(--schedule-vacation-bg);
+  --color-schedule-vacation-foreground: var(--schedule-vacation-foreground);
+  --color-schedule-vacation-ring: var(--schedule-vacation-ring);
+  --color-schedule-vacation-button: var(--schedule-vacation-button);
+  --color-schedule-vacation-button-hover: var(--schedule-vacation-button-hover);
+  --color-schedule-vacation-button-foreground: var(--schedule-vacation-button-foreground);
+
+  /* Schedule: holiday exception */
+  --color-schedule-holiday: var(--schedule-holiday);
+  --color-schedule-holiday-bg: var(--schedule-holiday-bg);
+  --color-schedule-holiday-foreground: var(--schedule-holiday-foreground);
+  --color-schedule-holiday-ring: var(--schedule-holiday-ring);
+  --color-schedule-holiday-border: var(--schedule-holiday-border);
+  --color-schedule-holiday-text: var(--schedule-holiday-text);
+  --color-schedule-holiday-bg-hover: var(--schedule-holiday-bg-hover);
+
+  /* Calendar: interactive hover */
+  --color-calendar-hover-bg: var(--calendar-hover-bg);
+  --color-calendar-hover-foreground: var(--calendar-hover-foreground);
+
+  /* Calendar: date range selection */
+  --color-calendar-selection-bg: var(--calendar-selection-bg);
+  --color-calendar-selection-foreground: var(--calendar-selection-foreground);
+  --color-calendar-selection-boundary: var(--calendar-selection-boundary);
+  --color-calendar-selection-boundary-foreground: var(--calendar-selection-boundary-foreground);
 }
 
 :root {
@@ -132,6 +179,53 @@
 
   /* Interactive hover */
   --secondary-hover: oklch(0.97 0 0 / 40%);
+
+  /* Destructive foreground */
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Overlay backdrop */
+  --overlay: oklch(0 0 0 / 60%);
+  --overlay-blur: oklch(0 0 0 / 30%);
+  --overlay-heavy: oklch(0 0 0 / 80%);
+
+  /* Schedule: every-week pattern (violet) */
+  --schedule-weekly: oklch(0.606 0.25 292.717);
+  --schedule-weekly-bg-subtle: oklch(0.606 0.25 292.717 / 15%);
+  --schedule-weekly-bg-subtle-hover: oklch(0.606 0.25 292.717 / 25%);
+  --schedule-weekly-border: oklch(0.606 0.25 292.717 / 40%);
+  --schedule-weekly-drag: oklch(0.606 0.25 292.717 / 20%);
+
+  /* Schedule: selection/editing bar borders */
+  --schedule-selecting-border: oklch(0.811 0.111 293.571);
+  --schedule-editing-border: oklch(0.848 0.157 84.073);
+
+  /* Schedule: vacation exception (emerald) */
+  --schedule-vacation: oklch(0.696 0.17 162.48);
+  --schedule-vacation-bg: oklch(0.95 0.052 163.051);
+  --schedule-vacation-foreground: oklch(0.365 0.126 152.288);
+  --schedule-vacation-ring: oklch(0.696 0.17 162.48);
+  --schedule-vacation-button: oklch(0.596 0.145 163.225);
+  --schedule-vacation-button-hover: oklch(0.527 0.132 163.541);
+  --schedule-vacation-button-foreground: oklch(1 0 0);
+
+  /* Schedule: holiday exception (rose) */
+  --schedule-holiday: oklch(0.645 0.246 16.439);
+  --schedule-holiday-bg: oklch(0.941 0.03 12.58);
+  --schedule-holiday-foreground: oklch(0.395 0.15 17.262);
+  --schedule-holiday-ring: oklch(0.645 0.246 16.439);
+  --schedule-holiday-border: oklch(0.81 0.117 11.638);
+  --schedule-holiday-text: oklch(0.514 0.222 16.935);
+  --schedule-holiday-bg-hover: oklch(0.971 0.015 12.422);
+
+  /* Calendar: interactive hover (sky) */
+  --calendar-hover-bg: oklch(0.951 0.026 236.824);
+  --calendar-hover-foreground: oklch(0.443 0.11 240.79);
+
+  /* Calendar: date range selection (indigo) */
+  --calendar-selection-bg: oklch(0.943 0.029 294.588);
+  --calendar-selection-foreground: oklch(0.399 0.118 276.966);
+  --calendar-selection-boundary: oklch(0.585 0.233 277.117);
+  --calendar-selection-boundary-foreground: oklch(1 0 0);
 }
 
 .dark {
@@ -185,6 +279,34 @@
 
   /* Interactive hover */
   --secondary-hover: oklch(0.269 0 0 / 40%);
+
+  /* Destructive foreground */
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Schedule: selection/editing bar borders */
+  --schedule-selecting-border: oklch(0.472 0.17 292.571);
+  --schedule-editing-border: oklch(0.555 0.163 48.998);
+
+  /* Schedule: vacation exception (emerald dark) */
+  --schedule-vacation-bg: oklch(0.365 0.126 152.288 / 40%);
+  --schedule-vacation-foreground: oklch(0.905 0.093 164.15);
+
+  /* Schedule: holiday exception (rose dark) */
+  --schedule-holiday-bg: oklch(0.395 0.15 17.262 / 40%);
+  --schedule-holiday-foreground: oklch(0.892 0.058 10.001);
+  --schedule-holiday-border: oklch(0.514 0.222 16.935);
+  --schedule-holiday-text: oklch(0.81 0.117 11.638);
+  --schedule-holiday-bg-hover: oklch(0.271 0.105 12.094);
+
+  /* Calendar: hover (sky dark) */
+  --calendar-hover-bg: oklch(0.391 0.09 240.876 / 30%);
+  --calendar-hover-foreground: oklch(0.901 0.058 230.902);
+
+  /* Calendar: selection (indigo dark) */
+  --calendar-selection-bg: oklch(0.337 0.093 281.376 / 30%);
+  --calendar-selection-foreground: oklch(0.87 0.065 274.039);
+  --calendar-selection-boundary: oklch(0.673 0.207 276.966);
+  --calendar-selection-boundary-foreground: oklch(0.257 0.09 281.288);
 }
 
 @layer base {

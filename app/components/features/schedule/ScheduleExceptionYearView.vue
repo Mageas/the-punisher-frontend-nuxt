@@ -129,14 +129,14 @@ function getCellClass(date: DateValue, month: number): string {
 
   if (exType === 'vacation') {
     return cn(
-      'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200 rounded-sm',
-      isDateToday && 'ring-1 ring-emerald-500',
+      'bg-schedule-vacation-bg text-schedule-vacation-foreground rounded-sm',
+      isDateToday && 'ring-1 ring-schedule-vacation-ring',
     )
   }
   if (exType === 'public_holiday') {
     return cn(
-      'bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-200 rounded-sm',
-      isDateToday && 'ring-1 ring-rose-500',
+      'bg-schedule-holiday-bg text-schedule-holiday-foreground rounded-sm',
+      isDateToday && 'ring-1 ring-schedule-holiday-ring',
     )
   }
 
@@ -181,10 +181,10 @@ function getCellClass(date: DateValue, month: number): string {
               :class="
                 cn(
                   'flex h-6 w-full items-center justify-center rounded-sm text-xs transition-colors',
-                  'enabled:cursor-pointer enabled:hover:bg-sky-100 enabled:hover:text-sky-800 dark:enabled:hover:bg-sky-900/30 dark:enabled:hover:text-sky-200',
+                  'enabled:cursor-pointer enabled:hover:bg-calendar-hover-bg enabled:hover:text-calendar-hover-foreground',
                   'focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:ring-2',
-                  'data-[selected=true]:bg-indigo-100 data-[selected=true]:text-indigo-800 dark:data-[selected=true]:bg-indigo-900/30 dark:data-[selected=true]:text-indigo-200',
-                  'data-[boundary=true]:!bg-indigo-500 data-[boundary=true]:!text-white dark:data-[boundary=true]:!bg-indigo-400 dark:data-[boundary=true]:!text-indigo-950',
+                  'data-[selected=true]:bg-calendar-selection-bg data-[selected=true]:text-calendar-selection-foreground',
+                  'data-[boundary=true]:!bg-calendar-selection-boundary data-[boundary=true]:!text-calendar-selection-boundary-foreground',
                   getCellClass(date, m.month),
                 )
               "

@@ -34,7 +34,7 @@ const { t } = useI18n()
 <template>
   <DialogPortal>
     <DialogOverlay
-      class="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 supports-[backdrop-filter]:bg-black/30 supports-[backdrop-filter]:backdrop-blur-[2px]"
+      class="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 supports-[backdrop-filter]:bg-overlay-blur supports-[backdrop-filter]:backdrop-blur-[2px]"
     >
       <DialogContent
         :class="

@@ -32,8 +32,8 @@ const selectionTitle = computed(() =>
 
 const borderClass = computed(() =>
   props.isEditing
-    ? 'border-amber-300 dark:border-amber-700'
-    : 'border-violet-300 dark:border-violet-700',
+    ? 'border-schedule-editing-border'
+    : 'border-schedule-selecting-border',
 )
 </script>
 
@@ -93,7 +93,7 @@ const borderClass = computed(() =>
           <div v-if="props.hasCompleteSelection" class="flex shrink-0 gap-2">
             <Button
               size="sm"
-              class="flex-1 cursor-pointer gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 sm:flex-none dark:bg-emerald-600 dark:hover:bg-emerald-700"
+              class="flex-1 cursor-pointer gap-1.5 bg-schedule-vacation-button text-schedule-vacation-button-foreground hover:bg-schedule-vacation-button-hover sm:flex-none"
               data-testid="schedule-exception-save-vacation"
               @click="emit('save-vacation')"
             >
@@ -103,7 +103,7 @@ const borderClass = computed(() =>
             <Button
               size="sm"
               variant="outline"
-              class="flex-1 cursor-pointer gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50 sm:flex-none dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950"
+              class="flex-1 cursor-pointer gap-1.5 border-schedule-holiday-border text-schedule-holiday-text hover:bg-schedule-holiday-bg-hover sm:flex-none"
               data-testid="schedule-exception-save-holiday"
               @click="emit('save-holiday')"
             >
