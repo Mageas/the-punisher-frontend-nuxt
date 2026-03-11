@@ -1,6 +1,7 @@
 import type {
   ApiRequestOptions,
   Penalty,
+  PenaltyBulkCreateData,
   PaginatedResponse,
   PenaltyCreateData,
   PenaltyUpdateData,
@@ -39,6 +40,13 @@ export function usePenaltyService() {
     })
   }
 
+  async function createBulkPenalties(classroomId: string, data: PenaltyBulkCreateData) {
+    return $api<Penalty[]>(`/classrooms/${classroomId}/penalties/bulk`, {
+      method: 'POST',
+      body: data,
+    })
+  }
+
   async function updatePenalty(penaltyId: string, data: PenaltyUpdateData) {
     return $api<Penalty>(`/penalties/${penaltyId}`, {
       method: 'PUT',
@@ -55,6 +63,7 @@ export function usePenaltyService() {
   return {
     getPenalties,
     createPenalty,
+    createBulkPenalties,
     updatePenalty,
     deletePenalty,
   }

@@ -35,6 +35,16 @@ export interface PenaltyCreateData {
 }
 
 /**
+ * Data required to create penalties in bulk for one classroom.
+ */
+export interface PenaltyBulkCreateData {
+  student_ids: string[]
+  penalty_type_id: string
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
  * Data accepted to update a penalty.
  */
 export interface PenaltyUpdateData {

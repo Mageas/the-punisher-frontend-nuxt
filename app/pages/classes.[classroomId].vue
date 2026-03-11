@@ -33,7 +33,13 @@ const addStudentId = ref('')
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const showRemoveModal = ref(false)
+const showBulkBonusModal = ref(false)
+const showBulkPenaltyModal = ref(false)
+const showBulkPunishmentModal = ref(false)
 const studentToRemove = ref<Student | null>(null)
+const bulkActionStudents = ref<Student[]>([])
+
+const studentsSection = ref<{ exitSelectionMode: () => void } | null>(null)
 
 const classroomName = computed(() => classroom.value?.name ?? '')
 
@@ -115,6 +121,32 @@ async function onDeleteConfirmed() {
   await navigateTo('/classes')
 }
 
+function resolveBulkStudents(studentIds: string[]) {
+  bulkActionStudents.value = classroomStudents.value.filter((student) =>
+    studentIds.includes(student.id),
+  )
+}
+
+function onBulkBonus(studentIds: string[]) {
+  resolveBulkStudents(studentIds)
+  showBulkBonusModal.value = true
+}
+
+function onBulkPenalty(studentIds: string[]) {
+  resolveBulkStudents(studentIds)
+  showBulkPenaltyModal.value = true
+}
+
+function onBulkPunishment(studentIds: string[]) {
+  resolveBulkStudents(studentIds)
+  showBulkPunishmentModal.value = true
+}
+
+async function onBulkActionCreated() {
+  await fetchClassroomProfile()
+  studentsSection.value?.exitSelectionMode()
+}
+
 await fetchClassroomProfile()
 
 watch(classroomId, async (nextClassroomId, previousClassroomId) => {
@@ -142,6 +174,7 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
       <ClassroomProfileKpiCards :kpis="classroomKpis" />
 
       <ClassroomProfileStudentsSection
+        ref="studentsSection"
         v-model="addStudentId"
         :students="classroomStudents"
         :student-count="classroom.student_count"
@@ -150,6 +183,9 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
         keep-focus-on-student-select
         @submit-add="addStudentToClassroom"
         @remove-student="openRemoveModal"
+        @bulk-bonus="onBulkBonus"
+        @bulk-penalty="onBulkPenalty"
+        @bulk-punishment="onBulkPunishment"
       />
     </template>
 
@@ -178,6 +214,23 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
       :classroom-name="classroomName"
       :remove-fn="removeStudentFromClass"
       @confirmed="onActionConfirmed"
+    />
+    <ClassroomBulkBonusModal
+      v-model:open="showBulkBonusModal"
+      :students="bulkActionStudents"
+      @created="onBulkActionCreated"
+    />
+    <ClassroomBulkPenaltyModal
+      v-model:open="showBulkPenaltyModal"
+      :students="bulkActionStudents"
+      :classroom-id="classroomId"
+      @created="onBulkActionCreated"
+    />
+    <ClassroomBulkPunishmentModal
+      v-model:open="showBulkPunishmentModal"
+      :students="bulkActionStudents"
+      :classroom-id="classroomId"
+      @created="onBulkActionCreated"
     />
   </div>
 </template>

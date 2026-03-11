@@ -1,6 +1,7 @@
 import type {
   ApiRequestOptions,
   Punishment,
+  PunishmentBulkCreateData,
   PaginatedResponse,
   PunishmentCreateData,
   PunishmentResolveData,
@@ -50,6 +51,13 @@ export function usePunishmentService() {
     })
   }
 
+  async function createBulkPunishments(classroomId: string, data: PunishmentBulkCreateData) {
+    return $api<Punishment[]>(`/classrooms/${classroomId}/punishments/bulk`, {
+      method: 'POST',
+      body: data,
+    })
+  }
+
   async function updatePunishment(punishmentId: string, data: PunishmentUpdateData) {
     return $api<Punishment>(`/punishments/${punishmentId}`, {
       method: 'PUT',
@@ -73,6 +81,7 @@ export function usePunishmentService() {
   return {
     getPunishments,
     createPunishment,
+    createBulkPunishments,
     updatePunishment,
     deletePunishment,
     resolvePunishment,
