@@ -1,0 +1,74 @@
+<script setup lang="ts">
+interface PenaltySectionItem {
+  id: string
+  penalty_type_name: string
+  occurred_at?: string | null
+  created_at: string
+  student_id?: string
+  student_first_name?: string
+  student_last_name?: string
+}
+
+const props = withDefaults(
+  defineProps<{
+    penalties: PenaltySectionItem[]
+    title: string
+    emptyLabel: string
+    badgeText?: string
+    badgeHelpText?: string
+    page?: number
+    totalPages?: number
+    loading?: boolean
+    disabled?: boolean
+    listClass?: string
+    showStudentDetails?: boolean
+  }>(),
+  {
+    badgeText: undefined,
+    badgeHelpText: undefined,
+    page: 1,
+    totalPages: 1,
+    loading: false,
+    disabled: false,
+    listClass: 'space-y-2',
+    showStudentDetails: false,
+  },
+)
+
+const emit = defineEmits<{
+  'update:page': [value: number]
+}>()
+</script>
+
+<template>
+  <div>
+    <SectionHeaderRow
+      :title="props.title"
+      :page="props.page"
+      :total-pages="props.totalPages"
+      :loading="props.loading"
+      :disabled="props.disabled"
+      :badge-text="props.badgeText"
+      :badge-help-text="props.badgeHelpText"
+      badge-class="text-muted-foreground"
+      @update:page="emit('update:page', $event)"
+    />
+
+    <SectionListBlock
+      :is-empty="props.penalties.length === 0"
+      :empty-label="props.emptyLabel"
+      :list-class="props.listClass"
+    >
+      <PenaltyCard
+        v-for="penalty in props.penalties"
+        :key="penalty.id"
+        :penalty-type-name="penalty.penalty_type_name"
+        :occurred-at="penalty.occurred_at ?? penalty.created_at"
+        :created-at="penalty.created_at"
+        :student-id="props.showStudentDetails ? penalty.student_id : undefined"
+        :student-first-name="props.showStudentDetails ? penalty.student_first_name : undefined"
+        :student-last-name="props.showStudentDetails ? penalty.student_last_name : undefined"
+      />
+    </SectionListBlock>
+  </div>
+</template>

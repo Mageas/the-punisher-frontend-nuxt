@@ -13,6 +13,7 @@ export function usePunishmentService() {
   async function getPunishments(
     options?: {
       page?: number
+      item_per_page?: number
       student_id?: string
       classroom_id?: string
       punishment_type_id?: string
@@ -28,6 +29,7 @@ export function usePunishmentService() {
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
     if (options?.student_id) params.student_id = options.student_id
     if (options?.classroom_id) params.classroom_id = options.classroom_id
     if (options?.punishment_type_id) params.punishment_type_id = options.punishment_type_id

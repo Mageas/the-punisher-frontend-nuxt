@@ -13,6 +13,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 - **Event Metadata Forms:** Create and edit bonus/penalty/punishment entries with optional event datetime (`occurred_at`) and evaluation label (`evaluation_label`), plus classroom resolution during penalty creation when automatic rules depend on `next_lessons`.
 - **Business Date Display:** Lists, dashboard cards, and student history display the business event datetime (`occurred_at`) when available.
 - **Student Profile Navigation:** Inline per-section pagination (`< page/total >`) for punishments, bonuses, penalties, and history (profile requests use `item_per_page=5`, respect section page query params like `punishments_page` and `history_page`, keep default profile section states: punishments=`pending`, bonuses=`unused`, and automatically fallback to the previous section page after consume/resolve when the current page becomes empty).
+- **Dashboard Section Queries:** Dashboard KPIs still come from `/dashboard`, but the penalties / bonuses / punishments cards now fetch their own paginated `/penalties`, `/bonuses`, and `/punishments` lists with `item_per_page=5`, reuse the student-style section query params (`penalties_page`, `bonuses_page`, `punishments_page`), and keep the same default states for bonuses/punishments (`unused`, `pending`).
 - **Type Management:** Customizable types for bonuses, penalties, and punishments.
 - **Authentication:** Secure teacher login/registration with token rotation, email confirmation, and forgot/reset password flows.
 - **User Security Settings:** Dedicated user settings page to change password and revoke all active sessions.
@@ -37,10 +38,10 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## 📁 Architecture
 
 - `app/components/features`: Domain-specific components grouped by feature.
-- `app/components/shared`: Reusable cross-feature building blocks (for example `SectionHeaderPagination` and `LoadingButton` for pending form actions).
+- `app/components/shared`: Reusable cross-feature building blocks (for example `SectionHeaderPagination`, `AvailableBonusesSection`, `PenaltiesSection`, `PendingPunishmentsSection`, and `LoadingButton` for pending form actions).
 - `app/components/ui`: Reusable UI primitives (Shadcn).
 - `app/services`: API communication layer. **All API calls must go through services.**
-- `app/composables`: Reusable business logic and state orchestration, including `useApiActionState` to scope loading states to real API calls after frontend validation passes.
+- `app/composables`: Reusable business logic and state orchestration, including `useApiActionState` to scope loading states to real API calls after frontend validation passes and shared section composables reused by both dashboard and student-profile adapters.
 - `app/types/api`: TypeScript definitions for API responses and payloads.
 - `i18n/locales/fr.json`: Locale messages with shared keys centralized under `common.*` (`actions`, `labels`, `placeholders`, `states`, `titles`, etc.) and feature-specific keys kept only for domain wording.
 

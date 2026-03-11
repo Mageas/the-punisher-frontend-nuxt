@@ -1,6 +1,11 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
-import type { Bonus } from '~/types/api'
+
+type StudentBonusesFilters = {
+  state?: 'used' | 'unused'
+  search?: string
+}
+
 /**
  * Composable to fetch and manage a student's bonuses with pagination.
  */
@@ -8,33 +13,16 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   const bonusService = useBonusService()
   const studentService = useStudentService()
   const PROFILE_SECTION_PAGE_SIZE = 5
-  const paginated = usePaginatedCollection<
-    Bonus,
-    {
-      state?: 'used' | 'unused'
-      search?: string
-    }
-  >(
-    (options) =>
+  const section = useBonusesSection<StudentBonusesFilters>({
+    source: (options) =>
       studentService.getStudentBonuses(toValue(studentId), {
         ...options,
         item_per_page: PROFILE_SECTION_PAGE_SIZE,
       }),
-    {
-      pageKey: 'bonuses_page',
-      filterKeys: ['search', 'state'],
-      defaultFilters: { state: 'unused' },
-      stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
-    },
-  )
-
-  async function fetchBonuses(options?: {
-    page?: number
-    state?: 'used' | 'unused'
-    search?: string
-  }) {
-    await paginated.fetchPage(options)
-  }
+    filterKeys: ['search', 'state'],
+    defaultFilters: { state: 'unused' },
+    stateKey: `paginated:student:${toValue(studentId)}:bonuses`,
+  })
 
   async function useBonus(id: string) {
     await bonusService.useBonus(id, {})
@@ -45,17 +33,7 @@ export function useStudentBonuses(studentId: MaybeRefOrGetter<string>) {
   }
 
   return {
-    bonuses: paginated.items,
-    loading: paginated.loading,
-    page: paginated.page,
-    filters: paginated.filters,
-    itemPerPage: paginated.itemPerPage,
-    totalCount: paginated.totalCount,
-    nextPage: paginated.nextPage,
-    previousPage: paginated.previousPage,
-    fetchBonuses,
-    gotoPage: paginated.gotoPage,
-    applyFilters: paginated.applyFilters,
+    ...section,
     useBonus,
     deleteBonus,
   }

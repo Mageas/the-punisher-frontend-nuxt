@@ -12,6 +12,7 @@ export function usePenaltyService() {
   async function getPenalties(
     options?: {
       page?: number
+      item_per_page?: number
       student_id?: string
       classroom_id?: string
       penalty_type_id?: string
@@ -22,6 +23,7 @@ export function usePenaltyService() {
   ) {
     const params: Record<string, unknown> = {}
     if (options?.page) params.page = options.page
+    if (options?.item_per_page) params.item_per_page = options.item_per_page
     if (options?.student_id) params.student_id = options.student_id
     if (options?.classroom_id) params.classroom_id = options.classroom_id
     if (options?.penalty_type_id) params.penalty_type_id = options.penalty_type_id
