@@ -40,6 +40,17 @@ export interface PunishmentCreateData {
 }
 
 /**
+ * Data required to create punishments in bulk for one classroom.
+ */
+export interface PunishmentBulkCreateData {
+  student_ids: string[]
+  punishment_type_id: string
+  due_at?: string
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
  * Data accepted to update a punishment.
  */
 export interface PunishmentUpdateData {

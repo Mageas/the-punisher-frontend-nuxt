@@ -191,6 +191,32 @@
       "title": "Élèves de la classe",
       "searchPlaceholder": "Rechercher un élève à ajouter...",
       "empty": "Aucun élève dans cette classe."
+    },
+    "selection": {
+      "enter": "Sélectionner",
+      "exit": "Annuler",
+      "selectAll": "Tout sélectionner",
+      "deselectAll": "Tout désélectionner",
+      "none": "Aucun élève sélectionné",
+      "count": "{count} élève sélectionné | {count} élèves sélectionnés",
+      "addBonus": "Ajouter bonus",
+      "addPenalty": "Ajouter pénalité",
+      "addPunishment": "Ajouter punition"
+    },
+    "bulkBonus": {
+      "title": "Ajouter des bonus groupés",
+      "selectedStudents": "{count} élève concerné | {count} élèves concernés",
+      "progress": "{current}/{total}..."
+    },
+    "bulkPenalty": {
+      "title": "Ajouter une pénalité groupée",
+      "selectedStudents": "{count} élève concerné | {count} élèves concernés",
+      "progress": "{current}/{total}..."
+    },
+    "bulkPunishment": {
+      "title": "Ajouter des punitions groupées",
+      "selectedStudents": "{count} élève concerné | {count} élèves concernés",
+      "progress": "{current}/{total}..."
     }
   },
   "studentProfile": {

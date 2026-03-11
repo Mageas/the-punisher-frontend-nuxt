@@ -33,6 +33,11 @@ Notes cookie refresh:
 - Path cookie: `/v1/auth`
 - Le frontend doit utiliser `credentials: 'include'` pour `login`, `refresh`, `logout`, `change-password`.
 
+### 1.2.1 Isolation des donnees metier
+- Toutes les routes metier protegees retournent et modifient uniquement des donnees liees a l'utilisateur authentifie (`user_id`).
+- Cette isolation est enforcee a la fois dans les requetes SQL metier et par des contraintes PostgreSQL qui refusent les relations cross-user.
+- Hors perimetre: endpoints d'authentification, tables de tokens et gestion du cookie `refresh_token`.
+
 ### 1.3 Types de données
 - UUID: format canonique (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
 - Date liste: `YYYY-MM-DD` (ex: `2026-02-28`)
@@ -852,6 +857,27 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 - 204: no content
 - Erreurs: `invalid_request_body`, `validation_failed`, `student_classroom_relation_exists`, `student_or_classroom_not_found`, `not_found`, `unauthorized`
 
+### POST `/v1/classrooms/{classroom_id}/students/bulk`
+- Auth: oui
+- Body:
+```json
+{
+  "students": [
+    {
+      "first_name": "Jean",
+      "last_name": "DUPONT"
+    },
+    {
+      "first_name": "Alice",
+      "last_name": "MARTIN"
+    }
+  ]
+}
+```
+- Crée plusieurs élèves puis les rattache à la classe en une seule transaction.
+- 201: `ReturnStudentDto[]`
+- Erreurs: `validation_failed`, `invalid_request_body`, `classroom_not_found`, `student_or_classroom_not_found`, `not_found`, `unauthorized`
+
 ### DELETE `/v1/classrooms/{classroom_id}/students/{student_id}`
 - Auth: oui
 - 204: no content
@@ -1126,11 +1152,33 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 }
 ```
 - `classroom_id` est optionnel et n'est pas persisté.
-- Il est utilisé uniquement si une règle active en `due_at_mode=next_lessons` se déclenche.
+- Si `classroom_id` est fourni mais que la classe n'existe pas, l'API répond `404 classroom_not_found`.
+- Si `classroom_id` est fourni mais que l'élève n'appartient pas à cette classe, l'API répond `409 punishment_student_not_in_classroom`.
+- Il est utilisé pour calculer l'échéance si une règle active en `due_at_mode=next_lessons` se déclenche.
 - Si `classroom_id` est absent et que l'élève a exactement une classe, cette classe est utilisée automatiquement.
-- Si `classroom_id` est absent ou ne correspond à aucune classe de l'élève alors qu'une règle `next_lessons` a besoin d'une classe, l'API répond `409 punishment_classroom_not_resolved`.
+- Si `classroom_id` est absent alors qu'une règle `next_lessons` a besoin d'une classe et qu'aucune classe unique ne peut être déduite, l'API répond `409 punishment_classroom_not_resolved`.
 - 201: `ReturnPenaltyDto`
-- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `penalty_type_not_found`, `punishment_classroom_not_resolved`, `rule_due_at_not_computable`, `unauthorized`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `penalty_type_not_found`, `classroom_not_found`, `punishment_student_not_in_classroom`, `punishment_classroom_not_resolved`, `rule_due_at_not_computable`, `unauthorized`
+
+### POST `/v1/classrooms/{classroom_id}/penalties/bulk`
+- Auth: oui
+- Body:
+```json
+{
+  "student_ids": [
+    "11111111-1111-1111-1111-111111111111",
+    "22222222-2222-2222-2222-222222222222"
+  ],
+  "penalty_type_id": "44444444-4444-4444-4444-444444444444",
+  "occurred_at": "2026-02-10T09:00:00Z",
+  "evaluation_label": "Retard collectif"
+}
+```
+- La classe est portée par le path et n'est pas répétée dans le body.
+- Tous les élèves ciblés doivent appartenir à la classe; sinon l'opération entière est rollback.
+- Les règles automatiques `due_at_mode=next_lessons` utilisent la classe du path.
+- 201: `ReturnPenaltyDto[]`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `penalty_type_not_found`, `classroom_not_found`, `punishment_student_not_in_classroom`, `rule_due_at_not_computable`, `unauthorized`
 
 ### GET `/v1/penalties/`
 - Auth: oui
@@ -1232,6 +1280,26 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 - 201: `ReturnPunishmentDto`
 - Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `punishment_type_not_found`, `unauthorized`
 
+### POST `/v1/classrooms/{classroom_id}/punishments/bulk`
+- Auth: oui
+- Body:
+```json
+{
+  "student_ids": [
+    "11111111-1111-1111-1111-111111111111",
+    "22222222-2222-2222-2222-222222222222"
+  ],
+  "punishment_type_id": "55555555-5555-5555-5555-555555555555",
+  "due_at": "2026-03-15T18:00:00Z",
+  "occurred_at": "2026-02-10T09:00:00Z",
+  "evaluation_label": "Travail non rendu"
+}
+```
+- La classe est portée par le path et tous les élèves ciblés doivent y appartenir.
+- L'opération est atomique: si un élève est hors classe ou introuvable, aucune punition n'est créée.
+- 201: `ReturnPunishmentDto[]`
+- Erreurs: `validation_failed`, `invalid_request_body`, `student_not_found`, `punishment_type_not_found`, `classroom_not_found`, `punishment_student_not_in_classroom`, `unauthorized`
+
 ### GET `/v1/punishments/`
 - Auth: oui
 - Query params (métier):
@@ -1317,7 +1385,7 @@ curl -X POST "http://localhost:8080/v1/students/import" \
 - Règles métier:
   - `due_at_mode=days`: `due_at_after_days` est requis et doit être `>= 0`; `due_at_after_lessons` doit être absent.
   - `due_at_mode=next_lessons`: `due_at_after_lessons` est requis et doit être entre `1` et `5`; `due_at_after_days` peut être omis ou `null`.
-  - pour `next_lessons`, l'échéance automatique `due_at` est fixée au début du cours calculé à partir de la classe transmise lors de `POST /v1/penalties/`, ou de l'unique classe de l'élève si elle peut être déduite.
+  - pour `next_lessons`, l'échéance automatique `due_at` est fixée au début du cours calculé à partir de la classe transmise lors de `POST /v1/penalties/` ou `POST /v1/classrooms/{classroom_id}/penalties/bulk`, ou de l'unique classe de l'élève si elle peut être déduite.
 - 201: `ReturnRuleDto`
 - Erreurs: `validation_failed`, `invalid_request_body`, `punishment_type_not_found`, `penalty_type_not_found`, `unauthorized`
 
@@ -1346,6 +1414,9 @@ curl -X POST "http://localhost:8080/v1/students/import" \
   "is_active": false
 }
 ```
+- Si `due_at_mode` change, le backend remet automatiquement a `null` le champ oppose:
+  - vers `days`: `due_at_after_lessons = null`
+  - vers `next_lessons`: `due_at_after_days = null`
 - 200: `ReturnRuleDto`
 - Erreurs: `validation_failed`, `invalid_request_body`, `rule_not_found`, `punishment_type_not_found`, `penalty_type_not_found`, `not_found`, `unauthorized`
 
@@ -1396,6 +1467,7 @@ Exemple 200 (tronqué):
 - `created_from` / `created_to` filtrent la date métier `occurred_at` (et non la date technique `created_at`).
 - `created_at` reste la date technique de création; `occurred_at` est la date métier de l'événement.
 - `overdue=true` sur punishments signifie: `resolved_at IS NULL` ET `due_at < now()`.
+- Les champs float renvoyés par les réponses (`points`, `available_bonus_points`, `total_bonus_points`) sont arrondis à 2 décimales côté backend.
 - Pour les IDs path invalides (`{student_id}`, etc.), le backend renvoie `404 not_found` avec `error_details` indiquant le champ invalide.
 
 ## 5) Catalogue complet des erreurs disponibles
@@ -1575,6 +1647,19 @@ Exemple 200 (tronqué):
     {
       "field": "classroom_id",
       "error": "punishment_classroom_not_resolved"
+    }
+  ]
+}
+```
+- `punishment_student_not_in_classroom`
+```json
+{
+  "error": "punishment_student_not_in_classroom",
+  "error_code": 409,
+  "error_details": [
+    {
+      "field": "classroom_id",
+      "error": "punishment_student_not_in_classroom"
     }
   ]
 }

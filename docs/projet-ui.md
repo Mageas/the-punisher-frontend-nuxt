@@ -134,6 +134,13 @@
   * **Header :** Nom de la classe (H3) + Icones Edit/Delete (Ghost buttons).
   * **Body :** Nombre d'élèves + Stack d'avatars (3-4 cercles avec initiales).
   * **Footer :** Bouton "Gérer les élèves" (Width full, Outline).
+  * **Profil de classe :**
+    * Liste des élèves triée alphabétiquement avec ajout rapide d'un élève existant.
+    * Mode "Sélectionner" pour cocher plusieurs élèves de la classe.
+    * Barre d'actions groupées : "Ajouter bonus", "Ajouter pénalité", "Ajouter punition".
+    * Les modales bulk sont déjà scopées à la classe courante : aucun champ `Classe` n'est affiché.
+    * Les créations groupées de pénalités et punitions utilisent les endpoints bulk de la classe pour garantir une opération atomique côté API.
+    * La modale de punition groupée propose les prochains cours de la classe affichée pour préremplir l'échéance commune.
 
 ---
 

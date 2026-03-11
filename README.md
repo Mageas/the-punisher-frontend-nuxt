@@ -5,6 +5,7 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## 🚀 Features
 
 - **Classroom Management:** Create, update, and manage student rosters.
+- **Classroom Bulk Actions:** From a classroom roster, select multiple students to create grouped bonuses, penalties, or punishments without reselecting the classroom; penalty/punishment submissions use classroom-scoped bulk endpoints, and punishment due-date suggestions reuse the current classroom next lessons.
 - **Bulk Student Import:** Import students/classrooms from CSV/XLSX with translated row-level validation errors.
 - **Behavior Tracking:** Log penalties and assign punishments based on rules, with due dates computed either in days or from the next lessons.
 - **Reward System:** Distribute and track bonus points for students, including hundredth precision (`0.25`) during bonus entry.
