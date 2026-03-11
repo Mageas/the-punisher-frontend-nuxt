@@ -29,7 +29,6 @@ const mockStudentService = {
   getStudentBonuses: vi.fn(),
   getStudentHistory: vi.fn(),
   getStudentPenalties: vi.fn(),
-  getStudentPunishments: vi.fn(),
 }
 
 const mockBonusService = {
@@ -42,6 +41,7 @@ const mockPenaltyService = {
 }
 
 const mockPunishmentService = {
+  getPunishments: vi.fn(),
   resolvePunishment: vi.fn(),
   deletePunishment: vi.fn(),
 }
@@ -82,18 +82,19 @@ describe('student profile section page size', () => {
     mockStudentService.getStudentBonuses.mockResolvedValue(createPaginatedResponse())
     mockStudentService.getStudentHistory.mockResolvedValue(createPaginatedResponse())
     mockStudentService.getStudentPenalties.mockResolvedValue(createPaginatedResponse())
-    mockStudentService.getStudentPunishments.mockResolvedValue(createPaginatedResponse())
+    mockPunishmentService.getPunishments.mockResolvedValue(createPaginatedResponse())
   })
 
   it('uses item_per_page=5 for student punishments', async () => {
     const { fetchPunishments } = useStudentPunishments('student-1')
-    await fetchPunishments({ page: 2, state: 'pending' })
+    await fetchPunishments({ page: 2, state: 'pending', overdue: 'true' })
 
-    expect(mockStudentService.getStudentPunishments).toHaveBeenCalledWith(
-      'student-1',
+    expect(mockPunishmentService.getPunishments).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 2,
         state: 'pending',
+        overdue: 'true',
+        student_id: 'student-1',
         item_per_page: 5,
       }),
     )
@@ -151,11 +152,11 @@ describe('student profile section page size', () => {
     await fetchPunishments({ state: 'pending' })
     await fetchHistory()
 
-    expect(mockStudentService.getStudentPunishments).toHaveBeenCalledWith(
-      'student-1',
+    expect(mockPunishmentService.getPunishments).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 6,
         state: 'pending',
+        student_id: 'student-1',
         item_per_page: 5,
       }),
     )
@@ -168,7 +169,7 @@ describe('student profile section page size', () => {
     )
   })
 
-  it('keeps default student profile states when reading section pages from route query', async () => {
+  it('keeps default student profile panel filters on all when reading section pages from route query', async () => {
     mockRoute.query = {
       punishments_page: '2',
       bonuses_page: '3',
@@ -180,11 +181,10 @@ describe('student profile section page size', () => {
     await fetchPunishments()
     await fetchBonuses()
 
-    expect(mockStudentService.getStudentPunishments).toHaveBeenCalledWith(
-      'student-1',
+    expect(mockPunishmentService.getPunishments).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 2,
-        state: 'pending',
+        student_id: 'student-1',
         item_per_page: 5,
       }),
     )
@@ -192,7 +192,27 @@ describe('student profile section page size', () => {
       'student-1',
       expect.objectContaining({
         page: 3,
-        state: 'unused',
+        item_per_page: 5,
+      }),
+    )
+  })
+
+  it('reads custom punishment filter query keys from the route', async () => {
+    mockRoute.query = {
+      punishments_state: 'resolved',
+      punishments_overdue: 'true',
+    }
+
+    const { fetchPunishments } = useStudentPunishments('student-1')
+
+    await fetchPunishments()
+
+    expect(mockPunishmentService.getPunishments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        page: 1,
+        state: 'resolved',
+        overdue: 'true',
+        student_id: 'student-1',
         item_per_page: 5,
       }),
     )

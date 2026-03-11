@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
-import AvailableBonusesSection from '../AvailableBonusesSection.vue'
+import BonusesSection from '../BonusesSection.vue'
 
 const mockI18n = {
   t: (key: string) =>
     ({
-      'studentProfile.availableBonuses': 'Bonus disponibles',
-      'studentProfile.empty.availableBonuses': 'Aucun bonus disponible.',
+      'common.titles.bonuses': 'Bonus',
+      'common.empty.noBonuses': 'Aucun bonus trouvé.',
       'common.actions.consume': 'Consommer',
     })[key] ?? key,
 }
@@ -71,10 +71,10 @@ const ButtonStub = defineComponent({
   template: '<button type="button"><slot /></button>',
 })
 
-describe('AvailableBonusesSection', () => {
-  it('uses shared defaults and re-emits pagination/consume events', async () => {
+describe('BonusesSection', () => {
+  it('uses generic defaults and re-emits pagination/consume events', async () => {
     const useFn = vi.fn()
-    const wrapper = mount(AvailableBonusesSection, {
+    const wrapper = mount(BonusesSection, {
       props: {
         bonuses: [
           {
@@ -107,10 +107,10 @@ describe('AvailableBonusesSection', () => {
     const modal = wrapper.getComponent(BonusUseModalStub)
 
     expect(header.props()).toMatchObject({
-      title: 'Bonus disponibles',
+      title: 'Bonus',
     })
     expect(list.props()).toMatchObject({
-      emptyLabel: 'Aucun bonus disponible.',
+      emptyLabel: 'Aucun bonus trouvé.',
       listClass: 'space-y-2',
     })
     expect(card.props()).toMatchObject({
@@ -126,5 +126,33 @@ describe('AvailableBonusesSection', () => {
 
     expect(wrapper.emitted('update:page')).toEqual([[2]])
     expect(wrapper.emitted('used')).toEqual([[]])
+  })
+
+  it('does not render a consume action for already used bonuses', () => {
+    const wrapper = mount(BonusesSection, {
+      props: {
+        bonuses: [
+          {
+            id: 'bonus-1',
+            bonus_type_name: 'Participation',
+            points: 2,
+            created_at: '2026-03-08T10:00:00Z',
+            used_at: '2026-03-09T10:00:00Z',
+          },
+        ],
+        useFn: vi.fn(),
+      },
+      global: {
+        stubs: {
+          SectionHeaderRow: SectionHeaderRowStub,
+          SectionListBlock: SectionListBlockStub,
+          BonusCard: BonusCardStub,
+          BonusUseModal: BonusUseModalStub,
+          Button: ButtonStub,
+        },
+      },
+    })
+
+    expect(wrapper.findComponent(ButtonStub).exists()).toBe(false)
   })
 })

@@ -6,6 +6,7 @@ type PunishmentSectionQueryOptions = Record<string, PunishmentSectionQueryValue>
 interface UsePunishmentsSectionOptions<TFilters extends PunishmentSectionQueryOptions> {
   source: (options?: TFilters & { page?: number }) => Promise<PaginatedResponse<Punishment>>
   filterKeys: (keyof TFilters & string)[]
+  filterQueryKeys?: Partial<Record<keyof TFilters & string, string>>
   defaultFilters?: Partial<TFilters>
   stateKey: string
 }
@@ -16,6 +17,7 @@ export function usePunishmentsSection<TFilters extends PunishmentSectionQueryOpt
   const paginated = usePaginatedCollection<Punishment, TFilters>(options.source, {
     pageKey: 'punishments_page',
     filterKeys: options.filterKeys,
+    filterQueryKeys: options.filterQueryKeys,
     defaultFilters: options.defaultFilters,
     stateKey: options.stateKey,
   })

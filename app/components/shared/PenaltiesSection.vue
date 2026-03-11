@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SectionFilterOption } from '~/types/ui'
+
 interface PenaltySectionItem {
   id: string
   penalty_type_name: string
@@ -22,6 +24,8 @@ const props = withDefaults(
     disabled?: boolean
     listClass?: string
     showStudentDetails?: boolean
+    filterOptions?: SectionFilterOption[]
+    filterValue?: string
   }>(),
   {
     badgeText: undefined,
@@ -32,11 +36,14 @@ const props = withDefaults(
     disabled: false,
     listClass: 'space-y-2',
     showStudentDetails: false,
+    filterOptions: undefined,
+    filterValue: undefined,
   },
 )
 
 const emit = defineEmits<{
   'update:page': [value: number]
+  'update:filterValue': [value: string]
 }>()
 </script>
 
@@ -51,7 +58,10 @@ const emit = defineEmits<{
       :badge-text="props.badgeText"
       :badge-help-text="props.badgeHelpText"
       badge-class="text-muted-foreground"
+      :filter-options="props.filterOptions"
+      :filter-value="props.filterValue"
       @update:page="emit('update:page', $event)"
+      @update:filter-value="emit('update:filterValue', $event)"
     />
 
     <SectionListBlock

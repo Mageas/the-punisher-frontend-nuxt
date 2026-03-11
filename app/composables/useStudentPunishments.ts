@@ -3,6 +3,7 @@ import { toValue } from 'vue'
 
 type StudentPunishmentsFilters = {
   state?: 'pending' | 'resolved'
+  overdue?: 'true' | 'false'
   search?: string
 }
 
@@ -11,16 +12,20 @@ type StudentPunishmentsFilters = {
  */
 export function useStudentPunishments(studentId: MaybeRefOrGetter<string>) {
   const punishmentService = usePunishmentService()
-  const studentService = useStudentService()
   const PROFILE_SECTION_PAGE_SIZE = 5
   const section = usePunishmentsSection<StudentPunishmentsFilters>({
     source: (options) =>
-      studentService.getStudentPunishments(toValue(studentId), {
+      punishmentService.getPunishments({
         ...options,
+        student_id: toValue(studentId),
         item_per_page: PROFILE_SECTION_PAGE_SIZE,
       }),
-    filterKeys: ['search', 'state'],
-    defaultFilters: { state: 'pending' },
+    filterKeys: ['search', 'state', 'overdue'],
+    filterQueryKeys: {
+      search: 'punishments_search',
+      state: 'punishments_state',
+      overdue: 'punishments_overdue',
+    },
     stateKey: `paginated:student:${toValue(studentId)}:punishments`,
   })
 

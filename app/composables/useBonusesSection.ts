@@ -6,6 +6,7 @@ type BonusSectionQueryOptions = Record<string, BonusSectionQueryValue>
 interface UseBonusesSectionOptions<TFilters extends BonusSectionQueryOptions> {
   source: (options?: TFilters & { page?: number }) => Promise<PaginatedResponse<Bonus>>
   filterKeys: (keyof TFilters & string)[]
+  filterQueryKeys?: Partial<Record<keyof TFilters & string, string>>
   defaultFilters?: Partial<TFilters>
   stateKey: string
 }
@@ -16,6 +17,7 @@ export function useBonusesSection<TFilters extends BonusSectionQueryOptions>(
   const paginated = usePaginatedCollection<Bonus, TFilters>(options.source, {
     pageKey: 'bonuses_page',
     filterKeys: options.filterKeys,
+    filterQueryKeys: options.filterQueryKeys,
     defaultFilters: options.defaultFilters,
     stateKey: options.stateKey,
   })

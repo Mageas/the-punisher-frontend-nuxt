@@ -8,6 +8,15 @@ import {
 } from '~/lib/dashboard-page'
 import { computeTotalPages, formatPunishmentsProgress, formatRatio } from '~/lib/kpi-formatters'
 import TrackingCreateMenu from '~/components/features/tracking/TrackingCreateMenu.vue'
+import {
+  mapBonusApiFiltersToSectionFilter,
+  mapBonusSectionFilterToApiFilters,
+  mapPunishmentApiFiltersToSectionFilter,
+  mapPunishmentSectionFilterToApiFilters,
+  type BonusSectionFilter,
+  type PunishmentSectionFilter,
+  useTrackingOverviewSectionFilters,
+} from '~/composables/useTrackingOverviewSectionFilters'
 
 const { t } = useI18n()
 const nuxtApp = useNuxtApp()
@@ -25,25 +34,29 @@ const dashboard = useState<DashboardResponse | null>('dashboard:data', () => nul
 const runLatestDashboardFetch = createLatestOnlyAsyncRunner<DashboardResponse>()
 
 const {
-  punishments: pendingPunishments,
+  punishments: punishmentsSectionItems,
   loading: loadingPunishments,
   page: punishmentsPage,
   previousPage: previousPunishmentsPage,
   totalCount: punishmentsTotal,
   itemPerPage: punishmentsPerPage,
+  filters: punishmentsSectionFilters,
   fetchPunishments,
   gotoPage: gotoPunishmentsPage,
+  applyFilters: applyPunishmentsSectionFilters,
   resolvePunishment: resolvePunishmentApi,
 } = useDashboardPunishments(selectedClassroomId)
 
 const {
-  bonuses: availableBonuses,
+  bonuses: bonusesSectionItems,
   loading: loadingBonuses,
   page: bonusesPage,
   totalCount: bonusesTotal,
   itemPerPage: bonusesPerPage,
+  filters: bonusesSectionFilters,
   fetchBonuses,
   gotoPage: gotoBonusesPage,
+  applyFilters: applyBonusesSectionFilters,
 } = useDashboardBonuses(selectedClassroomId)
 
 const {
@@ -70,6 +83,22 @@ const punishmentsTotalPages = computed(() =>
 const showBonusModal = ref(false)
 const showPenaltyModal = ref(false)
 const showPunishmentModal = ref(false)
+
+const { bonusesFilterOptions, punishmentsFilterOptions } = useTrackingOverviewSectionFilters()
+
+const bonusesFilter = computed<BonusSectionFilter>({
+  get: () => mapBonusApiFiltersToSectionFilter(bonusesSectionFilters),
+  set: (value) => {
+    void applyBonusesSectionFilters(mapBonusSectionFilterToApiFilters(value))
+  },
+})
+
+const punishmentsFilter = computed<PunishmentSectionFilter>({
+  get: () => mapPunishmentApiFiltersToSectionFilter(punishmentsSectionFilters),
+  set: (value) => {
+    void applyPunishmentsSectionFilters(mapPunishmentSectionFilterToApiFilters(value))
+  },
+})
 
 async function fetchDashboard(classroomId = selectedClassroomId.value) {
   const response = await runLatestDashboardFetch(() =>
@@ -129,9 +158,17 @@ async function onModalCreated(section: DashboardSectionKey) {
 async function onPunishmentResolved() {
   await loadAllData()
 
-  if (pendingPunishments.value.length === 0 && previousPunishmentsPage.value !== null) {
+  if (punishmentsSectionItems.value.length === 0 && previousPunishmentsPage.value !== null) {
     await gotoPunishmentsPage(previousPunishmentsPage.value)
   }
+}
+
+function updateBonusesFilter(value: string) {
+  bonusesFilter.value = value as BonusSectionFilter
+}
+
+function updatePunishmentsFilter(value: string) {
+  punishmentsFilter.value = value as PunishmentSectionFilter
 }
 
 // Watch filter changes
@@ -201,9 +238,9 @@ if (import.meta.server || !nuxtApp.isHydrating) {
           show-student-details
           @update:page="gotoPenaltiesPage($event)"
         />
-        <AvailableBonusesSection
-          :bonuses="availableBonuses"
-          :title="t('common.titles.recentBonuses')"
+        <BonusesSection
+          :bonuses="bonusesSectionItems"
+          :title="t('common.titles.bonuses')"
           :empty-label="t('common.empty.noBonuses')"
           :badge-text="
             formatRatio(dashboard.kpis.available_bonus_points, dashboard.kpis.total_bonus_points)
@@ -212,17 +249,20 @@ if (import.meta.server || !nuxtApp.isHydrating) {
           :page="bonusesPage"
           :total-pages="bonusesTotalPages"
           :loading="loadingBonuses"
+          :filter-options="bonusesFilterOptions"
+          :filter-value="bonusesFilter"
           list-class="space-y-3"
           show-student-details
           @update:page="gotoBonusesPage($event)"
+          @update:filter-value="updateBonusesFilter"
         />
       </div>
 
-      <!-- Punitions en attente -->
+      <!-- Punitions -->
       <div class="mt-8">
-        <PendingPunishmentsSection
-          :punishments="pendingPunishments"
-          :title="t('common.titles.pendingPunishments')"
+        <PunishmentsSection
+          :punishments="punishmentsSectionItems"
+          :title="t('common.titles.punishments')"
           :empty-label="t('common.empty.noPunishments')"
           :show-count="true"
           compact
@@ -237,9 +277,12 @@ if (import.meta.server || !nuxtApp.isHydrating) {
           :page="punishmentsPage"
           :total-pages="punishmentsTotalPages"
           :loading="loadingPunishments"
+          :filter-options="punishmentsFilterOptions"
+          :filter-value="punishmentsFilter"
           :resolve-fn="resolvePunishment"
           @resolved="onPunishmentResolved"
           @update:page="gotoPunishmentsPage($event)"
+          @update:filter-value="updatePunishmentsFilter"
         />
       </div>
     </template>

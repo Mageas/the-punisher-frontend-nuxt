@@ -19,7 +19,7 @@ export function useDashboardBonuses(classroomId: MaybeRefOrGetter<string>) {
         item_per_page: DASHBOARD_SECTION_PAGE_SIZE,
       }),
     filterKeys: ['state'],
-    defaultFilters: { state: 'unused' },
+    filterQueryKeys: { state: 'bonuses_state' },
     stateKey: 'paginated:dashboard:bonuses',
   })
 }

@@ -104,18 +104,21 @@
   * **Historique Récent (Split View) :**
     * *N'affiche que les événements liés à la sélection.*
     * Pagination inline par section, comme sur le profil élève (`penalties_page`, `bonuses_page`, `punishments_page`, `item_per_page=5`).
+    * Filtres persistés dans l'URL uniquement quand ils correspondent à des filtres API réels : bonus (`bonuses_state`) et punitions (`punishments_state`, `punishments_overdue`).
+    * Valeur par défaut des filtres de panneaux : `Tous les bonus` et `Toutes les punitions`.
     * **Colonne Gauche (Dernières Pénalités) :**
       * Header : "Dernières pénalités" + badge KPI.
-      * Plus de badge "Récent".
+      * Pas de filtre dédié tant qu'aucun filtre API pertinent n'est exposé sur cette section.
       * Survol du badge : popover d'explication.
       * Liste : Cartes compactes (Nom, Motif, Heure).
-    * **Colonne Droite (Derniers Bonus) :**
-      * Header : "Derniers bonus" + badge KPI.
-      * Plus de badge "Récent".
+    * **Colonne Droite (Bonus) :**
+      * Header : "Bonus" + badge KPI.
+      * Filtres : disponibles, utilisés, tous.
       * Survol du badge : popover d'explication.
       * Liste : Cartes compactes (Nom, Type, Badge Statut).
-  * **Punitions en attente :**
-    * Header : "Punitions en attente" + badge KPI.
+  * **Punitions :**
+    * Header : "Punitions" + badge KPI.
+    * Filtres : en attente, en retard, résolues, toutes.
     * Format du badge : `résolues / total (en retard)`.
     * *Source de vérité du badge :* KPIs (`total_punishment_count`, `pending_punishment_count`, `overdue_punishment_count`) et non la taille de liste affichée.
     * Survol du badge : popover d'explication.

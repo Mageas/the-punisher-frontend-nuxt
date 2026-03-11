@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Gift } from 'lucide-vue-next'
+import type { SectionFilterOption } from '~/types/ui'
 
 interface AvailableBonus {
   id: string
@@ -27,6 +28,8 @@ const props = withDefaults(
     disabled?: boolean
     listClass?: string
     showStudentDetails?: boolean
+    filterOptions?: SectionFilterOption[]
+    filterValue?: string
   }>(),
   {
     title: undefined,
@@ -40,19 +43,20 @@ const props = withDefaults(
     disabled: false,
     listClass: 'space-y-2',
     showStudentDetails: false,
+    filterOptions: undefined,
+    filterValue: undefined,
   },
 )
 
 const emit = defineEmits<{
   used: []
   'update:page': [value: number]
+  'update:filterValue': [value: string]
 }>()
 
 const { t } = useI18n()
-const sectionTitle = computed(() => props.title ?? t('studentProfile.availableBonuses'))
-const sectionEmptyLabel = computed(
-  () => props.emptyLabel ?? t('studentProfile.empty.availableBonuses'),
-)
+const sectionTitle = computed(() => props.title ?? t('common.titles.bonuses'))
+const sectionEmptyLabel = computed(() => props.emptyLabel ?? t('common.empty.noBonuses'))
 
 const showUseModal = ref(false)
 const bonusToUseId = ref<string | null>(null)
@@ -86,7 +90,10 @@ function onUsed() {
       :badge-text="props.badgeText"
       :badge-help-text="props.badgeHelpText"
       badge-class="text-muted-foreground"
+      :filter-options="props.filterOptions"
+      :filter-value="props.filterValue"
       @update:page="emit('update:page', $event)"
+      @update:filter-value="emit('update:filterValue', $event)"
     />
 
     <SectionListBlock
@@ -106,7 +113,7 @@ function onUsed() {
         :student-first-name="props.showStudentDetails ? bonus.student_first_name : undefined"
         :student-last-name="props.showStudentDetails ? bonus.student_last_name : undefined"
       >
-        <template v-if="hasConsumeAction" #actions>
+        <template v-if="hasConsumeAction && !bonus.used_at" #actions>
           <Button
             variant="ghost"
             size="icon-sm"
