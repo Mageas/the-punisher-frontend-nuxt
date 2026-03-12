@@ -19,6 +19,9 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const isAutomated = computed(() => props.automated === true)
+const isOverdue = computed(
+  () => !props.resolvedAt && props.dueAt && new Date(props.dueAt) < new Date(),
+)
 const hasRuleName = computed(() => Boolean(props.triggeringRuleName))
 const hasRuleLink = computed(
   () => isAutomated.value && hasRuleName.value && Boolean(props.triggeringRuleId),
@@ -38,9 +41,16 @@ const automatedLabel = computed(() => {
 const secondaryLine = computed(() => {
   return props.punishmentTypeName
 })
-const stateLabel = computed(() =>
-  props.resolvedAt ? t('common.states.resolved') : t('common.states.pending'),
-)
+const stateLabel = computed(() => {
+  if (props.resolvedAt) return t('common.states.resolved')
+  if (isOverdue.value) return t('filters.overdue')
+  return t('common.states.pending')
+})
+const stateTone = computed<'success' | 'warning' | 'destructive'>(() => {
+  if (props.resolvedAt) return 'success'
+  if (isOverdue.value) return 'destructive'
+  return 'warning'
+})
 const stateDescription = computed(() => {
   if (!props.resolvedAt && props.dueAt) {
     return t('common.dueAt', { date: formatDate(props.dueAt) })
@@ -123,7 +133,7 @@ const stateDescription = computed(() => {
       <StudentEventStatus
         :label="stateLabel"
         :description="stateDescription"
-        :tone="props.resolvedAt ? 'success' : 'warning'"
+        :tone="stateTone"
         desktop-align-right
       />
     </template>

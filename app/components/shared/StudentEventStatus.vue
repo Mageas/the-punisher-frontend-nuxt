@@ -3,7 +3,7 @@ const props = withDefaults(
   defineProps<{
     label: string
     description?: string
-    tone?: 'muted' | 'success' | 'warning'
+    tone?: 'muted' | 'success' | 'warning' | 'destructive'
     desktopAlignRight?: boolean
   }>(),
   {
@@ -16,6 +16,7 @@ const props = withDefaults(
 const badgeClass = computed(() => {
   if (props.tone === 'success') return 'text-success border-success-border'
   if (props.tone === 'warning') return 'text-warning border-warning-border'
+  if (props.tone === 'destructive') return 'text-destructive border-destructive'
   return 'text-muted-foreground'
 })
 </script>

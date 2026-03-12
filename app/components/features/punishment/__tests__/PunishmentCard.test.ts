@@ -9,6 +9,7 @@ const translations: Record<string, string | ((params?: Record<string, string>) =
   'common.states.resolved': 'Résolu',
   'common.dueAt': (params) => `Échéance : ${params?.date ?? ''}`,
   'punishments.resolvedAt': (params) => `Résolu le ${params?.date ?? ''}`,
+  'filters.overdue': 'En retard',
 }
 
 const mockI18n = {
@@ -92,5 +93,58 @@ describe('PunishmentCard', () => {
     expect(wrapper.text()).toContain('Lina Martin')
     expect(wrapper.text()).toContain('Retenue')
     expect(wrapper.text()).not.toContain('Punition manuelle')
+  })
+
+  it('shows overdue state instead of pending when punishment is past due date', () => {
+    const pastDate = new Date(Date.now() - 86_400_000).toISOString()
+    const wrapper = mount(PunishmentCard, {
+      props: {
+        punishmentTypeName: 'Retenue',
+        automated: false,
+        dueAt: pastDate,
+        resolvedAt: null,
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    expect(wrapper.text()).toContain('En retard')
+    expect(wrapper.text()).not.toContain('En attente')
+  })
+
+  it('shows resolved state when punishment is resolved even with past due date', () => {
+    const pastDate = new Date(Date.now() - 86_400_000).toISOString()
+    const wrapper = mount(PunishmentCard, {
+      props: {
+        punishmentTypeName: 'Retenue',
+        automated: false,
+        dueAt: pastDate,
+        resolvedAt: new Date().toISOString(),
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    expect(wrapper.text()).not.toContain('En retard')
+  })
+
+  it('shows pending state when due date is in the future', () => {
+    const futureDate = new Date(Date.now() + 86_400_000).toISOString()
+    const wrapper = mount(PunishmentCard, {
+      props: {
+        punishmentTypeName: 'Retenue',
+        automated: false,
+        dueAt: futureDate,
+        resolvedAt: null,
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    expect(wrapper.text()).toContain('En attente')
+    expect(wrapper.text()).not.toContain('En retard')
   })
 })
