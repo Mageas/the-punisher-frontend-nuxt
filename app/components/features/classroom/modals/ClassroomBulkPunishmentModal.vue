@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { getLocalTimeZone } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as zod from 'zod'
-import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
+import { getUserTimeZone, serializeDateValueWithTime } from '~/lib/date-time'
 import {
   resolvePunishmentDueAtFromNextLesson,
   resolveSelectedNextLessonKey,
@@ -152,16 +151,17 @@ const onSubmit = handleSubmit(async (formValues) => {
   submitLoading.value = true
 
   try {
-    const dueDate = (formValues.due_at as DateValue).toDate(getLocalTimeZone())
-    applyTimeInputToDate(dueDate, formValues.due_at_time)
-    const dueAt = toApiDateTimeString(dueDate) ?? undefined
-
-    let occurredAt: string | undefined
-    if (formValues.occurred_at) {
-      const occurredDate = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
-      applyTimeInputToDate(occurredDate, formValues.occurred_at_time)
-      occurredAt = toApiDateTimeString(occurredDate) ?? undefined
-    }
+    const timeZone = getUserTimeZone()
+    const dueAt = serializeDateValueWithTime({
+      dateValue: formValues.due_at,
+      timeValue: formValues.due_at_time,
+      timeZone,
+    })
+    const occurredAt = serializeDateValueWithTime({
+      dateValue: formValues.occurred_at,
+      timeValue: formValues.occurred_at_time,
+      timeZone,
+    })
 
     const evaluationLabel = formValues.evaluation_label?.trim()
     await punishmentService.createBulkPunishments(props.classroomId, {

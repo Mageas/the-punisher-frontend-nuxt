@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { getInitials, formatPoints, formatDate } from '../utils'
+import { describe, expect, it } from 'vitest'
+import { formatDate, formatDateTime, formatTime, getInitials, formatPoints, isUuid } from '../utils'
 
 describe('utils.ts', () => {
   describe('getInitials', () => {
@@ -14,6 +14,10 @@ describe('utils.ts', () => {
     it('returns single initial if only one name is provided', () => {
       expect(getInitials('John', null)).toBe('J')
       expect(getInitials(null, 'Doe')).toBe('D')
+    })
+
+    it('ignores leading and trailing spaces before extracting initials', () => {
+      expect(getInitials('  John  ', '  Doe  ')).toBe('JD')
     })
   })
 
@@ -42,9 +46,37 @@ describe('utils.ts', () => {
 
     it('formats valid date correctly', () => {
       const date = '2026-02-19T14:30:00Z'
-      // Note: toLocaleDateString might behave differently depending on environment locale
-      // but let's assume it works with the provided options.
-      expect(formatDate(date)).toContain('2026')
+      expect(formatDate(date, 'Europe/Paris')).toContain('2026')
+    })
+
+    it('uses the provided time zone for RFC3339 values', () => {
+      expect(formatDate('2026-03-15T23:30:00Z', 'Europe/Paris')).toContain('16')
+    })
+  })
+
+  describe('formatTime', () => {
+    it('uses the provided time zone for RFC3339 values', () => {
+      expect(formatTime('2026-03-15T17:45:00Z', 'Europe/Paris')).toBe('18:45')
+    })
+  })
+
+  describe('formatDateTime', () => {
+    it('includes both date and time in the requested time zone', () => {
+      const formatted = formatDateTime('2026-03-15T17:45:00Z', 'Europe/Paris')
+      expect(formatted).toContain('2026')
+      expect(formatted).toContain('18:45')
+    })
+  })
+
+  describe('isUuid', () => {
+    it('accepts canonical UUID strings', () => {
+      expect(isUuid('550e8400-e29b-41d4-a716-446655440000')).toBe(true)
+      expect(isUuid('550E8400-E29B-41D4-A716-446655440000')).toBe(true)
+    })
+
+    it('rejects non-canonical 36-character strings', () => {
+      expect(isUuid('------------------------------------')).toBe(false)
+      expect(isUuid('550e8400e29b41d4a716446655440000')).toBe(false)
     })
   })
 })

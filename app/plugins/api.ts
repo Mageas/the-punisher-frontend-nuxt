@@ -1,6 +1,6 @@
 import type { ApiRequestOptions, AuthResponse } from '~/types/api'
 import { getApiErrorStatus, isFatalApiError } from '~/lib/api-error'
-import { normalizeApiDateTimeFields } from '~/lib/date-time'
+import { getUserTimeZone, normalizeApiDateTimeFields } from '~/lib/date-time'
 
 /**
  * Nuxt plugin that provides a global `$api` fetch instance.
@@ -102,7 +102,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     onRequest({ options }) {
       if (options.body !== undefined) {
-        options.body = normalizeApiDateTimeFields(options.body)
+        options.body = normalizeApiDateTimeFields(options.body, {
+          timeZone: getUserTimeZone(),
+        })
       }
 
       if (accessToken.value) {

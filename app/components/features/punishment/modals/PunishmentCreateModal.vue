@@ -2,10 +2,9 @@
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { getLocalTimeZone } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
 import type { NextLesson } from '~/types/api'
-import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
+import { getUserTimeZone, serializeDateValueWithTime } from '~/lib/date-time'
 import {
   resolvePunishmentDueAtFromNextLesson,
   resolveSelectedNextLessonKey,
@@ -226,16 +225,17 @@ const onSubmit = handleSubmit(async (formValues) => {
   }
 
   try {
-    const date = (formValues.due_at as DateValue).toDate(getLocalTimeZone())
-    applyTimeInputToDate(date, formValues.due_at_time)
-    const dueAt = toApiDateTimeString(date) ?? undefined
-
-    let occurredAt: string | undefined
-    if (formValues.occurred_at) {
-      const occurredDate = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
-      applyTimeInputToDate(occurredDate, formValues.occurred_at_time)
-      occurredAt = toApiDateTimeString(occurredDate) ?? undefined
-    }
+    const timeZone = getUserTimeZone()
+    const dueAt = serializeDateValueWithTime({
+      dateValue: formValues.due_at,
+      timeValue: formValues.due_at_time,
+      timeZone,
+    })
+    const occurredAt = serializeDateValueWithTime({
+      dateValue: formValues.occurred_at,
+      timeValue: formValues.occurred_at_time,
+      timeZone,
+    })
 
     const evaluationLabel = formValues.evaluation_label?.trim()
 

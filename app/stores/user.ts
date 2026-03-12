@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { getLocalTimeZone } from '@internationalized/date'
 import type { User } from '~/types/api'
 
 export const useUserStore = defineStore('user', () => {
@@ -14,6 +15,7 @@ export const useUserStore = defineStore('user', () => {
     if (!user.value) return ''
     return `${user.value.first_name.charAt(0)}${user.value.last_name.charAt(0)}`.toUpperCase()
   })
+  const timeZone = computed(() => user.value?.timezone || getLocalTimeZone())
 
   async function fetchUser() {
     if (user.value) return
@@ -37,6 +39,7 @@ export const useUserStore = defineStore('user', () => {
     loading,
     fullName,
     initials,
+    timeZone,
     fetchUser,
     clearUser,
   }

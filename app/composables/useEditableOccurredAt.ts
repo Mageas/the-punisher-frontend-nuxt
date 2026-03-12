@@ -1,6 +1,11 @@
-import { getLocalTimeZone, parseDate } from '@internationalized/date'
+import { parseDate } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
-import { parseApiDateTime, serializeEditableDateTime, toTimeInputValue } from '~/lib/date-time'
+import {
+  getUserTimeZone,
+  parseApiDateTimeInTimeZone,
+  serializeEditableDateTime,
+  toTimeInputValue,
+} from '~/lib/date-time'
 
 interface EditableOccurredAtOptions {
   getInitialOccurredAt: () => string | null
@@ -15,13 +20,12 @@ export function useEditableOccurredAt(options: EditableOccurredAtOptions) {
   const occurredAtTouched = ref(false)
 
   function toDateValue(dateTime: string | null | undefined): DateValue | undefined {
-    const parsed = parseApiDateTime(dateTime)
+    const parsed = parseApiDateTimeInTimeZone(dateTime, getUserTimeZone())
     if (!parsed) return undefined
 
-    const year = parsed.getFullYear()
-    const month = String(parsed.getMonth() + 1).padStart(2, '0')
-    const day = String(parsed.getDate()).padStart(2, '0')
-    return parseDate(`${year}-${month}-${day}`)
+    return parseDate(
+      `${String(parsed.year).padStart(4, '0')}-${String(parsed.month).padStart(2, '0')}-${String(parsed.day).padStart(2, '0')}`,
+    )
   }
 
   function getInitialOccurredAtFieldValues(): EditableOccurredAtFieldValues {
@@ -29,7 +33,7 @@ export function useEditableOccurredAt(options: EditableOccurredAtOptions) {
 
     return {
       occurred_at: toDateValue(initialOccurredAt),
-      occurred_at_time: toTimeInputValue(initialOccurredAt),
+      occurred_at_time: toTimeInputValue(initialOccurredAt, '08:00', getUserTimeZone()),
     }
   }
 
@@ -57,7 +61,7 @@ export function useEditableOccurredAt(options: EditableOccurredAtOptions) {
     return serializeEditableDateTime({
       dateValue: optionsForSerialize.dateValue,
       timeValue: optionsForSerialize.timeValue,
-      timeZone: getLocalTimeZone(),
+      timeZone: getUserTimeZone(),
       touched: occurredAtTouched.value,
       initialApiValue: options.getInitialOccurredAt(),
     })

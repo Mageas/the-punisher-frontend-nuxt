@@ -1,11 +1,19 @@
-import { parseDate } from '@internationalized/date'
-import { describe, expect, it, vi } from 'vitest'
-import { parseApiDateTime, toTimeInputValue } from '~/lib/date-time'
+import { parseDate, resetLocalTimeZone, setLocalTimeZone } from '@internationalized/date'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { toTimeInputValue } from '~/lib/date-time'
 import { useEditableOccurredAt } from '../useEditableOccurredAt'
 
 describe('useEditableOccurredAt', () => {
+  beforeEach(() => {
+    setLocalTimeZone('Europe/Paris')
+  })
+
+  afterEach(() => {
+    resetLocalTimeZone()
+  })
+
   it('builds initial field values from the initial api datetime and serializes untouched values', () => {
-    const initialOccurredAt = '2026-03-05T10:30:37.250Z'
+    const initialOccurredAt = '2026-03-05T09:30:37.250Z'
     const editableOccurredAt = useEditableOccurredAt({
       getInitialOccurredAt: () => initialOccurredAt,
     })
@@ -19,12 +27,8 @@ describe('useEditableOccurredAt', () => {
       dateValue: parseDate('2026-03-20'),
       timeValue: '14:25',
     })
-    const parsed = parseApiDateTime(serialized)
 
-    expect(parsed?.getHours()).toBe(14)
-    expect(parsed?.getMinutes()).toBe(25)
-    expect(parsed?.getSeconds()).toBe(37)
-    expect(parsed?.getMilliseconds()).toBe(250)
+    expect(serialized).toBe('2026-03-20T14:25:37.250+01:00')
   })
 
   it('marks the field as touched when the date or time changes', () => {

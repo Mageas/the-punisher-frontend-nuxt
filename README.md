@@ -82,6 +82,8 @@ Modern web application for classroom management, built with Nuxt 3, TypeScript, 
 ## 🕒 Date Handling
 
 - API response datetime fields ending with `*_at` are normalized to RFC3339 UTC (`Z`) in the shared utility `app/lib/date-time.ts`, wired through the global API plugin.
-- Request body datetime fields ending with `*_at` are serialized to RFC3339 UTC (`.toISOString()`) before being sent.
+- The authenticated user's IANA timezone (for example `Europe/Paris`) is stored in the user store and used as the frontend reference timezone for RFC3339 conversions.
+- Request body datetime fields ending with `*_at` are serialized to RFC3339 with the user's actual offset at that instant (for example `+01:00` or `+02:00`) before being sent, independently of the browser, Node, or CI runner local timezone.
+- RFC3339 response datetimes received in UTC are converted back in the user's timezone for form defaults and UI formatting, without relying on the host machine timezone.
 - Event datetime pickers only expose `HH:mm` in the UI; when time selection is enabled, choosing a date moves focus to the hours field and the popover closes via an explicit `Ok` action or by pressing `Enter` in a time field; new datetimes are sent with seconds forced to `00`, while edit flows preserve API-provided seconds until the user actively changes the date/time, at which point seconds are reset to `00`.
 - Date filters in query params (`created_from`, `created_to`, `due_from`, `due_to`) stay as `YYYY-MM-DD`.
