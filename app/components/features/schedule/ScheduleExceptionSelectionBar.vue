@@ -31,9 +31,7 @@ const selectionTitle = computed(() =>
 )
 
 const borderClass = computed(() =>
-  props.isEditing
-    ? 'border-schedule-editing-border'
-    : 'border-schedule-selecting-border',
+  props.isEditing ? 'border-schedule-editing-border' : 'border-schedule-selecting-border',
 )
 </script>
 

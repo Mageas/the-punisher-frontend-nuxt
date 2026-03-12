@@ -7,6 +7,7 @@ const props = defineProps<{
   usedAt?: string | null
   occurredAt?: string | null
   createdAt?: string | null
+  evaluationLabel?: string | null
   studentId?: string
   studentFirstName?: string
   studentLastName?: string
@@ -21,23 +22,20 @@ const pointsBadgeClass = computed(() =>
   props.usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning',
 )
 const secondaryLine = computed(() => {
-  if (hasStudentName.value) {
-    if (displayedDate.value) {
-      return `${props.bonusTypeName} - ${formatDate(displayedDate.value)}`
-    }
-
-    return props.bonusTypeName
-  }
-
-  if (!displayedDate.value) return ''
-  return formatDate(displayedDate.value)
+  if (hasStudentName.value) return props.bonusTypeName
+  return ''
 })
 const stateLabel = computed(() =>
   props.usedAt ? t('common.states.used') : t('common.states.available'),
 )
 const stateDescription = computed(() => {
-  if (!props.usedAt) return undefined
-  return t('bonuses.usedAt', { date: formatDate(props.usedAt) })
+  if (props.usedAt) {
+    return t('bonuses.usedAt', { date: formatDate(props.usedAt) })
+  }
+  if (displayedDate.value) {
+    return formatDate(displayedDate.value)
+  }
+  return undefined
 })
 </script>
 
@@ -61,9 +59,22 @@ const stateDescription = computed(() => {
       />
     </template>
 
-    <template #meta>
+    <template #mobile-meta>
       <StudentEventMeta v-if="secondaryLine">
         {{ secondaryLine }}
+      </StudentEventMeta>
+      <StudentEventMeta v-if="props.evaluationLabel" tone="default">
+        <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+      </StudentEventMeta>
+    </template>
+
+    <template #desktop-meta>
+      <StudentEventMeta v-if="secondaryLine || props.evaluationLabel" inline class="min-w-0">
+        <span v-if="secondaryLine">{{ secondaryLine }}</span>
+        <template v-if="props.evaluationLabel">
+          <span v-if="secondaryLine" class="mx-1.5">·</span>
+          <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+        </template>
       </StudentEventMeta>
     </template>
 

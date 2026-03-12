@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Gift } from 'lucide-vue-next'
+import type { Bonus } from '~/types/api'
 import type { SectionFilterOption } from '~/types/ui'
 
-interface AvailableBonus {
-  id: string
-  bonus_type_name: string
-  points: number
-  occurred_at?: string
-  created_at: string
-  used_at?: string | null
+type AvailableBonus = Pick<
+  Bonus,
+  'id' | 'bonus_type_name' | 'points' | 'created_at' | 'evaluation_label'
+> & {
+  occurred_at?: Bonus['occurred_at']
+  used_at?: Bonus['used_at']
   student_id?: string
   student_first_name?: string
   student_last_name?: string
@@ -109,6 +109,7 @@ function onUsed() {
         :used-at="bonus.used_at"
         :occurred-at="bonus.occurred_at ?? bonus.created_at"
         :created-at="bonus.created_at"
+        :evaluation-label="bonus.evaluation_label"
         :student-id="props.showStudentDetails ? bonus.student_id : undefined"
         :student-first-name="props.showStudentDetails ? bonus.student_first_name : undefined"
         :student-last-name="props.showStudentDetails ? bonus.student_last_name : undefined"

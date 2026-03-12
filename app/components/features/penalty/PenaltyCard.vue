@@ -4,6 +4,7 @@ import { formatDate } from '~/lib/utils'
 
 const props = defineProps<{
   penaltyTypeName: string
+  evaluationLabel?: string | null
   occurredAt?: string
   createdAt: string
   studentId?: string
@@ -13,41 +14,58 @@ const props = defineProps<{
 
 const hasStudentName = computed(() => Boolean(props.studentFirstName && props.studentLastName))
 const displayedDate = computed(() => props.occurredAt ?? props.createdAt)
+const secondaryLine = computed(() => {
+  if (hasStudentName.value) return props.penaltyTypeName
+  return ''
+})
 </script>
 
 <template>
-  <div class="flex items-center gap-4 rounded-lg border border-border p-4">
-    <div
-      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-bg-subtle"
-    >
-      <AlertTriangle class="h-4 w-4 text-warning" />
-    </div>
+  <ResponsiveEventCardLayout>
+    <template #icon>
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-bg-subtle"
+      >
+        <AlertTriangle class="h-4 w-4 text-warning" />
+      </div>
+    </template>
 
-    <div class="min-w-0 flex-1">
-      <p class="text-sm font-medium">
-        <NuxtLink
-          v-if="hasStudentName && props.studentId"
-          :to="`/students/${props.studentId}`"
-          class="transition-colors hover:text-primary hover:underline underline-offset-4"
-        >
-          {{ props.studentFirstName }} {{ props.studentLastName }}
-        </NuxtLink>
-        <span v-else-if="hasStudentName">
-          {{ props.studentFirstName }} {{ props.studentLastName }}
-        </span>
-        <span v-else>{{ penaltyTypeName }}</span>
+    <template #title>
+      <StudentEventTitle
+        :fallback-label="props.penaltyTypeName"
+        :student-id="props.studentId"
+        :student-first-name="props.studentFirstName"
+        :student-last-name="props.studentLastName"
+      />
+    </template>
+
+    <template #mobile-meta>
+      <StudentEventMeta v-if="secondaryLine">
+        {{ secondaryLine }}
+      </StudentEventMeta>
+      <StudentEventMeta v-if="props.evaluationLabel" tone="default">
+        <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+      </StudentEventMeta>
+    </template>
+
+    <template #desktop-meta>
+      <StudentEventMeta v-if="secondaryLine || props.evaluationLabel" inline class="min-w-0">
+        <span v-if="secondaryLine">{{ secondaryLine }}</span>
+        <template v-if="props.evaluationLabel">
+          <span v-if="secondaryLine" class="mx-1.5">·</span>
+          <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+        </template>
+      </StudentEventMeta>
+    </template>
+
+    <template #status>
+      <p class="shrink-0 text-xs text-muted-foreground sm:text-right">
+        {{ formatDate(displayedDate) }}
       </p>
-      <p v-if="hasStudentName" class="mt-0.5 text-xs text-muted-foreground">
-        {{ penaltyTypeName }}
-      </p>
-    </div>
+    </template>
 
-    <span class="text-xs text-muted-foreground shrink-0">
-      {{ formatDate(displayedDate) }}
-    </span>
-
-    <div v-if="$slots.actions" class="flex items-center gap-1">
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
-    </div>
-  </div>
+    </template>
+  </ResponsiveEventCardLayout>
 </template>

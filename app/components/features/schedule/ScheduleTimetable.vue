@@ -137,7 +137,8 @@ function getPositionedSlots(daySlots: ScheduleSlot[]): PositionedSlot[] {
 }
 
 const weekPatternColor: Record<string, string> = {
-  every_week: 'bg-schedule-weekly-bg-subtle border-schedule-weekly-border hover:bg-schedule-weekly-bg-subtle-hover text-foreground',
+  every_week:
+    'bg-schedule-weekly-bg-subtle border-schedule-weekly-border hover:bg-schedule-weekly-bg-subtle-hover text-foreground',
   even_weeks: 'bg-info/15 border-info/40 hover:bg-info/25 text-foreground',
   odd_weeks: 'bg-warning/15 border-warning/40 hover:bg-warning/25 text-foreground',
 }
