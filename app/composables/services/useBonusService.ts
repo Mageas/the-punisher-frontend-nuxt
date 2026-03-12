@@ -1,6 +1,7 @@
 import type {
   ApiRequestOptions,
   Bonus,
+  BonusBulkCreateData,
   PaginatedResponse,
   BonusCreateData,
   BonusUseData,
@@ -49,6 +50,16 @@ export function useBonusService() {
   }
 
   /**
+   * Create multiple bonuses for students in one classroom.
+   */
+  async function createBulkBonuses(classroomId: string, data: BonusBulkCreateData) {
+    return $api<Bonus[]>(`/classrooms/${classroomId}/bonuses/bulk`, {
+      method: 'POST',
+      body: data,
+    })
+  }
+
+  /**
    * Update an existing bonus.
    */
   async function updateBonus(bonusId: string, data: BonusUpdateData) {
@@ -80,6 +91,7 @@ export function useBonusService() {
   return {
     getBonuses,
     createBonus,
+    createBulkBonuses,
     updateBonus,
     deleteBonus,
     useBonus,

@@ -14,6 +14,7 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 const props = defineProps<{
   students: Student[]
+  classroomId: string
 }>()
 
 const { t } = useI18n()
@@ -22,7 +23,6 @@ const bonusService = useBonusService()
 const { notifyCreateSuccess } = useActionToast()
 
 const submitLoading = ref(false)
-const progress = ref(0)
 
 const schema = toTypedSchema(
   zod.object({
@@ -64,14 +64,12 @@ watch(open, (isOpen) => {
   if (!isOpen) return
 
   clearErrors()
-  progress.value = 0
   resetForm({ values: getInitialValues() })
 })
 
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   submitLoading.value = true
-  progress.value = 0
 
   try {
     let occurredAt: string | undefined
@@ -82,19 +80,13 @@ const onSubmit = handleSubmit(async (formValues) => {
     }
 
     const evaluationLabel = formValues.evaluation_label?.trim()
-    let progressCount = 0
-
-    for (const student of props.students) {
-      await bonusService.createBonus({
-        student_id: student.id,
-        bonus_type_id: formValues.bonus_type_id,
-        points: formValues.points,
-        ...(occurredAt ? { occurred_at: occurredAt } : {}),
-        ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
-      })
-      progressCount += 1
-      progress.value = progressCount
-    }
+    await bonusService.createBulkBonuses(props.classroomId, {
+      student_ids: props.students.map((student) => student.id),
+      bonus_type_id: formValues.bonus_type_id,
+      points: formValues.points,
+      ...(occurredAt ? { occurred_at: occurredAt } : {}),
+      ...(evaluationLabel ? { evaluation_label: evaluationLabel } : {}),
+    })
 
     notifyCreateSuccess()
     open.value = false
@@ -114,11 +106,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     :global-error="globalError"
     :submitting="submitLoading"
     :can-submit="meta.valid"
-    :submit-text="
-      submitLoading
-        ? t('classProfile.bulkBonus.progress', { current: progress, total: students.length })
-        : t('common.actions.submit')
-    "
+    :submit-text="submitLoading ? t('common.loading') : t('common.actions.submit')"
     prevent-auto-focus
     @submit="onSubmit"
   >

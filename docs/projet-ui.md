@@ -139,7 +139,7 @@
     * Mode "Sélectionner" pour cocher plusieurs élèves de la classe.
     * Barre d'actions groupées : "Ajouter bonus", "Ajouter pénalité", "Ajouter punition".
     * Les modales bulk sont déjà scopées à la classe courante : aucun champ `Classe` n'est affiché.
-    * Les créations groupées de pénalités et punitions utilisent les endpoints bulk de la classe pour garantir une opération atomique côté API.
+    * Les créations groupées de bonus, pénalités et punitions utilisent les endpoints bulk de la classe pour garantir une opération atomique côté API.
     * La modale de punition groupée propose les prochains cours de la classe affichée pour préremplir l'échéance commune.
 
 ---
