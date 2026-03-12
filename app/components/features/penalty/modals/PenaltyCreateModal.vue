@@ -3,8 +3,7 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import type { DateValue } from '@internationalized/date'
-import { getLocalTimeZone } from '@internationalized/date'
-import { applyTimeInputToDate, toApiDateTimeString } from '~/lib/date-time'
+import { getUserTimeZone, serializeDateValueWithTime } from '~/lib/date-time'
 
 const emit = defineEmits<{
   created: []
@@ -127,12 +126,11 @@ watch(open, async (isOpen) => {
 const onSubmit = handleSubmit(async (formValues) => {
   clearErrors()
   try {
-    let occurredAt: string | undefined
-    if (formValues.occurred_at) {
-      const date = (formValues.occurred_at as DateValue).toDate(getLocalTimeZone())
-      applyTimeInputToDate(date, formValues.occurred_at_time)
-      occurredAt = toApiDateTimeString(date) ?? undefined
-    }
+    const occurredAt = serializeDateValueWithTime({
+      dateValue: formValues.occurred_at,
+      timeValue: formValues.occurred_at_time,
+      timeZone: getUserTimeZone(),
+    })
 
     const evaluationLabel = formValues.evaluation_label?.trim()
 
