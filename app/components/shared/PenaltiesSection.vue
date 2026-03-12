@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { Penalty } from '~/types/api'
 import type { SectionFilterOption } from '~/types/ui'
 
-interface PenaltySectionItem {
-  id: string
-  penalty_type_name: string
+type PenaltySectionItem = Pick<
+  Penalty,
+  'id' | 'penalty_type_name' | 'created_at' | 'evaluation_label'
+> & {
   occurred_at?: string | null
-  created_at: string
   student_id?: string
   student_first_name?: string
   student_last_name?: string
@@ -73,6 +74,7 @@ const emit = defineEmits<{
         v-for="penalty in props.penalties"
         :key="penalty.id"
         :penalty-type-name="penalty.penalty_type_name"
+        :evaluation-label="penalty.evaluation_label"
         :occurred-at="penalty.occurred_at ?? penalty.created_at"
         :created-at="penalty.created_at"
         :student-id="props.showStudentDetails ? penalty.student_id : undefined"

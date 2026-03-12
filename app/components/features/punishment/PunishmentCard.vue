@@ -7,6 +7,7 @@ const props = defineProps<{
   automated: boolean
   triggeringRuleId?: string | null
   triggeringRuleName?: string | null
+  evaluationLabel?: string | null
   dueAt?: string | null
   resolvedAt?: string | null
   studentId?: string
@@ -76,6 +77,9 @@ const stateDescription = computed(() => {
       <StudentEventMeta v-if="secondaryLine">
         {{ secondaryLine }}
       </StudentEventMeta>
+      <StudentEventMeta v-if="props.evaluationLabel" tone="default">
+        <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+      </StudentEventMeta>
       <StudentEventMeta v-if="isAutomated" inline tone="info">
         <template #icon>
           <Scale class="h-3 w-3 shrink-0" />
@@ -92,8 +96,12 @@ const stateDescription = computed(() => {
     </template>
 
     <template #desktop-meta>
-      <StudentEventMeta v-if="secondaryLine" inline class="min-w-0">
-        <span>{{ secondaryLine }}</span>
+      <StudentEventMeta v-if="secondaryLine || props.evaluationLabel" inline class="min-w-0">
+        <span v-if="secondaryLine">{{ secondaryLine }}</span>
+        <template v-if="props.evaluationLabel">
+          <span v-if="secondaryLine" class="mx-1.5">·</span>
+          <span class="truncate italic">« {{ props.evaluationLabel }} »</span>
+        </template>
         <template v-if="isAutomated">
           <span class="mx-1.5">·</span>
           <span class="inline-flex min-w-0 items-center gap-1 text-info">

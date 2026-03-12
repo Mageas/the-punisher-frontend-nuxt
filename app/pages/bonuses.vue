@@ -161,6 +161,7 @@ await useAsyncData(
         :used-at="bonus.used_at"
         :occurred-at="bonus.occurred_at ?? bonus.created_at"
         :created-at="bonus.created_at"
+        :evaluation-label="bonus.evaluation_label"
         :student-id="bonus.student_id"
         :student-first-name="bonus.student_first_name"
         :student-last-name="bonus.student_last_name"

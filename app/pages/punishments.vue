@@ -210,6 +210,7 @@ await useAsyncData(
         :automated="punishment.automated"
         :triggering-rule-id="punishment.triggering_rule_id"
         :triggering-rule-name="punishment.triggering_rule_name"
+        :evaluation-label="punishment.evaluation_label"
         :due-at="punishment.due_at"
         :resolved-at="punishment.resolved_at"
         :student-id="punishment.student_id"

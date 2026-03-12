@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { CircleCheck } from 'lucide-vue-next'
+import type { Punishment } from '~/types/api'
 import type { SectionFilterOption } from '~/types/ui'
 
-interface PendingPunishment {
-  id: string
+type PendingPunishment = Pick<
+  Punishment,
+  'id' | 'punishment_type_name' | 'automated' | 'evaluation_label'
+> & {
   student_id?: string
-  punishment_type_name: string
-  automated: boolean
-  triggering_rule_id?: string | null
-  triggering_rule_name?: string | null
-  due_at?: string | null
-  resolved_at?: string | null
+  triggering_rule_id?: Punishment['triggering_rule_id']
+  triggering_rule_name?: Punishment['triggering_rule_name']
+  due_at?: Punishment['due_at']
+  resolved_at?: Punishment['resolved_at']
   student_first_name?: string
   student_last_name?: string
 }
@@ -98,6 +99,7 @@ function onResolved() {
         :automated="punishment.automated"
         :triggering-rule-id="punishment.triggering_rule_id"
         :triggering-rule-name="punishment.triggering_rule_name"
+        :evaluation-label="punishment.evaluation_label"
         :due-at="punishment.due_at"
         :resolved-at="punishment.resolved_at"
         :student-id="punishment.student_id"
