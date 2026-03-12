@@ -37,6 +37,17 @@ export interface BonusCreateData {
 }
 
 /**
+ * Data required to create bonuses in bulk for one classroom.
+ */
+export interface BonusBulkCreateData {
+  student_ids: string[]
+  bonus_type_id: string
+  points: number
+  occurred_at?: string
+  evaluation_label?: string
+}
+
+/**
  * Data accepted to update a bonus.
  */
 export interface BonusUpdateData {

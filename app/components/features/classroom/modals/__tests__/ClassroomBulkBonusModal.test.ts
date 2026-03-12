@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { reactive, ref } from 'vue'
+import { defineComponent, h, reactive, ref } from 'vue'
 import ClassroomBulkBonusModal from '../ClassroomBulkBonusModal.vue'
 
 const mockBonusService = {
-  createBonus: vi.fn(),
+  createBulkBonuses: vi.fn(),
 }
 
 const mockApiErrors = {
@@ -22,16 +22,15 @@ const mockI18n = {
   te: () => true,
 }
 
-const formValues = reactive({
-  bonus_type_id: '22222222-2222-2222-2222-222222222222',
-  points: 0.25,
-  occurred_at: undefined,
-  occurred_at_time: '08:00',
-  evaluation_label: 'Interrogation surprise',
-})
+let currentValues: Record<string, unknown>
 
-const mockResetForm = vi.fn()
-const mockSetFieldValue = vi.fn()
+const mockResetForm = vi.fn((payload?: { values?: Record<string, unknown> }) => {
+  if (!payload?.values) return
+  Object.assign(currentValues, payload.values)
+})
+const mockSetFieldValue = vi.fn((field: string, value: unknown) => {
+  currentValues[field] = value
+})
 
 vi.mock('~/composables/services/useBonusService', () => ({
   useBonusService: () => mockBonusService,
@@ -54,28 +53,61 @@ vi.mock('vee-validate', async () => {
 
   return {
     ...original,
-    useForm: () => ({
-      handleSubmit: (fn: (values: Record<string, unknown>) => Promise<unknown>) => async () => {
-        await fn({ ...formValues })
-      },
-      resetForm: mockResetForm,
-      values: formValues,
-      setFieldValue: mockSetFieldValue,
-      meta: reactive({ valid: true }),
-    }),
+    useForm: (options: { initialValues: Record<string, unknown> }) => {
+      currentValues = reactive({
+        ...options.initialValues,
+        bonus_type_id: '22222222-2222-2222-2222-222222222222',
+        points: 0.25,
+        evaluation_label: 'Interrogation surprise',
+      })
+
+      return {
+        handleSubmit: (fn: (values: Record<string, unknown>) => Promise<unknown>) => async () => {
+          await fn({ ...currentValues })
+        },
+        resetForm: mockResetForm,
+        values: currentValues,
+        setFieldValue: mockSetFieldValue,
+        meta: ref({ valid: true }),
+      }
+    },
   }
 })
 
+const FormFieldStub = defineComponent({
+  props: {
+    name: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props, { slots }) {
+    return () =>
+      h(
+        'div',
+        slots.default?.({
+          value: currentValues?.[props.name],
+          handleChange: (value: unknown) => {
+            mockSetFieldValue(props.name, value)
+          },
+          componentField: {
+            modelValue: currentValues?.[props.name],
+            'onUpdate:modelValue': (value: unknown) => {
+              mockSetFieldValue(props.name, value)
+            },
+          },
+        }),
+      )
+  },
+})
+
 const stubs = {
-  BaseModal: {
+  BaseModal: defineComponent({
+    emits: ['submit'],
     template:
       '<div><slot /><button id="submit-btn" type="button" @click="$emit(\'submit\')">Submit</button></div>',
-    props: ['open', 'title', 'globalError', 'submitting', 'canSubmit', 'submitText'],
-  },
-  FormField: {
-    template:
-      '<div><slot :value="\'\'" :handleChange="() => {}" :componentField="{ modelValue: \'\', \'onUpdate:modelValue\': () => {} }" /></div>',
-  },
+  }),
+  FormField: FormFieldStub,
   FormItem: {
     template: '<div><slot /></div>',
   },
@@ -91,9 +123,11 @@ const stubs = {
   BonusTypeSelect: {
     template: '<div />',
   },
-  DatePicker: {
-    template: '<div />',
-  },
+  DatePicker: defineComponent({
+    props: ['modelValue', 'time'],
+    template:
+      '<div data-testid="date-picker">{{ modelValue ? modelValue.toString() : `` }}|{{ time }}</div>',
+  }),
   Input: {
     template: '<input data-testid="points-input" v-bind="$attrs" />',
   },
@@ -102,13 +136,14 @@ const stubs = {
 describe('ClassroomBulkBonusModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockBonusService.createBonus.mockResolvedValue({ id: 'bonus-1' })
+    mockBonusService.createBulkBonuses.mockResolvedValue([{ id: 'bonus-1' }])
   })
 
-  it('submits the same bonus payload for each selected student', async () => {
+  it('submits one classroom-scoped bulk bonus request', async () => {
     const wrapper = mount(ClassroomBulkBonusModal, {
       props: {
         open: true,
+        classroomId: 'class-1',
         students: [
           {
             id: 'student-1',
@@ -143,15 +178,9 @@ describe('ClassroomBulkBonusModal', () => {
 
     await wrapper.get('#submit-btn').trigger('click')
 
-    expect(mockBonusService.createBonus).toHaveBeenCalledTimes(2)
-    expect(mockBonusService.createBonus).toHaveBeenNthCalledWith(1, {
-      student_id: 'student-1',
-      bonus_type_id: '22222222-2222-2222-2222-222222222222',
-      points: 0.25,
-      evaluation_label: 'Interrogation surprise',
-    })
-    expect(mockBonusService.createBonus).toHaveBeenNthCalledWith(2, {
-      student_id: 'student-2',
+    expect(mockBonusService.createBulkBonuses).toHaveBeenCalledTimes(1)
+    expect(mockBonusService.createBulkBonuses).toHaveBeenCalledWith('class-1', {
+      student_ids: ['student-1', 'student-2'],
       bonus_type_id: '22222222-2222-2222-2222-222222222222',
       points: 0.25,
       evaluation_label: 'Interrogation surprise',

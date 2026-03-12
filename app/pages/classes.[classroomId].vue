@@ -218,6 +218,7 @@ watch(classroomId, async (nextClassroomId, previousClassroomId) => {
     <ClassroomBulkBonusModal
       v-model:open="showBulkBonusModal"
       :students="bulkActionStudents"
+      :classroom-id="classroomId"
       @created="onBulkActionCreated"
     />
     <ClassroomBulkPenaltyModal
