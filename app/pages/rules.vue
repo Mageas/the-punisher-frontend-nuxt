@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next'
+import { getApiErrorStatus } from '~/lib/api-error'
 import type { Rule } from '~/types/api'
 
 const { t } = useI18n()
+const { selectedRuleId, openRuleDetails, closeRuleDetails } = useRuleDetailsRouteState()
 const {
   rules,
   loading,
@@ -16,17 +18,22 @@ const {
 } = useRules()
 const { globalError, handleApiError, clearErrors } = useApiErrors()
 const { notifyUpdateSuccess } = useActionToast()
-
-const safeItemsPerPage = computed(() => itemPerPage.value || 10)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / safeItemsPerPage.value)))
-const showPagination = computed(() => totalCount.value > 0)
+const { safeItemsPerPage, totalPages, showPagination } = usePaginationMetrics({
+  itemPerPage,
+  totalCount,
+})
 
 const showCreateModal = ref(false)
+const showDetailsModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const ruleToEdit = ref<Rule | null>(null)
 const ruleToDeleteId = ref<string | null>(null)
 const togglingById = ref<Record<string, boolean>>({})
+const restoreDetailsAfterEdit = ref(false)
+const { selectedRule, loadingSelectedRule, loadRule, clearSelectedRule } = useRuleDetails({
+  initialRules: rules,
+})
 
 async function reload(pageToLoad = page.value || 1) {
   await fetchRules({ page: pageToLoad })
@@ -35,6 +42,24 @@ async function reload(pageToLoad = page.value || 1) {
 async function onPageChange(nextPage: number) {
   if (nextPage === page.value || nextPage < 1 || nextPage > totalPages.value) return
   await gotoPage(nextPage)
+}
+
+async function loadSelectedRule(ruleId: string) {
+  clearErrors()
+
+  try {
+    await loadRule(ruleId)
+  } catch (err) {
+    showDetailsModal.value = false
+
+    if (getApiErrorStatus(err) === 404) {
+      handleApiError({ error: 'rule_not_found', error_code: 404 })
+    } else {
+      handleApiError(err)
+    }
+
+    await closeRuleDetails()
+  }
 }
 
 async function onToggleActive(rule: Rule, nextIsActive: boolean) {
@@ -46,6 +71,11 @@ async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   try {
     await updateRule(rule.id, { is_active: nextIsActive })
     await reload(page.value)
+
+    if (selectedRuleId.value === rule.id) {
+      await loadSelectedRule(rule.id)
+    }
+
     notifyUpdateSuccess()
   } catch (err) {
     handleApiError(err)
@@ -55,7 +85,8 @@ async function onToggleActive(rule: Rule, nextIsActive: boolean) {
   }
 }
 
-function openEditModal(rule: Rule) {
+function openEditModal(rule: Rule, options?: { restoreDetails?: boolean }) {
+  restoreDetailsAfterEdit.value = options?.restoreDetails ?? false
   ruleToEdit.value = rule
   showEditModal.value = true
 }
@@ -65,17 +96,59 @@ function openDeleteModal(ruleId: string) {
   showDeleteModal.value = true
 }
 
+function onDetailsModalOpenChange(nextOpen: boolean) {
+  showDetailsModal.value = nextOpen
+
+  if (!nextOpen) {
+    void closeRuleDetails()
+  }
+}
+
+function onEditFromDetails() {
+  if (!selectedRule.value) return
+
+  showDetailsModal.value = false
+  openEditModal(selectedRule.value, { restoreDetails: true })
+}
+
 async function onCreated() {
   await reload(1)
 }
 
 async function onUpdated() {
   await reload(page.value)
+
+  if (selectedRuleId.value) {
+    await loadSelectedRule(selectedRuleId.value)
+  }
 }
 
 async function onDeleteConfirmed() {
   await reload(page.value)
 }
+
+watch(
+  selectedRuleId,
+  async (ruleId) => {
+    if (!ruleId) {
+      showDetailsModal.value = false
+      clearSelectedRule()
+      restoreDetailsAfterEdit.value = false
+      return
+    }
+
+    showDetailsModal.value = true
+    await loadSelectedRule(ruleId)
+  },
+  { immediate: true },
+)
+
+watch(showEditModal, (isOpen, wasOpen) => {
+  if (!isOpen && wasOpen && restoreDetailsAfterEdit.value && selectedRuleId.value) {
+    showDetailsModal.value = true
+    restoreDetailsAfterEdit.value = false
+  }
+})
 
 await reload()
 </script>
@@ -123,6 +196,7 @@ await reload()
         :is-active="rule.is_active"
         :toggling="Boolean(togglingById[rule.id])"
         @toggle-active="(nextIsActive) => onToggleActive(rule, nextIsActive)"
+        @view="openRuleDetails(rule.id)"
         @edit="openEditModal(rule)"
         @delete="openDeleteModal(rule.id)"
       />
@@ -139,6 +213,14 @@ await reload()
     />
 
     <RuleCreateModal v-model:open="showCreateModal" @created="onCreated" />
+    <RuleDetailsModal
+      :open="showDetailsModal"
+      :rule="selectedRule"
+      :loading="loadingSelectedRule"
+      show-edit-action
+      @update:open="onDetailsModalOpenChange"
+      @edit="onEditFromDetails"
+    />
     <RuleEditModal v-model:open="showEditModal" :rule="ruleToEdit" @updated="onUpdated" />
     <RuleDeleteModal
       v-model:open="showDeleteModal"

@@ -27,6 +27,7 @@
       "save": "Enregistrer",
       "signIn": "Se connecter",
       "submit": "Valider",
+      "view": "Voir le détail",
       "viewNextLessons": "Voir les prochains cours",
       "viewSelectedClassroom": "Voir la classe sélectionnée"
     },
@@ -546,6 +547,17 @@
     "threshold": "Seuil : {count}",
     "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
     "dueAfterLessons": "Échéance : au prochain cours | Échéance : après {count} cours",
+    "details": {
+      "description": "Consultez la configuration complète de cette règle d'automatisation.",
+      "triggerFlow": "Déclencheur vers conséquence",
+      "trigger": "Déclencheur",
+      "consequence": "Conséquence",
+      "createdAt": "Créée le",
+      "updatedAt": "Modifiée le",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "Aucune règle sélectionnée."
+    },
     "modes": {
       "at": "Au seuil exact",
       "every": "À chaque multiple",

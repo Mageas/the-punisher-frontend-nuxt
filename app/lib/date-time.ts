@@ -79,9 +79,9 @@ function formatOffset(offsetMs: number): string {
 
 function formatRfc3339WithOffsetParts(value: DateTimeParts, offsetMs: number): string {
   return (
-    `${padTimeUnit(value.year, 4)}-${padTimeUnit(value.month)}-${padTimeUnit(value.day)}`
-    + `T${padTimeUnit(value.hour)}:${padTimeUnit(value.minute)}:${padTimeUnit(value.second)}`
-    + `.${padTimeUnit(value.millisecond, 3)}${formatOffset(offsetMs)}`
+    `${padTimeUnit(value.year, 4)}-${padTimeUnit(value.month)}-${padTimeUnit(value.day)}` +
+    `T${padTimeUnit(value.hour)}:${padTimeUnit(value.minute)}:${padTimeUnit(value.second)}` +
+    `.${padTimeUnit(value.millisecond, 3)}${formatOffset(offsetMs)}`
   )
 }
 
@@ -126,7 +126,10 @@ function getOffsetFormatter(timeZone: string): Intl.DateTimeFormat {
   return formatter
 }
 
-function getRequiredPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes): string {
+function getRequiredPart(
+  parts: Intl.DateTimeFormatPart[],
+  type: Intl.DateTimeFormatPartTypes,
+): string {
   const part = parts.find((item) => item.type === type)
 
   if (!part) {
@@ -169,7 +172,7 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
   const minutesText = match[3]
   const hours = Number.parseInt(hoursText, 10)
   const minutes = Number.parseInt(minutesText ?? '0', 10)
-  const totalMs = ((hours * 60) + minutes) * 60_000
+  const totalMs = (hours * 60 + minutes) * 60_000
 
   return sign === '+' ? totalMs : -totalMs
 }
@@ -328,13 +331,16 @@ export function applyTimeInputToDate(
 
   if (options.timeZone) {
     const zonedDateTimeParts = getDateTimePartsInTimeZone(date, options.timeZone)
-    const nextDate = dateFromTimeZoneParts({
-      ...zonedDateTimeParts,
-      hour: hours,
-      minute: minutes,
-      second: seconds,
-      millisecond: milliseconds,
-    }, options.timeZone)
+    const nextDate = dateFromTimeZoneParts(
+      {
+        ...zonedDateTimeParts,
+        hour: hours,
+        minute: minutes,
+        second: seconds,
+        millisecond: milliseconds,
+      },
+      options.timeZone,
+    )
 
     date.setTime(nextDate.getTime())
     return date
@@ -357,15 +363,18 @@ export function serializeDateValueWithTime({
   const { hours, minutes } = resolveTimeInput(timeValue, fallbackTime ?? '08:00')
   const { seconds, milliseconds } = resolveSubMinutePrecision(preserveSubMinuteFrom)
 
-  const date = dateFromTimeZoneParts({
-    year: dateValue.year,
-    month: dateValue.month,
-    day: dateValue.day,
-    hour: hours,
-    minute: minutes,
-    second: seconds,
-    millisecond: milliseconds,
-  }, resolvedTimeZone)
+  const date = dateFromTimeZoneParts(
+    {
+      year: dateValue.year,
+      month: dateValue.month,
+      day: dateValue.day,
+      hour: hours,
+      minute: minutes,
+      second: seconds,
+      millisecond: milliseconds,
+    },
+    resolvedTimeZone,
+  )
 
   return toApiDateTimeString(date, resolvedTimeZone) ?? undefined
 }

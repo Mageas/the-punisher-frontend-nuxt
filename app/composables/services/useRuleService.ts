@@ -10,6 +10,10 @@ export function useRuleService() {
     return $api<PaginatedResponse<Rule>>('/rules', { params })
   }
 
+  async function getRule(ruleId: string) {
+    return $api<Rule>(`/rules/${ruleId}`)
+  }
+
   async function createRule(data: RuleCreateData) {
     return $api<Rule>('/rules', {
       method: 'POST',
@@ -31,6 +35,7 @@ export function useRuleService() {
   }
 
   return {
+    getRule,
     getRules,
     createRule,
     updateRule,

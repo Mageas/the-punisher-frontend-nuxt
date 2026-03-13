@@ -15,6 +15,7 @@ const translations: Record<
   'rules.threshold': (params) => `Seuil : ${readCount(params)}`,
   'rules.dueAfterDays': (params) => `Délai : ${readCount(params)} jours`,
   'rules.dueAfterLessons': (params) => `Échéance : après ${readCount(params)} cours`,
+  'common.actions.view': 'Voir le détail',
   'common.actions.edit': 'Modifier',
   'common.actions.delete': 'Supprimer',
 }
@@ -89,5 +90,28 @@ describe('RuleCard', () => {
     })
 
     expect(wrapper.text()).toContain('Échéance : après 2 cours')
+  })
+
+  it('emits view when the central content is clicked', async () => {
+    const wrapper = mount(RuleCard, {
+      props: {
+        name: 'Tolérance bavardage',
+        penaltyTypeName: 'Bavardage',
+        punishmentTypeName: 'Retenue',
+        threshold: 3,
+        dueAtMode: 'days',
+        dueAtAfterDays: 7,
+        dueAtAfterLessons: null,
+        mode: 'at',
+        isActive: true,
+      },
+      global: {
+        stubs,
+      },
+    })
+
+    await wrapper.get('button[aria-label="Voir le détail"]').trigger('click')
+
+    expect(wrapper.emitted('view')).toHaveLength(1)
   })
 })
