@@ -20,6 +20,7 @@ Ces règles s'appliquent uniquement aux tâches de développement ("dev").
   - `test.md`
   - `chore.md`
   - `docs.md` (si la tâche est majoritairement documentation)
+- Il faut que le titre et la description de l'Issue soient en francais.
 - Ne pas créer d'issue GitHub pour les tâches non-dev.
 - L'issue doit être basée sur le template choisi et complétée proprement (contexte, besoin, critères d'acceptation).
 
@@ -40,6 +41,8 @@ Ces règles s'appliquent uniquement aux tâches de développement ("dev").
   - `test: ...`
   - `chore: ...`
   - `docs: ...`
+- A la fin du message du commit, je veux référencer l'issue Github avec "(#number)", si il n'y a pas d'issue associée, mettre "(#?)".
+  - Exemple : "feat: keep only kpis in dashboard response (#112)"
 
 ## Définition pratique de "dev"
 

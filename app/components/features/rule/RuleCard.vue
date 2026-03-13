@@ -22,6 +22,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   toggleActive: [nextIsActive: boolean]
+  view: []
   edit: []
   delete: []
 }>()
@@ -54,7 +55,13 @@ const onUpdateModelValue = (value: boolean) => {
       @update:model-value="onUpdateModelValue"
     />
 
-    <div class="min-w-0 flex-1">
+    <button
+      type="button"
+      class="min-w-0 flex-1 rounded-md text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      :title="t('common.actions.view')"
+      :aria-label="t('common.actions.view')"
+      @click="emit('view')"
+    >
       <p class="text-sm font-semibold truncate">
         {{ props.name }}
       </p>
@@ -76,7 +83,7 @@ const onUpdateModelValue = (value: boolean) => {
           {{ dueLabel }}
         </span>
       </div>
-    </div>
+    </button>
 
     <div class="ml-auto flex shrink-0 items-center gap-1">
       <Button

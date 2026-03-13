@@ -240,7 +240,7 @@
   * **Liste (Punitions) :**
     * **Icone :** `Gavel`.
     * **Contenu :**
-      * Punitions automatiques : origine prioritaire `Auto par {Nom de règle}` avec icône de règle et lien vers `/rules`.
+      * Punitions automatiques : origine prioritaire `Auto par {Nom de règle}` avec icône de règle et lien vers `/rules?ruleId={id}` quand la règle est connue, sinon fallback vers `/rules`.
       * Fallback automatique sans règle exploitable : `Règle supprimée`.
       * Punitions manuelles : pas de libellé `Punition manuelle`, seules les métadonnées utiles sont affichées.
       * Type de punition et autres métadonnées affichés en zone secondaire.
@@ -256,9 +256,10 @@
   * **Header :** Titre "Règles d'automatisation" + Bouton "Nouvelle règle" (ouvre Modale).
   * **Liste des Règles :** Cartes larges.
   * **Gauche :** `Switch` (Toggle) pour activer/désactiver instantanément.
-  * **Centre :** titre principal `rule.name`, puis ligne secondaire "Trigger (ex: Bavardage) ➝ Conséquence (ex: Retenue)".
+  * **Centre :** titre principal `rule.name`, puis ligne secondaire "Trigger (ex: Bavardage) ➝ Conséquence (ex: Retenue)"; le bloc central ouvre une popup de détail.
   * **Détails :** Badge Mode "Au seuil exact" / "A chaque multiple", puis texte "Seuil: X" et rappel d'échéance ("Délai : 2 jours" ou "Échéance : après 2 cours").
   * **Droite :** Actions Edit/Delete (ouvrent Modale).
+  * **Détail :** la popup de détail est pilotée par l'URL `rules?ruleId={uuid}` pour permettre l'ouverture directe depuis une punition ou l'historique, sans créer de page `/:id`; elle peut afficher un bouton "Modifier".
   * **Création :** champ optionnel `Nom de la règle`. Si vide, fallback auto `from -> to`. Le formulaire expose aussi un sélecteur de mode d'échéance qui masque/affiche `due_at_after_days` ou `due_at_after_lessons`.
 
 ---
