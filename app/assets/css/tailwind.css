@@ -40,11 +40,13 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
   --color-caution: var(--caution);
 
   /* Subtle backgrounds (10% opacity) – icon wrappers, score badges */
@@ -152,11 +154,13 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --warning: oklch(0.828 0.189 84.429);
+  --warning-foreground: oklch(0.5 0.14 75);
   --success: oklch(0.792 0.209 151.711);
-  --success-foreground: oklch(0.627 0.194 149.214);
+  --success-foreground: oklch(0.5 0.17 150);
   --info: oklch(0.707 0.165 254.624);
-  --info-foreground: oklch(0.546 0.245 262.881);
+  --info-foreground: oklch(0.52 0.22 262);
   --danger: oklch(0.704 0.191 22.216);
+  --danger-foreground: oklch(0.5 0.2 22);
   --caution: oklch(0.75 0.183 55.934);
 
   /* Subtle backgrounds */
@@ -261,11 +265,13 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --warning: oklch(0.828 0.189 84.429);
+  --warning-foreground: oklch(0.828 0.189 84.429);
   --success: oklch(0.792 0.209 151.711);
   --success-foreground: oklch(0.792 0.209 151.711);
   --info: oklch(0.707 0.165 254.624);
   --info-foreground: oklch(0.707 0.165 254.624);
   --danger: oklch(0.704 0.191 22.216);
+  --danger-foreground: oklch(0.704 0.191 22.216);
   --caution: oklch(0.75 0.183 55.934);
 
   /* Subtle backgrounds (destructive changes in dark) */

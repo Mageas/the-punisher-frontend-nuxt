@@ -9,6 +9,8 @@ import {
 } from '~/types/api'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.schedule.slot') })
+
 const scheduleService = useScheduleService()
 const {
   globalError: fetchError,

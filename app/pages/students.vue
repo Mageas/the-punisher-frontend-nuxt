@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.students') })
+
 const {
   students,
   loading,

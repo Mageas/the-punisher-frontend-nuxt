@@ -36,7 +36,7 @@ const navGroups = computed(() => getAppNavigation((key) => String(t(key))))
   <SidebarProvider>
     <Sidebar>
       <AppSidebarBrand />
-      <SidebarContent>
+      <SidebarContent as="nav" :aria-label="t('ui.sidebar.navLabel')">
         <AppSidebarNavGroup
           v-for="group in navGroups"
           :key="group.label"

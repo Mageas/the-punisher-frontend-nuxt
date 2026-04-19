@@ -93,8 +93,8 @@ function eventDateTime(item: StudentHistoryItem): string {
                 class="text-xs"
                 :class="
                   item.resolved_at
-                    ? 'text-success border-success-border'
-                    : 'text-warning border-warning-border'
+                    ? 'text-success-foreground border-success-border'
+                    : 'text-warning-foreground border-warning-border'
                 "
               >
                 {{ item.resolved_at ? t('common.states.resolved') : t('common.states.pending') }}
@@ -102,7 +102,7 @@ function eventDateTime(item: StudentHistoryItem): string {
             </div>
             <p
               v-if="isPunishmentAutomated(item)"
-              class="mt-1 inline-flex items-center gap-1.5 text-xs text-info"
+              class="mt-1 inline-flex items-center gap-1.5 text-xs text-info-foreground"
             >
               <Scale class="h-3 w-3 shrink-0" />
               <NuxtLink
@@ -145,7 +145,7 @@ function eventDateTime(item: StudentHistoryItem): string {
                 :class="
                   item.used_at
                     ? 'bg-secondary text-muted-foreground'
-                    : 'bg-warning-bg-subtle text-warning'
+                    : 'bg-warning-bg-subtle text-warning-foreground'
                 "
               >
                 +{{ item.points }}
@@ -154,7 +154,7 @@ function eventDateTime(item: StudentHistoryItem): string {
                 variant="outline"
                 class="text-xs"
                 :class="
-                  item.used_at ? 'text-muted-foreground' : 'text-success border-success-border'
+                  item.used_at ? 'text-muted-foreground' : 'text-success-foreground border-success-border'
                 "
               >
                 {{ item.used_at ? t('common.states.used') : t('common.states.available') }}

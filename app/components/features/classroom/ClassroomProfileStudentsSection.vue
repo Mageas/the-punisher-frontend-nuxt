@@ -293,7 +293,7 @@ watch(
 
         <div class="flex items-center gap-1.5 text-xs">
           <span
-            class="inline-flex items-center gap-1 rounded-full bg-warning-bg-subtle px-2 py-0.5 font-bold text-warning"
+            class="inline-flex items-center gap-1 rounded-full bg-warning-bg-subtle px-2 py-0.5 font-bold text-warning-foreground"
           >
             <Star class="h-3 w-3" />
             {{ formatBonusPoints(student.available_bonus_points) }}
@@ -325,7 +325,7 @@ watch(
 
         <div class="flex items-center gap-1.5 text-xs">
           <span
-            class="inline-flex items-center gap-1 rounded-full bg-warning-bg-subtle px-2 py-0.5 font-bold text-warning"
+            class="inline-flex items-center gap-1 rounded-full bg-warning-bg-subtle px-2 py-0.5 font-bold text-warning-foreground"
           >
             <Star class="h-3 w-3" />
             {{ formatBonusPoints(student.available_bonus_points) }}

@@ -373,7 +373,7 @@ onBeforeUnmount(() => {
                     : t('schedule.noClassrooms')
                 }}
               </p>
-              <p class="truncate leading-tight text-muted-foreground">
+              <p class="truncate leading-tight text-foreground">
                 {{ pos.slot.start_time }} – {{ pos.slot.end_time }}
               </p>
             </div>

@@ -13,7 +13,7 @@ const props = withDefaults(
 const slots = useSlots()
 
 const toneClass = computed(() => {
-  if (props.tone === 'info') return 'text-info'
+  if (props.tone === 'info') return 'text-info-foreground'
   if (props.tone === 'default') return 'text-foreground'
   return 'text-muted-foreground'
 })

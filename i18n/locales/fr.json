@@ -173,7 +173,9 @@
     "sidebar": {
       "title": "Barre latérale",
       "mobileDescription": "Affiche la barre latérale mobile.",
-      "toggle": "Afficher ou masquer la barre latérale"
+      "toggle": "Afficher ou masquer la barre latérale",
+      "navLabel": "Navigation principale",
+      "userMenuLabel": "Menu utilisateur"
     }
   },
   "sidebar": {
@@ -547,6 +549,7 @@
     "threshold": "Seuil : {count}",
     "dueAfterDays": "Délai : {count} jour | Délai : {count} jours",
     "dueAfterLessons": "Échéance : au prochain cours | Échéance : après {count} cours",
+    "toggleActive": "Activer ou désactiver la règle",
     "details": {
       "description": "Consultez la configuration complète de cette règle d'automatisation.",
       "triggerFlow": "Déclencheur vers conséquence",
@@ -672,7 +675,10 @@
       "legend": "Légende",
       "listTitle": "Exceptions configurées",
       "deleteTitle": "Supprimer l'exception",
-      "deleteMessage": "Êtes-vous sûr de vouloir supprimer cette exception ?"
+      "deleteMessage": "Êtes-vous sûr de vouloir supprimer cette exception ?",
+      "previousYear": "Année précédente",
+      "nextYear": "Année suivante",
+      "dayLabel": "{day} {month} {year}"
     }
   }
 }

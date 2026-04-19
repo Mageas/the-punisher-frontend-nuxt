@@ -3,6 +3,8 @@ import { Gift, Pencil, Trash2 } from 'lucide-vue-next'
 import type { Bonus } from '~/types/api'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.bonuses') })
+
 const route = useRoute()
 const {
   bonuses,

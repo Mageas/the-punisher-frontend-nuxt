@@ -2,6 +2,8 @@
 import { School, ShieldAlert, Users } from 'lucide-vue-next'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.dangerZone') })
+
 const { deleteAllStudents: deleteAllStudentsRequest } = useStudents()
 const { deleteAllClassrooms: deleteAllClassroomsRequest } = useClassrooms()
 

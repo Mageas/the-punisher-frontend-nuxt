@@ -24,6 +24,9 @@ const classroomId = computed<string>(() => {
 const { kpis: classroomKpis, fetchKpis: fetchClassroomKpis } = useClassroomKpis(classroomId)
 
 const classroom = ref<Classroom | null>(null)
+useSeoMeta({
+  title: () => classroom.value?.name || t('common.titles.classes'),
+})
 const classroomStudents = ref<Student[]>([])
 const loading = ref(false)
 const { isPending: submittingAddStudent, withPending: withAddStudentSubmitting } =

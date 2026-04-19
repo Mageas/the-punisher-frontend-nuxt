@@ -5,6 +5,8 @@ import { parseDate } from '@internationalized/date'
 import { toast } from 'vue-sonner'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.schedule.exception') })
+
 const { formatDateValue, getExceptionDayCount } = useScheduleExceptionFormatting()
 const scheduleService = useScheduleService()
 const { notifyCreateSuccess, notifyUpdateSuccess } = useActionToast()

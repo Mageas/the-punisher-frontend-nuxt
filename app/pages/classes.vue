@@ -4,6 +4,8 @@ import type { Classroom, DashboardKpis } from '~/types/api'
 import { formatRatio } from '~/lib/kpi-formatters'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.classes') })
+
 const classroomService = useClassroomService()
 const {
   classrooms,
@@ -131,9 +133,9 @@ await reload()
         class="flex flex-col rounded-lg border border-border p-5 transition-colors hover:bg-secondary-hover"
       >
         <div class="mb-3 flex items-center justify-between gap-2">
-          <h3 class="text-base font-semibold">
+          <h2 class="text-base font-semibold">
             {{ classroom.name }}
-          </h3>
+          </h2>
           <Badge variant="outline" class="text-muted-foreground text-xs">
             {{ classroom.year }}
           </Badge>
@@ -156,7 +158,7 @@ await reload()
 
             <div
               v-if="extraStudentsCount(classroom) > 0"
-              class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-secondary text-[10px] font-medium text-muted-foreground"
+              class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-secondary text-[10px] font-medium text-secondary-foreground"
             >
               +{{ extraStudentsCount(classroom) }}
             </div>

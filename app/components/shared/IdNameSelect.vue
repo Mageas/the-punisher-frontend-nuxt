@@ -178,6 +178,7 @@ watch(
         role="combobox"
         :disabled="props.disabled"
         :aria-expanded="open"
+        :aria-label="selectedLabel"
         :class="
           cn(
             'max-w-full justify-between overflow-hidden font-normal cursor-pointer hover:bg-accent hover:text-accent-foreground',

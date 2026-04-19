@@ -4,6 +4,8 @@ import { getApiErrorStatus } from '~/lib/api-error'
 import type { Rule } from '~/types/api'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.rules') })
+
 const { selectedRuleId, openRuleDetails, closeRuleDetails } = useRuleDetailsRouteState()
 const {
   rules,

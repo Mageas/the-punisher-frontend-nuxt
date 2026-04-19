@@ -2,6 +2,13 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      title: 'The Punisher',
+      titleTemplate: '%s · The Punisher',
+    },
+  },
   runtimeConfig: {
     apiBaseUrlServer:
       process.env.NUXT_API_BASE_URL_SERVER ||

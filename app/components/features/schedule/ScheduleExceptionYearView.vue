@@ -6,6 +6,8 @@ import { createMonth } from 'reka-ui/date'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
+const { t } = useI18n()
+
 const props = defineProps<{
   exceptions: ScheduleException[]
 }>()
@@ -148,20 +150,32 @@ function getCellClass(date: DateValue, month: number): string {
 <template>
   <div>
     <div class="mb-6 flex items-center justify-center gap-4">
-      <Button variant="outline" size="icon" class="h-8 w-8 cursor-pointer" @click="currentYear--">
+      <Button
+        variant="outline"
+        size="icon"
+        class="h-8 w-8 cursor-pointer"
+        :aria-label="t('schedule.exceptions.previousYear')"
+        @click="currentYear--"
+      >
         <ChevronLeft class="h-4 w-4" />
       </Button>
       <span class="text-lg font-semibold tabular-nums">{{ currentYear }}</span>
-      <Button variant="outline" size="icon" class="h-8 w-8 cursor-pointer" @click="currentYear++">
+      <Button
+        variant="outline"
+        size="icon"
+        class="h-8 w-8 cursor-pointer"
+        :aria-label="t('schedule.exceptions.nextYear')"
+        @click="currentYear++"
+      >
         <ChevronRight class="h-4 w-4" />
       </Button>
     </div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <div v-for="m in months" :key="m.month" class="rounded-lg border bg-card p-3">
-        <h3 class="mb-2 text-center text-sm font-medium capitalize">
+        <h2 class="mb-2 text-center text-sm font-medium capitalize">
           {{ m.label }}
-        </h3>
+        </h2>
         <div class="grid grid-cols-7 gap-px text-center text-xs">
           <div
             v-for="(day, index) in weekDayLabels"
@@ -171,27 +185,33 @@ function getCellClass(date: DateValue, month: number): string {
             {{ day }}
           </div>
           <template v-for="(week, wi) in m.grid.rows" :key="wi">
-            <button
-              v-for="(date, di) in week"
-              :key="`${wi}-${di}`"
-              type="button"
-              :disabled="!isInteractiveDate(date, m.month)"
-              :data-selected="isSelected(date, m.month) ? 'true' : undefined"
-              :data-boundary="isSelectionBoundary(date, m.month) ? 'true' : undefined"
-              :class="
-                cn(
-                  'flex h-6 w-full items-center justify-center rounded-sm text-xs transition-colors',
-                  'enabled:cursor-pointer enabled:hover:bg-calendar-hover-bg enabled:hover:text-calendar-hover-foreground',
-                  'focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:ring-2',
-                  'data-[selected=true]:bg-calendar-selection-bg data-[selected=true]:text-calendar-selection-foreground',
-                  'data-[boundary=true]:!bg-calendar-selection-boundary data-[boundary=true]:!text-calendar-selection-boundary-foreground',
-                  getCellClass(date, m.month),
-                )
-              "
-              @click="selectDate(date, m.month)"
-            >
-              {{ isCurrentMonth(date, m.month) ? date.day : '' }}
-            </button>
+            <template v-for="(date, di) in week" :key="`${wi}-${di}`">
+              <button
+                v-if="isInteractiveDate(date, m.month)"
+                type="button"
+                :aria-label="`${date.day} ${m.label} ${currentYear}`"
+                :data-selected="isSelected(date, m.month) ? 'true' : undefined"
+                :data-boundary="isSelectionBoundary(date, m.month) ? 'true' : undefined"
+                :class="
+                  cn(
+                    'flex h-6 w-full items-center justify-center rounded-sm text-xs transition-colors',
+                    'cursor-pointer hover:bg-calendar-hover-bg hover:text-calendar-hover-foreground',
+                    'focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:ring-2',
+                    'data-[selected=true]:bg-calendar-selection-bg data-[selected=true]:text-calendar-selection-foreground',
+                    'data-[boundary=true]:!bg-calendar-selection-boundary data-[boundary=true]:!text-calendar-selection-boundary-foreground',
+                    getCellClass(date, m.month),
+                  )
+                "
+                @click="selectDate(date, m.month)"
+              >
+                {{ date.day }}
+              </button>
+              <div
+                v-else
+                aria-hidden="true"
+                class="flex h-6 w-full items-center justify-center rounded-sm text-xs text-muted-foreground/30"
+              />
+            </template>
           </template>
         </div>
       </div>

@@ -19,7 +19,7 @@ const hasStudentName = computed(() => Boolean(props.studentFirstName && props.st
 const displayedDate = computed(() => props.occurredAt ?? props.createdAt)
 const formattedPoints = computed(() => `+${props.points}`)
 const pointsBadgeClass = computed(() =>
-  props.usedAt ? 'bg-secondary text-muted-foreground' : 'bg-warning-bg-subtle text-warning',
+  props.usedAt ? 'bg-secondary text-secondary-foreground' : 'bg-warning-bg-subtle text-warning-foreground',
 )
 const secondaryLine = computed(() => {
   if (hasStudentName.value) return props.bonusTypeName

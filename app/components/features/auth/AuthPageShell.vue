@@ -6,10 +6,10 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center p-4">
+  <main class="flex min-h-screen items-center justify-center p-4">
     <div class="w-full max-w-sm">
       <AuthPageBrand :title="props.title" :subtitle="props.subtitle" />
       <slot />
     </div>
-  </div>
+  </main>
 </template>

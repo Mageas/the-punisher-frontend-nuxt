@@ -3,6 +3,8 @@ import { Pencil, Trash2 } from 'lucide-vue-next'
 import type { Penalty } from '~/types/api'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.penalties') })
+
 const route = useRoute()
 const {
   penalties,

@@ -14,7 +14,7 @@ const props = withDefaults(
 <template>
   <div
     class="rounded-lg border border-border"
-    :class="[{ 'opacity-60': props.dimmed }, props.compact ? 'p-3' : 'p-4']"
+    :class="[{ 'bg-muted/40': props.dimmed }, props.compact ? 'p-3' : 'p-4']"
   >
     <div class="flex items-start gap-3 sm:hidden">
       <slot name="icon" />
