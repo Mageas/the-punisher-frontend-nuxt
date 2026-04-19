@@ -46,11 +46,12 @@ const onUpdateModelValue = (value: boolean) => {
 <template>
   <div
     class="flex flex-wrap items-start gap-3 rounded-lg border border-border p-4 sm:flex-nowrap sm:items-center sm:gap-4"
-    :class="{ 'opacity-60': !props.isActive }"
+    :class="{ 'bg-muted/40': !props.isActive }"
   >
     <Switch
       :model-value="props.isActive"
       :disabled="props.toggling"
+      :aria-label="t('rules.toggleActive')"
       class="cursor-pointer"
       @update:model-value="onUpdateModelValue"
     />

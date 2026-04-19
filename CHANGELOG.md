@@ -1,5 +1,16 @@
 # Changelog
 
+## [2026-04-19]
+
+### Accessibilité
+- Audit axe-core automatisé via Playwright sur toutes les routes (script `scripts/a11y-audit.mjs`)
+- Ajout de `lang="fr"`, titre par défaut et template de titre global
+- Landmarks ARIA corrigés (`<main>` sur les pages publiques, `<aside>`/`<nav>` sur la sidebar)
+- Labels accessibles ajoutés sur les boutons icône (navigation calendrier, suppression d'exception, switch d'activation de règle, combobox de sélection)
+- Ordre des titres corrigé (`<h3>` remplacés par `<h2>` sur classes, exceptions, settings, danger zone)
+- Contraste des couleurs renforcé : nouveaux tokens `--warning-foreground` et `--danger-foreground`, assombrissement des variants `--success-foreground` et `--info-foreground` en mode clair, et remplacement des usages `text-*` par `text-*-foreground` dans les cartes et badges
+- Remplacement de `opacity-60` par `bg-muted/40` sur les cartes atténuées pour préserver le contraste du texte
+
 ## [2026-03-13]
 
 ### Ajouts

@@ -15,6 +15,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.createAccount') })
+
 const { register, isRegisterAllowed } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 

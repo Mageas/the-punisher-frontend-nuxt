@@ -5,6 +5,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.forgotPassword.title') })
+
 const { forgotPassword } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 

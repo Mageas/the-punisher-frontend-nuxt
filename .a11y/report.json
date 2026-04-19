@@ -1,0 +1,74 @@
+{
+  "totalViolations": 0,
+  "perPage": [
+    {
+      "path": "/login",
+      "violations": []
+    },
+    {
+      "path": "/register",
+      "violations": []
+    },
+    {
+      "path": "/forgot-password",
+      "violations": []
+    },
+    {
+      "path": "/",
+      "violations": []
+    },
+    {
+      "path": "/penalties",
+      "violations": []
+    },
+    {
+      "path": "/punishments",
+      "violations": []
+    },
+    {
+      "path": "/bonuses",
+      "violations": []
+    },
+    {
+      "path": "/students",
+      "violations": []
+    },
+    {
+      "path": "/classes",
+      "violations": []
+    },
+    {
+      "path": "/rules",
+      "violations": []
+    },
+    {
+      "path": "/penalty-types",
+      "violations": []
+    },
+    {
+      "path": "/punishment-types",
+      "violations": []
+    },
+    {
+      "path": "/bonus-types",
+      "violations": []
+    },
+    {
+      "path": "/schedule/slots",
+      "violations": []
+    },
+    {
+      "path": "/schedule/exceptions",
+      "violations": []
+    },
+    {
+      "path": "/settings",
+      "violations": []
+    },
+    {
+      "path": "/management/danger",
+      "violations": []
+    }
+  ],
+  "perRule": []
+}

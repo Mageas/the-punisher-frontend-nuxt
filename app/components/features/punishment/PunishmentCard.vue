@@ -114,7 +114,7 @@ const stateDescription = computed(() => {
         </template>
         <template v-if="isAutomated">
           <span class="mx-1.5">·</span>
-          <span class="inline-flex min-w-0 items-center gap-1 text-info">
+          <span class="inline-flex min-w-0 items-center gap-1 text-info-foreground">
             <Scale class="h-3 w-3 shrink-0" />
             <NuxtLink
               v-if="hasRuleLink"

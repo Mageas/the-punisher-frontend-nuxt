@@ -41,12 +41,12 @@ const { t } = useI18n()
     </div>
 
     <div class="ml-auto flex items-center gap-5 text-sm">
-      <div class="flex items-center gap-1.5 text-warning">
+      <div class="flex items-center gap-1.5 text-warning-foreground">
         <Star class="h-3.5 w-3.5" />
         <span class="font-medium">{{ formatPoints(props.student.available_bonus_points) }}</span>
       </div>
 
-      <div class="flex items-center gap-1.5 text-danger">
+      <div class="flex items-center gap-1.5 text-danger-foreground">
         <AlertCircle class="h-3.5 w-3.5" />
         <span class="font-medium">{{ props.student.penalty_count }}</span>
       </div>

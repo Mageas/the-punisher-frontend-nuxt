@@ -11,6 +11,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.actions.signIn') })
+
 const route = useRoute()
 const { login } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()

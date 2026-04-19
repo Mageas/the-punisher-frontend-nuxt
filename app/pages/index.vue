@@ -19,6 +19,8 @@ import {
 } from '~/composables/useTrackingOverviewSectionFilters'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.dashboard') })
+
 const nuxtApp = useNuxtApp()
 const route = useRoute()
 const router = useRouter()

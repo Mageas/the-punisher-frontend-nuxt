@@ -2,6 +2,8 @@
 import { FileWarning } from 'lucide-vue-next'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.punishmentTypes') })
+
 const typeService = useTypeService()
 
 const punishmentTypeServices = {

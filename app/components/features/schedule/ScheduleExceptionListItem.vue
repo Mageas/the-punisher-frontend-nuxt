@@ -89,6 +89,7 @@ const endLabel = computed(() => formatExceptionDate(props.exception.end_date))
         variant="ghost"
         size="icon"
         class="h-8 w-8 cursor-pointer text-muted-foreground hover:text-destructive"
+        :aria-label="t('common.actions.delete')"
         @click="emit('delete', props.exception.id)"
       >
         <Trash2 class="h-4 w-4" />

@@ -9,6 +9,8 @@ import {
 } from '~/lib/auth-form-validation'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.userSettings') })
+
 const { changePassword, logoutAll } = useAuth()
 const userStore = useUserStore()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()

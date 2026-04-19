@@ -2,6 +2,8 @@
 import { Trophy } from 'lucide-vue-next'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.bonusTypes') })
+
 const typeService = useTypeService()
 
 const bonusTypeServices = {

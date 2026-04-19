@@ -80,7 +80,7 @@ function onResolved() {
       :disabled="props.disabled"
       :badge-text="showCountBadge ? displayedBadgeText : undefined"
       :badge-help-text="props.badgeHelpText"
-      badge-class="border-danger-border text-danger"
+      badge-class="border-danger-border text-danger-foreground"
       :filter-options="props.filterOptions"
       :filter-value="props.filterValue"
       @update:page="emit('update:page', $event)"

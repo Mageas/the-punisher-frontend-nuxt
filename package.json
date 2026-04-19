@@ -36,6 +36,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
     "@nuxt/eslint": "^1.15.1",
     "@nuxt/test-utils": "^4.0.0",
     "@nuxtjs/tailwindcss": "7.0.0-beta.1",

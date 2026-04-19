@@ -17,6 +17,14 @@ import {
 const { t } = useI18n()
 const studentService = useStudentService()
 
+const student = ref<Student | null>(null)
+useSeoMeta({
+  title: () =>
+    student.value
+      ? `${student.value.first_name} ${student.value.last_name}`
+      : t('common.titles.students'),
+})
+
 definePageMeta({
   path: '/students/:studentId',
 })
@@ -28,7 +36,6 @@ const studentId = computed(() => {
   return (Array.isArray(routeStudentId) ? routeStudentId[0] : routeStudentId) as string
 })
 
-const student = ref<Student | null>(null)
 const kpis = ref<StudentKpis | null>(null)
 const loadingProfile = ref(false)
 

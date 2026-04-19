@@ -48,7 +48,7 @@ const iconWrapperClass = computed(() =>
       </div>
       <div class="flex-1 min-w-0" :class="props.contentClass">
         <div class="space-y-1">
-          <h3 class="text-sm font-semibold leading-none tracking-tight">{{ props.title }}</h3>
+          <h2 class="text-sm font-semibold leading-none tracking-tight">{{ props.title }}</h2>
           <p class="text-sm text-muted-foreground leading-relaxed">{{ props.description }}</p>
           <p v-if="props.disabledMessage" class="text-xs text-muted-foreground italic pt-1">
             {{ props.disabledMessage }}

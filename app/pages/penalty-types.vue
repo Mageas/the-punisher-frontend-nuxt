@@ -2,6 +2,8 @@
 import { AlertCircle } from 'lucide-vue-next'
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('common.titles.penaltyTypes') })
+
 const typeService = useTypeService()
 
 const penaltyTypeServices = {

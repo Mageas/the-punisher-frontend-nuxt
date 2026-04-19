@@ -12,6 +12,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.resetPassword.title') })
+
 const { resetPassword } = useAuth()
 const { fieldErrors, globalError, handleApiError, clearErrors, clearFieldError } = useApiErrors()
 

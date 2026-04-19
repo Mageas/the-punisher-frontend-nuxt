@@ -7,6 +7,8 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+useSeoMeta({ title: () => t('auth.confirmEmail.title') })
+
 const route = useRoute()
 const { confirmEmail, resendConfirmationEmail } = useAuth()
 
